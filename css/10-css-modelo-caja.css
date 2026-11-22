@@ -1,0 +1,766 @@
+#ej-anatomia .capa {
+    padding: 28px 24px 24px;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+#ej-anatomia .capa > .nombre {
+    display: block;
+    margin-top: -20px;
+    margin-bottom: 4px;
+}
+
+#ej-anatomia .margin {
+    border: 2px dashed #f97316;
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+#ej-anatomia .border {
+    background: #fde68a;
+    color: #854d0e;
+}
+
+#ej-anatomia .padding {
+    background: #bbf7d0;
+    color: #166534;
+}
+
+#ej-anatomia .content {
+    padding: 24px;
+    background: #bfdbfe;
+    color: #1e3a8a;
+    text-align: center;
+}
+
+#ej-anatomia .caja-real {
+    width: 260px;
+    margin: 24px;
+    padding: 20px;
+    border: 8px solid #4f46e5;
+    background: #e0e7ff;
+}
+
+
+#ej-sizing .caja {
+    width: 250px;
+    margin-bottom: 8px;
+    padding: 20px;
+    border: 6px solid #4f46e5;
+    background: #eef2ff;
+}
+
+#ej-sizing .content-box {
+    box-sizing: content-box;
+}
+
+#ej-sizing .border-box {
+    box-sizing: border-box;
+}
+
+#ej-sizing .regla {
+    width: 250px;
+    height: 10px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid #1f2937;
+    background: repeating-linear-gradient(90deg, #1f2937 0 1px, transparent 1px 25px);
+}
+
+
+#ej-botones .btn {
+    display: inline-block;
+    margin: 0 8px 12px 0;
+    padding: 10px 20px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#ej-botones .primario {
+    background: #4f46e5;
+    color: #ffffff;
+}
+
+#ej-botones .secundario {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+#ej-botones .contorno {
+    border-color: #4f46e5;
+    background: transparent;
+    color: #4f46e5;
+}
+
+#ej-botones .texto {
+    background: transparent;
+    color: #4f46e5;
+}
+
+#ej-botones .peligro {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+#ej-botones .pequeno {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+
+#ej-botones .grande {
+    padding: 16px 32px;
+    font-size: 1.15rem;
+}
+
+#ej-botones .pildora {
+    border-radius: 999px;
+}
+
+#ej-botones .redondo {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 1.3rem;
+}
+
+#ej-botones .bloque {
+    display: block;
+    width: 100%;
+}
+
+
+#ej-producto .producto {
+    max-width: 300px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgb(15 23 42 / 0.08);
+}
+
+#ej-producto .producto img {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+#ej-producto .cuerpo {
+    padding: 16px 20px 20px;
+}
+
+#ej-producto .cuerpo h3 {
+    margin: 0 0 4px;
+}
+
+#ej-producto .detalle {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+#ej-producto .precio {
+    margin: 12px 0 16px;
+    color: #4f46e5;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+#ej-producto .producto button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #4f46e5;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+
+#ej-perfil .perfil {
+    max-width: 360px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #ffffff;
+    text-align: center;
+}
+
+#ej-perfil .portada {
+    height: 110px;
+    background: linear-gradient(135deg, #4f46e5, #ec4899);
+}
+
+#ej-perfil .avatar {
+    display: block;
+    width: 96px;
+    height: 96px;
+    margin: -48px auto 0;
+    border: 4px solid #ffffff;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px #4f46e5;
+}
+
+#ej-perfil .perfil h3 {
+    margin: 12px 0 0;
+}
+
+#ej-perfil .usuario {
+    margin: 0;
+    color: #64748b;
+}
+
+#ej-perfil .stats {
+    margin-top: 16px;
+    padding: 16px 0;
+    border-top: 1px solid #e2e8f0;
+}
+
+#ej-perfil .stats span {
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+#ej-perfil .stats span + span {
+    border-left: 1px solid #e2e8f0;
+}
+
+#ej-perfil .stats strong {
+    display: block;
+    color: #0f172a;
+    font-size: 1.1rem;
+}
+
+
+#ej-margin .centrado {
+    max-width: 400px;
+    margin: 0 auto 16px;
+    padding: 16px;
+    border: 2px dashed #4f46e5;
+    background: #eef2ff;
+    text-align: center;
+}
+
+#ej-margin .derecha {
+    width: 220px;
+    margin: 0 0 16px auto;
+    padding: 12px;
+    background: #fef3c7;
+    text-align: center;
+}
+
+#ej-margin .colapso p {
+    margin: 24px 0;
+    padding: 8px 12px;
+    background: #dcfce7;
+}
+
+
+#ej-formas .formas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 20px;
+    align-items: center;
+}
+
+#ej-formas .forma {
+    display: grid;
+    place-items: center;
+    height: 100px;
+    background: #4f46e5;
+    color: #ffffff;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+#ej-formas .redondeado {
+    border-radius: 16px;
+}
+
+#ej-formas .circulo {
+    width: 100px;
+    justify-self: center;
+    border-radius: 50%;
+}
+
+#ej-formas .pildora {
+    height: 50px;
+    border-radius: 999px;
+}
+
+#ej-formas .hoja {
+    border-radius: 0 60px;
+    background: #16a34a;
+}
+
+#ej-formas .huevo {
+    width: 80px;
+    justify-self: center;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: #f59e0b;
+}
+
+#ej-formas .pestana {
+    border-radius: 16px 16px 0 0;
+}
+
+#ej-formas .ticket {
+    border-radius: 4px 24px;
+    background: #ec4899;
+}
+
+
+#ej-chat .chat {
+    max-width: 420px;
+    padding: 16px;
+    border-radius: 16px;
+    background: #f1f5f9;
+}
+
+#ej-chat .msg {
+    width: fit-content;
+    max-width: 75%;
+    margin-bottom: 8px;
+    padding: 10px 14px;
+    border-radius: 18px;
+}
+
+#ej-chat .recibido {
+    border-bottom-left-radius: 4px;
+    background: #ffffff;
+}
+
+#ej-chat .enviado {
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+    background: #4f46e5;
+    color: #ffffff;
+}
+
+#ej-chat .hora {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.7rem;
+    opacity: 0.7;
+    text-align: right;
+}
+
+
+#ej-bordes .estilos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+#ej-bordes .estilos div {
+    padding: 16px 8px;
+    border-width: 6px;
+    border-color: #4f46e5;
+    font-family: "Courier New", monospace;
+    text-align: center;
+}
+
+#ej-bordes .solid { border-style: solid; }
+#ej-bordes .dashed { border-style: dashed; }
+#ej-bordes .dotted { border-style: dotted; }
+#ej-bordes .double { border-style: double; }
+#ej-bordes .groove { border-style: groove; }
+#ej-bordes .ridge { border-style: ridge; }
+#ej-bordes .inset { border-style: inset; }
+#ej-bordes .outset { border-style: outset; }
+
+#ej-bordes .cupon {
+    max-width: 380px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 3px dashed #16a34a;
+    border-radius: 12px;
+    background: #f0fdf4;
+    text-align: center;
+}
+
+#ej-bordes .cupon p {
+    margin: 0;
+}
+
+#ej-bordes .cupon .descuento {
+    color: #15803d;
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+#ej-bordes .clave {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 18px;
+    border: 2px solid #16a34a;
+    border-radius: 6px;
+    background: #ffffff;
+    font-family: "Courier New", monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+}
+
+
+#ej-elevacion .niveles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 24px;
+    padding: 24px;
+    border-radius: 8px;
+    background: #f1f5f9;
+}
+
+#ej-elevacion .nivel {
+    padding: 24px 12px;
+    border-radius: 12px;
+    background: #ffffff;
+    font-size: 0.9rem;
+    text-align: center;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+#ej-elevacion .s1 { box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
+#ej-elevacion .s2 { box-shadow: 0 4px 8px rgb(0 0 0 / 0.1); }
+#ej-elevacion .s3 { box-shadow: 0 10px 24px rgb(0 0 0 / 0.14); }
+#ej-elevacion .s4 { box-shadow: 0 20px 48px rgb(0 0 0 / 0.22); }
+
+#ej-elevacion .s-color {
+    background: #4f46e5;
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgb(79 70 229 / 0.5);
+}
+
+#ej-elevacion .s-interior {
+    background: #e2e8f0;
+    box-shadow: inset 0 3px 8px rgb(0 0 0 / 0.2);
+}
+
+#ej-elevacion .s-anillo {
+    box-shadow: 0 0 0 4px #a5b4fc, 0 0 0 8px #e0e7ff;
+}
+
+#ej-elevacion .s-hover {
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+    cursor: pointer;
+}
+
+#ej-elevacion .s-hover:hover {
+    box-shadow: 0 20px 48px rgb(0 0 0 / 0.22);
+    transform: translateY(-6px);
+}
+
+
+#ej-outline .campo {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    margin-bottom: 4px;
+    padding: 10px;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+#ej-outline .con-border:focus {
+    outline: none;
+    border-width: 5px;
+    border-color: #4f46e5;
+}
+
+#ej-outline .con-outline:focus {
+    outline: 3px solid #4f46e5;
+    outline-offset: 3px;
+}
+
+#ej-outline .debajo {
+    margin: 0 0 20px;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+
+#ej-dimensiones .formatos {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 12px;
+    align-items: start;
+    margin-bottom: 24px;
+}
+
+#ej-dimensiones .miniatura {
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#ej-dimensiones .r-16-9 { aspect-ratio: 16 / 9; }
+#ej-dimensiones .r-1-1 { aspect-ratio: 1; }
+#ej-dimensiones .r-4-5 { aspect-ratio: 4 / 5; }
+
+#ej-dimensiones .lectura {
+    max-width: 45ch;
+    margin-bottom: 24px;
+    padding: 12px;
+    border: 1px dashed #94a3b8;
+}
+
+#ej-dimensiones .iguales {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+#ej-dimensiones .iguales div {
+    min-height: 120px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+
+#ej-object-fit .marcos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+#ej-object-fit figure {
+    margin: 0;
+    text-align: center;
+}
+
+#ej-object-fit img {
+    display: block;
+    width: 100%;
+    height: 160px;
+    border: 2px solid #4f46e5;
+    border-radius: 8px;
+    background: #e0e7ff;
+}
+
+#ej-object-fit .fill { object-fit: fill; }
+#ej-object-fit .contain { object-fit: contain; }
+#ej-object-fit .cover { object-fit: cover; }
+#ej-object-fit .cover-arriba { object-fit: cover; object-position: top; }
+
+#ej-object-fit figcaption {
+    margin-top: 6px;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+}
+
+
+#ej-overflow .modos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+}
+
+#ej-overflow .modo {
+    height: 110px;
+    padding: 8px;
+    border: 2px solid #4f46e5;
+    border-radius: 6px;
+    background: #ffffff;
+    font-size: 0.85rem;
+}
+
+#ej-overflow .visible { overflow: visible; }
+#ej-overflow .hidden { overflow: hidden; }
+#ej-overflow .scroll { overflow: scroll; }
+#ej-overflow .auto { overflow: auto; }
+
+#ej-overflow .terminos {
+    max-width: 520px;
+    height: 160px;
+    overflow-y: auto;
+    padding: 12px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    font-size: 0.9rem;
+}
+
+
+#ej-inline .demo {
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+#ej-inline .demo span {
+    margin: 8px;
+    padding: 12px;
+    border: 2px solid #4f46e5;
+    background: rgb(224 231 255 / 0.8);
+}
+
+#ej-inline .d-inline span { display: inline; }
+#ej-inline .d-inline-block span { display: inline-block; }
+#ej-inline .d-block span { display: block; }
+
+
+#ej-timeline .linea {
+    margin: 0 0 0 12px;
+    padding: 0 0 0 28px;
+    border-left: 3px solid #c7d2fe;
+    list-style: none;
+}
+
+#ej-timeline .linea li {
+    padding-bottom: 20px;
+}
+
+#ej-timeline .linea li:last-child {
+    padding-bottom: 0;
+}
+
+#ej-timeline .linea li::before {
+    content: "";
+    float: left;
+    width: 16px;
+    height: 16px;
+    margin: 4px 0 0 -37.5px;
+    border: 3px solid #4f46e5;
+    border-radius: 50%;
+    background: #ffffff;
+}
+
+#ej-timeline .linea li.hecho::before {
+    background: #4f46e5;
+}
+
+#ej-timeline .linea small {
+    display: block;
+    color: #64748b;
+}
+
+
+#ej-boleto .boleto {
+    max-width: 520px;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgb(15 23 42 / 0.12);
+}
+
+#ej-boleto .cabeza {
+    padding: 12px 20px;
+    background: #0f172a;
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+}
+
+#ej-boleto .ruta {
+    padding: 24px 20px;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-align: center;
+}
+
+#ej-boleto .ruta span {
+    padding: 0 16px;
+    color: #4f46e5;
+}
+
+#ej-boleto .datos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 16px 20px 20px;
+    border-top: 2px dashed #cbd5e1;
+    font-weight: 700;
+}
+
+#ej-boleto .datos small {
+    display: block;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+
+#ej-login .login {
+    max-width: 380px;
+    margin: 0 auto;
+    padding: 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 20px 48px rgb(15 23 42 / 0.12);
+}
+
+#ej-login .login h3 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+}
+
+#ej-login .sub {
+    margin: 0 0 24px;
+    color: #64748b;
+}
+
+#ej-login .login label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+#ej-login .login input {
+    display: block;
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 1rem;
+}
+
+#ej-login .login input:focus {
+    border-color: #4f46e5;
+    outline: 3px solid #c7d2fe;
+}
+
+#ej-login .login button {
+    width: 100%;
+    margin-top: 8px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #4f46e5;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#ej-login .pie {
+    margin: 24px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 0.9rem;
+    text-align: center;
+}
