@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>08. CSS: selectores</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <link rel="stylesheet" href="css/08-css-selectores.css">
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>08. CSS: selectores</h1>
+        <p>Un selector le dice al navegador <strong>a qué elementos</strong> se aplica una regla. Elegir bien el selector es la mitad del trabajo en CSS.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-basicos">Básicos</a></li>
+            <li><a href="#ej-menu">Combinadores</a></li>
+            <li><a href="#ej-tabla">Estructurales</a></li>
+            <li><a href="#ej-tareas">Estado</a></li>
+            <li><a href="#ej-formulario">Formularios</a></li>
+            <li><a href="#ej-atributos">Atributos</a></li>
+            <li><a href="#ej-revista">Pseudo-elementos</a></li>
+            <li><a href="#ej-especificidad">Especificidad</a></li>
+            <li><a href="#ej-faq">:target</a></li>
+            <li><a href="#ej-tabs">Pestañas</a></li>
+            <li><a href="#ej-precios">Precios</a></li>
+            <li><a href="#ej-buscador">:focus-within</a></li>
+            <li><a href="#ej-opciones">:has()</a></li>
+            <li><a href="#ej-vacio">:empty</a></li>
+            <li><a href="#ej-nth">Laboratorio nth</a></li>
+            <li><a href="#ej-is">:is() y :where()</a></li>
+            <li><a href="#ej-botones">Botones</a></li>
+            <li><a href="#ej-requerido">Registro</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Anatomía de una regla</h2>
+<pre>selector {
+    propiedad: valor;
+    propiedad: valor;
+}</pre>
+            <p>Esta página enlaza dos hojas de estilo: <code>css/base.css</code> da formato a la lección y <code>css/08-css-selectores.css</code> contiene solo los ejemplos. Cada ejemplo vive dentro de un contenedor con <code>id</code> para que sus reglas no afecten al resto de la página.</p>
+            <table>
+                <thead>
+                    <tr><th>Tipo</th><th>Ejemplo</th><th>Selecciona</th><th>Peso</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Universal</td><td><code>*</code></td><td>todos los elementos</td><td>0-0-0</td></tr>
+                    <tr><td>Elemento</td><td><code>p</code></td><td>todos los párrafos</td><td>0-0-1</td></tr>
+                    <tr><td>Clase</td><td><code>.destacado</code></td><td>elementos con <code>class="destacado"</code></td><td>0-1-0</td></tr>
+                    <tr><td>ID</td><td><code>#aviso</code></td><td>el elemento con <code>id="aviso"</code></td><td>1-0-0</td></tr>
+                    <tr><td>Atributo</td><td><code>[type="email"]</code></td><td>elementos con ese atributo</td><td>0-1-0</td></tr>
+                    <tr><td>Pseudo-clase</td><td><code>:hover</code></td><td>elementos en un estado</td><td>0-1-0</td></tr>
+                    <tr><td>Pseudo-elemento</td><td><code>::first-letter</code></td><td>una parte de un elemento</td><td>0-0-1</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="ej-basicos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Elemento, clase, ID y grupo</h2>
+            <p>Una noticia corta donde cada selector aplica un estilo distinto.</p>
+            <div class="resultado">
+                <h3>Nuevo horario de la biblioteca</h3>
+                <p>A partir del lunes, la biblioteca abrirá de <span class="destacado">8:00 a 20:00</span>.</p>
+                <p>Los sábados se mantiene el horario <span class="destacado">de 9:00 a 13:00</span>.</p>
+                <h4>Importante</h4>
+                <p id="aviso">El préstamo de libros se suspende durante la primera semana.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Nuevo horario de la biblioteca&lt;/h3&gt;
+&lt;p&gt;... de &lt;span class="destacado"&gt;8:00 a 20:00&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;... &lt;span class="destacado"&gt;de 9:00 a 13:00&lt;/span&gt;.&lt;/p&gt;
+&lt;h4&gt;Importante&lt;/h4&gt;
+&lt;p id="aviso"&gt;El préstamo de libros...&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>p {
+    color: #334155;
+}
+
+.destacado {
+    background: #fef08a;
+    font-weight: 700;
+}
+
+#aviso {
+    padding-left: 8px;
+    border-left: 4px solid #dc2626;
+    color: #dc2626;
+}
+
+h3,
+h4 {
+    color: #4f46e5;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-menu" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Combinadores: menú de navegación</h2>
+            <p>El enlace de la página actual se marca con la clase <code>activo</code>. Pasa el mouse sobre los demás.</p>
+            <div class="resultado">
+                <nav aria-label="Menú de ejemplo">
+                    <ul class="menu">
+                        <li><a href="#ej-menu">Inicio</a></li>
+                        <li><a href="#ej-menu" class="activo">Productos</a></li>
+                        <li><a href="#ej-menu">Nosotros</a></li>
+                        <li><a href="#ej-menu">Contacto</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <table class="teoria">
+                <tbody>
+                    <tr><td><code>A B</code></td><td>descendiente</td><td><code>B</code> dentro de <code>A</code>, a cualquier profundidad</td></tr>
+                    <tr><td><code>A &gt; B</code></td><td>hijo directo</td><td><code>B</code> justo dentro de <code>A</code></td></tr>
+                    <tr><td><code>A + B</code></td><td>hermano adyacente</td><td>el <code>B</code> que va justo después de <code>A</code></td></tr>
+                    <tr><td><code>A ~ B</code></td><td>hermanos siguientes</td><td>todos los <code>B</code> después de <code>A</code></td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;nav&gt;
+  &lt;ul class="menu"&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Inicio&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#" class="activo"&gt;Productos&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Nosotros&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Contacto&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.menu &gt; li {
+    display: inline-block;
+}
+
+.menu &gt; li + li {
+    border-left: 1px solid #475569;
+}
+
+.menu a {
+    padding: 12px 20px;
+    color: #cbd5e1;
+}
+
+.menu a:hover {
+    background: #334155;
+}
+
+.menu a.activo {
+    background: #4f46e5;
+    font-weight: 700;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tabla" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Pseudo-clases estructurales: tabla de calificaciones</h2>
+            <p>Filas alternas, resaltado al pasar el mouse y la última columna alineada a la derecha, sin agregar ni una clase al HTML.</p>
+            <div class="resultado">
+                <table>
+                    <thead>
+                        <tr><th>Estudiante</th><th>Materia</th><th>Nota</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Ana</td><td>Matemática</td><td>95</td></tr>
+                        <tr><td>Bruno</td><td>Historia</td><td>78</td></tr>
+                        <tr><td>Carla</td><td>Física</td><td>88</td></tr>
+                        <tr><td>Diego</td><td>Química</td><td>91</td></tr>
+                        <tr><td>Elena</td><td>Inglés</td><td>84</td></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr><td>Promedio</td><td></td><td>87.2</td></tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>tbody tr:nth-child(even) {
+    background: #f1f5f9;
+}
+
+tbody tr:hover {
+    background: #e0e7ff;
+}
+
+td:first-child {
+    font-weight: 700;
+}
+
+td:last-child,
+th:last-child {
+    text-align: right;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Otras variantes</figcaption>
+<pre>tr:nth-child(odd)     filas impares
+tr:nth-child(3)       solo la tercera
+tr:nth-child(3n)      cada tres filas
+tr:nth-child(-n + 3)  las tres primeras
+li:first-child        el primer hijo
+li:last-child         el último hijo
+p:first-of-type       el primer párrafo
+li:not(.activo)       todos menos .activo</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tareas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Pseudo-clases de estado: lista de tareas</h2>
+            <p>Marca las casillas. El texto se tacha y la fila cambia de color sin una sola línea de JavaScript.</p>
+            <div class="resultado">
+                <ul>
+                    <li><input type="checkbox" id="t1" checked> <label for="t1">Instalar Visual Studio Code</label></li>
+                    <li><input type="checkbox" id="t2" checked> <label for="t2">Crear la estructura HTML</label></li>
+                    <li><input type="checkbox" id="t3"> <label for="t3">Enlazar la hoja de estilos</label></li>
+                    <li><input type="checkbox" id="t4"> <label for="t4">Practicar los selectores</label></li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;ul&gt;
+  &lt;li&gt;
+    &lt;input type="checkbox" id="t1" checked&gt;
+    &lt;label for="t1"&gt;Instalar VS Code&lt;/label&gt;
+  &lt;/li&gt;
+  ...
+&lt;/ul&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>input:checked + label {
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+li:has(input:checked) {
+    background: #ecfdf5;
+    border-color: #6ee7b7;
+}
+
+li:not(:has(input:checked)) {
+    border-left: 4px solid #f59e0b;
+}</pre>
+                </figure>
+            </div>
+            <p><code>:has()</code> selecciona un elemento según lo que contiene: aquí, el <code>li</code> que tiene una casilla marcada.</p>
+        </section>
+
+        <section id="ej-formulario" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Formulario que se valida con CSS</h2>
+            <p>Escribe un correo mal formado o una contraseña corta: el borde y el mensaje de ayuda reaccionan solos.</p>
+            <div class="resultado">
+                <form action="#" onsubmit="return false">
+                    <label for="f-correo">Correo electrónico</label>
+                    <input type="email" id="f-correo" placeholder="nombre@correo.com" required>
+                    <p class="ayuda">Escribe un correo válido, por ejemplo ana@correo.com</p>
+
+                    <label for="f-clave">Contraseña</label>
+                    <input type="password" id="f-clave" placeholder="Mínimo 8 caracteres" minlength="8" required>
+                    <p class="ayuda">La contraseña necesita al menos 8 caracteres.</p>
+
+                    <label for="f-usuario">Usuario asignado</label>
+                    <input type="text" id="f-usuario" value="estudiante_2026" disabled>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>input:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px #c7d2fe;
+}
+
+input:valid:not(:placeholder-shown) {
+    border-color: #16a34a;
+}
+
+input:invalid:not(:placeholder-shown) {
+    border-color: #dc2626;
+}
+
+input:invalid:not(:placeholder-shown) + .ayuda {
+    display: block;
+}
+
+input:disabled {
+    background: #f1f5f9;
+    cursor: not-allowed;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué <code>:not(:placeholder-shown)</code></figcaption>
+<pre>Un campo vacío y required ya es :invalid,
+así que el formulario aparecería en rojo
+apenas carga la página.
+
+:placeholder-shown es verdadero mientras
+el campo está vacío. Con :not(...) el
+color solo aparece cuando el usuario
+ya escribió algo.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-atributos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Selectores de atributo: enlaces con icono automático</h2>
+            <p>El icono depende de a dónde apunta el enlace. No hay clases en el HTML.</p>
+            <div class="resultado">
+                <ul>
+                    <li><a href="https://developer.mozilla.org/es/" target="_blank" rel="noopener noreferrer">Documentación de MDN</a></li>
+                    <li><a href="programa-del-curso.pdf">Programa del curso</a></li>
+                    <li><a href="mailto:profesor@ejemplo.com">Escribir al profesor</a></li>
+                    <li><a href="tel:+50760000000">Llamar a la oficina</a></li>
+                    <li><a href="index.html">Volver al índice</a></li>
+                </ul>
+                <p><input type="text" placeholder="type=&quot;text&quot;"> <input type="password" placeholder="type=&quot;password&quot;"></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>a[href^="http"]::after {
+    content: " ↗";
+}
+
+a[href$=".pdf"]::before {
+    content: "📄 ";
+}
+
+a[href^="mailto:"]::before {
+    content: "✉️ ";
+}
+
+a[target="_blank"] {
+    font-style: italic;
+}
+
+input[type="password"] {
+    border: 2px solid #dc2626;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Operadores</figcaption>
+<pre>[attr]          tiene el atributo
+[attr="v"]      es exactamente v
+[attr^="v"]     empieza por v
+[attr$="v"]     termina en v
+[attr*="v"]     contiene v
+[attr~="v"]     contiene la palabra v</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-revista" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Pseudo-elementos: artículo de revista</h2>
+            <p>Letra capital, primera línea en versalitas, comillas decorativas y viñetas propias. Selecciona texto con el mouse para ver <code>::selection</code>.</p>
+            <div class="resultado">
+                <p>Hace más de treinta años, Tim Berners-Lee publicó la primera página web. Era un documento sencillo, con texto y enlaces, que explicaba cómo funcionaba el proyecto World Wide Web. Hoy existen miles de millones de páginas, pero todas siguen la misma idea: documentos conectados entre sí.</p>
+                <blockquote>La web es más una creación social que técnica.</blockquote>
+                <p>Las tres tecnologías que hacen posible la web moderna son:</p>
+                <ul>
+                    <li>HTML, para el contenido</li>
+                    <li>CSS, para la presentación</li>
+                    <li>JavaScript, para el comportamiento</li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>p:first-of-type::first-letter {
+    float: left;
+    margin-right: 8px;
+    color: #b45309;
+    font-size: 3.5rem;
+}
+
+p:first-of-type::first-line {
+    font-variant: small-caps;
+}
+
+blockquote::before {
+    content: "“";
+    color: #b45309;
+    font-size: 4rem;
+}
+
+li::marker {
+    content: "★ ";
+    color: #b45309;
+}
+
+::selection {
+    background: #b45309;
+    color: #ffffff;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Pseudo-clase vs pseudo-elemento</figcaption>
+<pre>:hover          un ESTADO del elemento
+                (un dos puntos)
+
+::first-letter  una PARTE del elemento
+                (dos dos puntos)
+
+::before y ::after crean contenido
+que no está en el HTML; necesitan
+la propiedad content.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-especificidad" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Especificidad: ¿qué regla gana?</h2>
+            <p>Los tres párrafos reciben varias reglas de color que compiten. Gana la más específica; si empatan, gana la última.</p>
+            <div class="resultado esp">
+                <p>Solo coincide con <code>.esp p</code>: gris.</p>
+                <p class="nota">También tiene <code>class="nota"</code>: verde.</p>
+                <p class="nota" id="nota-final">Además tiene <code>id="nota-final"</code>: rojo.</p>
+                <p class="nota forzado">Usa <code>!important</code>: morado, aunque haya un selector con ID.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.esp p              { color: #64748b; }   0-1-1
+.esp .nota          { color: #16a34a; }   0-2-0
+.esp #nota-final    { color: #dc2626; }   1-1-0
+
+.esp p              { font-weight: 700; }
+
+.esp .forzado       { color: #7c3aed !important; }
+.forzado { color: #0891b2; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo se cuenta</figcaption>
+<pre>IDs - clases/atributos/pseudo-clases - elementos
+
+1-0-0  gana a  0-9-9
+0-1-0  gana a  0-0-9
+
+Las reglas de font-weight no compiten
+con las de color: cada propiedad se
+resuelve por separado.
+
+!important se salta la especificidad.
+Úsalo como último recurso.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-faq" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2><code>:target</code>: preguntas frecuentes</h2>
+            <p>Haz clic en una pregunta. La URL cambia a <code>#faq-...</code> y la respuesta con ese <code>id</code> se resalta.</p>
+            <div class="resultado">
+                <p class="preguntas">
+                    <a href="#faq-envio">¿Cuánto tarda el envío?</a>
+                    <a href="#faq-pago">¿Qué formas de pago aceptan?</a>
+                    <a href="#faq-devolucion">¿Puedo devolver un producto?</a>
+                </p>
+                <div class="respuesta" id="faq-envio"><strong>Envío:</strong> entre 2 y 5 días hábiles dentro del país.</div>
+                <div class="respuesta" id="faq-pago"><strong>Pago:</strong> tarjeta, transferencia y pago contra entrega.</div>
+                <div class="respuesta" id="faq-devolucion"><strong>Devoluciones:</strong> tienes 30 días con el producto sin usar.</div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;a href="#faq-envio"&gt;¿Cuánto tarda el envío?&lt;/a&gt;
+...
+&lt;div class="respuesta" id="faq-envio"&gt;...&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.respuesta {
+    opacity: 0.5;
+}
+
+.respuesta:target {
+    border-color: #4f46e5;
+    background: #eef2ff;
+    opacity: 1;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tabs" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Hermanos generales <code>~</code>: pestañas solo con CSS</h2>
+            <p>Botones de radio ocultos controlan qué panel se ve. Es la ficha de un producto en una tienda en línea.</p>
+            <div class="resultado">
+                <input type="radio" name="tabs" id="tab-desc" checked>
+                <input type="radio" name="tabs" id="tab-spec">
+                <input type="radio" name="tabs" id="tab-opin">
+                <div class="pestanas">
+                    <label for="tab-desc">Descripción</label>
+                    <label for="tab-spec">Características</label>
+                    <label for="tab-opin">Opiniones</label>
+                </div>
+                <div class="panel" id="panel-desc">Audífonos inalámbricos con cancelación de ruido y 30 horas de batería.</div>
+                <div class="panel" id="panel-spec">Bluetooth 5.3 · Carga USB-C · Peso 250 g · Micrófono integrado.</div>
+                <div class="panel" id="panel-opin">★★★★☆ "Muy cómodos y el sonido es excelente." — María</div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;input type="radio" name="tabs" id="tab-desc" checked&gt;
+&lt;input type="radio" name="tabs" id="tab-spec"&gt;
+&lt;input type="radio" name="tabs" id="tab-opin"&gt;
+&lt;div class="pestanas"&gt;
+  &lt;label for="tab-desc"&gt;Descripción&lt;/label&gt;
+  ...
+&lt;/div&gt;
+&lt;div class="panel" id="panel-desc"&gt;...&lt;/div&gt;
+&lt;div class="panel" id="panel-spec"&gt;...&lt;/div&gt;
+&lt;div class="panel" id="panel-opin"&gt;...&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.panel {
+    display: none;
+}
+
+#tab-desc:checked ~ #panel-desc,
+#tab-spec:checked ~ #panel-spec,
+#tab-opin:checked ~ #panel-opin {
+    display: block;
+}
+
+#tab-desc:checked ~ .pestanas label[for="tab-desc"] {
+    border-color: #4f46e5;
+    color: #4f46e5;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-precios" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Tabla de precios: <code>:nth-child</code>, <code>:hover</code> y <code>:not()</code></h2>
+            <p>El plan del medio se destaca solo por su posición. Al pasar el mouse sobre uno, los demás se apagan.</p>
+            <div class="resultado">
+                <div class="planes">
+                    <div class="plan">
+                        <h3>Básico</h3>
+                        <p class="precio">$5</p>
+                        <ul><li>1 sitio web</li><li>10 GB</li><li>Soporte por correo</li></ul>
+                    </div>
+                    <div class="plan">
+                        <h3>Profesional</h3>
+                        <p class="precio">$12</p>
+                        <ul><li>5 sitios web</li><li>50 GB</li><li>Soporte por chat</li></ul>
+                    </div>
+                    <div class="plan">
+                        <h3>Empresa</h3>
+                        <p class="precio">$30</p>
+                        <ul><li>Sitios ilimitados</li><li>200 GB</li><li>Soporte 24/7</li></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.plan:nth-child(2) {
+    border-color: #4f46e5;
+    background: #eef2ff;
+}
+
+.plan:nth-child(2)::before {
+    content: "Más popular";
+}
+
+.planes:hover .plan:not(:hover) {
+    opacity: 0.45;
+}
+
+.plan:hover {
+    transform: translateY(-4px);
+}
+
+.plan li + li {
+    border-top: 1px solid #e2e8f0;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo se lee</figcaption>
+<pre>.planes:hover .plan:not(:hover)
+
+"cuando el mouse está sobre el
+contenedor .planes, selecciona
+cada .plan que NO tiene el mouse
+encima"
+
+li + li
+
+"cada li que tiene otro li justo
+antes": todos menos el primero.
+Así la línea divisoria no aparece
+arriba del primer elemento.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-buscador" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2><code>:focus-within</code>: buscador con sugerencias</h2>
+            <p>Haz clic en el campo. El contenedor se ilumina y aparecen sugerencias porque <em>algo dentro</em> tiene el foco.</p>
+            <div class="resultado">
+                <div class="caja">
+                    <span class="icono">🔍︎</span>
+                    <input type="search" placeholder="Buscar cursos..." aria-label="Buscar cursos">
+                </div>
+                <ul class="sugerencias">
+                    <li>Curso de HTML desde cero</li>
+                    <li>Diseño responsive con CSS</li>
+                    <li>JavaScript para principiantes</li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="caja"&gt;
+  &lt;span class="icono"&gt;🔍︎&lt;/span&gt;
+  &lt;input type="search" placeholder="Buscar cursos..."&gt;
+&lt;/div&gt;
+&lt;ul class="sugerencias"&gt;
+  &lt;li&gt;Curso de HTML desde cero&lt;/li&gt;
+  ...
+&lt;/ul&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.caja:focus-within {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 4px #c7d2fe;
+}
+
+.caja:focus-within .icono {
+    color: #4f46e5;
+}
+
+.sugerencias {
+    display: none;
+}
+
+.caja:focus-within + .sugerencias {
+    display: block;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-opciones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2><code>:has()</code>: tarjetas de opción en un checkout</h2>
+            <p>Elige un método de envío. La tarjeta elegida se marca y aparece un aviso distinto según la opción.</p>
+            <div class="resultado">
+                <form action="#" onsubmit="return false">
+                    <label><input type="radio" name="envio" value="estandar"> <strong>Estándar</strong> · 5 días · Gratis</label>
+                    <label><input type="radio" name="envio" value="express"> <strong>Express</strong> · 24 horas · $8</label>
+                    <label><input type="radio" name="envio" value="tienda"> <strong>Recoger en tienda</strong> · Hoy · Gratis</label>
+                    <p class="aviso sin-eleccion">Selecciona un método de envío para continuar.</p>
+                    <p class="aviso aviso-express">Los pedidos express hechos después de las 3:00 p. m. salen al día siguiente.</p>
+                    <p class="aviso aviso-tienda">Te avisaremos por correo cuando tu pedido esté listo para retirar.</p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form&gt;
+  &lt;label&gt;
+    &lt;input type="radio" name="envio" value="express"&gt;
+    Express
+  &lt;/label&gt;
+  ...
+  &lt;p class="aviso sin-eleccion"&gt;...&lt;/p&gt;
+  &lt;p class="aviso aviso-express"&gt;...&lt;/p&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>label:has(input:checked) {
+    border-color: #4f46e5;
+    background: #eef2ff;
+}
+
+label:has(input:checked)::after {
+    content: "✔";
+    float: right;
+}
+
+.aviso {
+    display: none;
+}
+
+form:has(input[value="express"]:checked) .aviso-express {
+    display: block;
+}
+
+form:has(input:checked) .sin-eleccion {
+    display: none;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-vacio" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2><code>:empty</code>: notificaciones, carrito y horario</h2>
+            <p>Un elemento sin contenido se puede ocultar o rellenar con un mensaje, sin tocar el HTML.</p>
+            <div class="resultado">
+                <p>Mensajes <span class="badge">3</span> · Alertas <span class="badge"></span> · Pedidos <span class="badge">12</span></p>
+                <h3>Carrito de Ana</h3>
+                <ul class="carrito"><li>Camiseta azul · $15</li><li>Gorra negra · $9</li></ul>
+                <h3>Carrito de Luis</h3>
+                <ul class="carrito"></ul>
+                <h3>Horario</h3>
+                <table>
+                    <thead><tr><th>Hora</th><th>Lunes</th><th>Martes</th><th>Miércoles</th></tr></thead>
+                    <tbody>
+                        <tr><td>8:00</td><td>HTML</td><td></td><td>CSS</td></tr>
+                        <tr><td>10:00</td><td></td><td>JavaScript</td><td></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.badge:empty {
+    display: none;
+}
+
+.carrito:empty::before {
+    content: "Tu carrito está vacío 🛒";
+    color: #94a3b8;
+}
+
+td:empty {
+    background: repeating-linear-gradient(
+        45deg, #f1f5f9, #f1f5f9 6px,
+        #ffffff 6px, #ffffff 12px);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cuidado</figcaption>
+<pre>&lt;ul class="carrito"&gt;&lt;/ul&gt;     es :empty
+
+&lt;ul class="carrito"&gt;
+&lt;/ul&gt;                         NO es :empty
+
+Un salto de línea o un espacio
+cuentan como contenido.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-nth" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Laboratorio de <code>:nth-child</code></h2>
+            <p>Diez casillas por fila. Cada fila usa una fórmula distinta; las casillas seleccionadas se pintan.</p>
+            <div class="resultado">
+                <code>:nth-child(odd)</code>
+                <div class="fila f1"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+                <code>:nth-child(3n)</code>
+                <div class="fila f2"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+                <code>:nth-child(-n + 3)</code>
+                <div class="fila f3"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+                <code>:nth-child(n + 6)</code>
+                <div class="fila f4"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+                <code>:nth-child(n + 3):nth-child(-n + 7)</code>
+                <div class="fila f5"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+                <code>:nth-last-child(-n + 2)</code>
+                <div class="fila f6"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+                <code>:not(:nth-child(5))</code>
+                <div class="fila f7"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>La fórmula <code>an + b</code></figcaption>
+<pre>n toma los valores 0, 1, 2, 3...
+
+3n       →  0, 3, 6, 9         cada tres
+2n + 1   →  1, 3, 5, 7         impares (odd)
+-n + 3   →  3, 2, 1            las tres primeras
+n + 6    →  6, 7, 8, 9...      desde la sexta
+
+Combinar dos = intersección:
+:nth-child(n + 3):nth-child(-n + 7)
+→ de la 3 a la 7</pre>
+                </figure>
+                <figure>
+                    <figcaption>Dónde se usa</figcaption>
+<pre>Filas alternas en tablas
+Quitar el margen de la última tarjeta
+Destacar los 3 primeros de un ranking
+Cambiar el color cada 4 fotos
+Mostrar solo los 5 primeros comentarios</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-is" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2><code>:is()</code> y <code>:where()</code>: agrupar selectores</h2>
+            <p>Escriben menos código cuando varias combinaciones comparten estilo. La diferencia está en la especificidad.</p>
+            <div class="resultado">
+                <article>
+                    <h3>Artículo principal</h3>
+                    <h4>Subtítulo del artículo</h4>
+                </article>
+                <aside>
+                    <h4>Nota al margen</h4>
+                </aside>
+                <div class="caja-is"><p>Dentro de <code>:is(.caja-is)</code>: rojo, porque <code>:is()</code> suma el peso de la clase y gana a <code>p</code>.</p></div>
+                <div class="caja-where"><p>Dentro de <code>:where(.caja-where)</code>: gris, porque <code>:where()</code> pesa cero y empata con <code>p</code>, que va después y gana.</p></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Sin <code>:is()</code></figcaption>
+<pre>article h3::before,
+article h4::before,
+aside h3::before,
+aside h4::before {
+    content: "▸ ";
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Con <code>:is()</code></figcaption>
+<pre>:is(article, aside) :is(h3, h4)::before {
+    content: "▸ ";
+}
+
+:is(.caja-is) p {
+    color: #dc2626;
+}
+
+:where(.caja-where) p {
+    color: #dc2626;
+}
+
+p {
+    color: #334155;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-botones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Estados de botones y enlaces</h2>
+            <p>Pasa el mouse, mantén presionado y navega con la tecla <kbd>Tab</kbd> para ver cada estado.</p>
+            <div class="resultado">
+                <a href="#ej-botones" class="boton">Enlace con forma de botón</a>
+                <button type="button" class="boton">Botón normal</button>
+                <button type="button" class="boton" disabled>Botón deshabilitado</button>
+                <p><a class="enlace" href="index.html">Enlace ya visitado</a> · <a class="enlace" href="pagina-que-no-has-visitado.html">Enlace sin visitar</a></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.boton:hover {
+    background: #4338ca;
+}
+
+.boton:active {
+    transform: translateY(2px) scale(0.98);
+}
+
+.boton:focus-visible {
+    outline: 3px solid #f59e0b;
+    outline-offset: 3px;
+}
+
+.boton:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+}
+
+a.enlace:link    { color: #1d4ed8; }
+a.enlace:visited { color: #7c3aed; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Orden recomendado (LoVe HAte)</figcaption>
+<pre>:link      enlace sin visitar
+:visited   enlace ya visitado
+:hover     mouse encima
+:focus     tiene el foco
+:active    se está presionando
+
+:focus-visible solo aparece cuando
+se navega con teclado, no al hacer
+clic con el mouse.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-requerido" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Formulario de registro: asterisco automático</h2>
+            <p>Los campos obligatorios reciben un <code>*</code> en su etiqueta y los opcionales un borde punteado. Todo depende de los atributos <code>required</code> y <code>readonly</code> del HTML.</p>
+            <div class="resultado">
+                <form action="#" onsubmit="return false">
+                    <label for="r-nombre">Nombre completo</label>
+                    <input type="text" id="r-nombre" placeholder="Ej. Ana Pérez" required>
+                    <label for="r-correo">Correo</label>
+                    <input type="email" id="r-correo" placeholder="ana@correo.com" required>
+                    <label for="r-telefono">Teléfono</label>
+                    <input type="tel" id="r-telefono" placeholder="Opcional">
+                    <label for="r-codigo">Código de estudiante</label>
+                    <input type="text" id="r-codigo" value="EST-2026-0142" readonly>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label for="r-nombre"&gt;Nombre completo&lt;/label&gt;
+&lt;input id="r-nombre" required&gt;
+
+&lt;label for="r-telefono"&gt;Teléfono&lt;/label&gt;
+&lt;input id="r-telefono"&gt;
+
+&lt;label for="r-codigo"&gt;Código&lt;/label&gt;
+&lt;input id="r-codigo" value="EST-2026-0142" readonly&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>label:has(+ input:required)::after {
+    content: " *";
+    color: #dc2626;
+}
+
+input:optional {
+    border-style: dashed;
+}
+
+input::placeholder {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+input:read-only {
+    background: #f8fafc;
+    color: #64748b;
+}</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="07-html-incrustados.html">Anterior: imágenes e incrustados</a> |
+            <a href="index.html">Índice</a> |
+            <a href="09-css-colores-texto.html">Siguiente: colores y texto</a>
+        </nav>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16. CSS: variables y temas</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <link rel="stylesheet" href="css/16-css-variables-temas.css">
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>16. CSS: variables y temas</h1>
+        <p>Las <strong>variables CSS</strong> (su nombre oficial es <em>custom properties</em>) guardan un valor con un nombre para reutilizarlo en muchos lugares. Cambias el valor en un solo sitio y se actualiza todo: colores de marca, modo oscuro, temas, tamaños y espaciados. Son la base de cualquier sistema de diseño moderno.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-declarar">Declarar y usar</a></li>
+            <li><a href="#ej-respaldo">Valor de respaldo</a></li>
+            <li><a href="#ej-herencia">Herencia y alcance</a></li>
+            <li><a href="#ej-cafeteria">Paleta de marca</a></li>
+            <li><a href="#ej-laboratorio">Laboratorio</a></li>
+            <li><a href="#ej-modo-oscuro">Modo oscuro</a></li>
+            <li><a href="#ej-tema-auto">Tema automático</a></li>
+            <li><a href="#ej-temas-marca">Tres temas</a></li>
+            <li><a href="#ej-botones">Variantes de botón</a></li>
+            <li><a href="#ej-escala">Escalas</a></li>
+            <li><a href="#ej-calc">Variables y calc()</a></li>
+            <li><a href="#ej-consultas">Media y container queries</a></li>
+            <li><a href="#ej-color-mix">color-mix()</a></li>
+            <li><a href="#ej-alertas">Alertas con hsl()</a></li>
+            <li><a href="#ej-medidores">Barras y estrellas</a></li>
+            <li><a href="#ej-perfil">Perfiles</a></li>
+            <li><a href="#ej-tokens">Design tokens</a></li>
+            <li><a href="#ej-property">@property</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Declarar, usar y redefinir</h2>
+            <p>Una variable CSS es una propiedad cuyo nombre empieza con <strong>dos guiones</strong>. Se declara dentro de una regla, como cualquier otra propiedad, y se lee con la función <code>var()</code>. Igual que <code>color</code> o <code>font-family</code>, <strong>se hereda</strong> a todos los descendientes.</p>
+            <table>
+                <thead>
+                    <tr><th>Sintaxis</th><th>Qué hace</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>--color-marca: #7c3aed;</code></td><td>declara la variable</td></tr>
+                    <tr><td><code>var(--color-marca)</code></td><td>usa su valor</td></tr>
+                    <tr><td><code>var(--color-marca, gray)</code></td><td>usa <code>gray</code> si la variable no existe</td></tr>
+                    <tr><td><code>calc(var(--n) * 1px)</code></td><td>convierte un número en una medida</td></tr>
+                    <tr><td><code>hsl(var(--h) 70% 50%)</code></td><td>arma un color a partir de un número</td></tr>
+                    <tr><td><code>color-mix(in srgb, var(--c) 20%, white)</code></td><td>mezcla colores para crear variantes</td></tr>
+                    <tr><td><code>@property --x { ... }</code></td><td>le da un tipo a la variable para poder animarla</td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Dónde se declara</th><th>Alcance</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>:root { ... }</code></td><td>toda la página (variables globales)</td></tr>
+                    <tr><td><code>.tarjeta { ... }</code></td><td>esa tarjeta y todo lo que tiene dentro</td></tr>
+                    <tr><td><code>.btn:hover { ... }</code></td><td>solo mientras dure ese estado</td></tr>
+                    <tr><td><code>.app:has(:checked) { ... }</code></td><td>cuando se cumple una condición</td></tr>
+                    <tr><td><code>@media (...) { .x { ... } }</code></td><td>solo en ciertas pantallas</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Reglas que conviene recordar</figcaption>
+<pre>1. Distinguen MAYÚSCULAS y minúsculas
+   --Color y --color son dos variables distintas.
+
+2. No sirven como NOMBRE de propiedad
+   --lado: margin-top;
+   var(--lado): 10px;        → no funciona
+   Solo pueden ir en el VALOR.
+
+3. No funcionan en las condiciones de @media
+   @media (min-width: var(--tablet))   → no funciona
+   Sí puedes CAMBIAR variables dentro de una @media.
+
+4. Tampoco van en selectores ni en nombres de @keyframes.
+
+5. Un número no se pega a una unidad
+   --n: 20;
+   width: var(--n)px;        → no funciona
+   width: calc(var(--n) * 1px);   → 20px
+
+6. Si el valor no sirve para esa propiedad,
+   la propiedad vuelve a su valor inicial o heredado
+   (NO usa el respaldo). Lo ves en el ejemplo 2.</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo verlas en DevTools</figcaption>
+<pre>1. Clic derecho sobre el elemento → Inspeccionar.
+2. En la pestaña Estilos (Styles) aparecen las
+   variables declaradas en cada regla.
+3. Pasa el mouse sobre var(--algo): muestra el valor final.
+4. Clic en un valor para editarlo: todo lo que usa esa
+   variable se actualiza en vivo.
+5. En la pestaña Calculado (Computed) activa
+   "Mostrar todo" para ver las variables heredadas.
+6. Si una variable no existe, Chrome la muestra
+   subrayada o en gris: revisa el nombre.</pre>
+                </figure>
+                <figure>
+                    <figcaption>Variables CSS frente a variables de Sass</figcaption>
+<pre>Sass (preprocesador)               CSS (nativo)
+$marca: #7c3aed;                   --marca: #7c3aed;
+color: $marca;                     color: var(--marca);
+
+Sass se COMPILA antes de llegar al navegador:
+$marca se reemplaza por #7c3aed y desaparece.
+El navegador nunca sabe que hubo una variable.
+
+Las variables CSS VIVEN en el navegador:
+- se heredan y se pueden redefinir en un hijo
+- cambian con :hover, :has(), @media...
+- JavaScript puede leerlas y cambiarlas
+- se ven y se editan en DevTools
+
+Sass sigue siendo útil para bucles, funciones y
+mixins. En proyectos reales se combinan:
+--marca: #{$marca};</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-declarar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Declarar y usar una variable</h2>
+            <p>El color de la marca aparece en cinco lugares: logo, palabra destacada, botón, enlace y borde superior. En lugar de repetir <code>#7c3aed</code> cinco veces, se guarda en <code>--color-marca</code>. La segunda página usa el mismo CSS y solo cambia una línea.</p>
+            <div class="resultado">
+                <div class="landings">
+                    <div class="landing">
+                        <span class="logo">◆ Rumbo Lila</span>
+                        <h3>Viaja más, <span>planifica menos</span></h3>
+                        <p>Arma tu ruta por la costa en minutos y recibe el itinerario en tu correo.</p>
+                        <div class="acciones">
+                            <button type="button" class="btn">Planificar viaje</button>
+                            <a href="#ej-declarar">Ver destinos</a>
+                        </div>
+                    </div>
+                    <div class="landing marca-verde">
+                        <span class="logo">◆ Marea Verde Seguros</span>
+                        <h3>Tu casa protegida <span>desde hoy</span></h3>
+                        <p>Cotiza tu seguro de hogar en línea, sin papeles ni llamadas.</p>
+                        <div class="acciones">
+                            <button type="button" class="btn">Cotizar ahora</button>
+                            <a href="#ej-declarar">Ver planes</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.landing {
+    --color-marca: #7c3aed;
+    border-top: 6px solid var(--color-marca);
+}
+
+.landing.marca-verde {
+    --color-marca: #0d9488;
+}
+
+.logo {
+    color: var(--color-marca);
+}
+
+.landing h3 span {
+    color: var(--color-marca);
+}
+
+.landing a {
+    color: var(--color-marca);
+}
+
+.btn {
+    background: var(--color-marca);
+    color: #ffffff;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="landing"&gt;...&lt;/div&gt;
+&lt;div class="landing marca-verde"&gt;...&lt;/div&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-respaldo" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Valor de respaldo: <code>var(--x, respaldo)</code></h2>
+            <p>El segundo valor de <code>var()</code> se usa cuando la variable <strong>no está definida</strong>. Así un componente funciona aunque nadie le pase variables, y quien lo use puede personalizarlo.</p>
+            <div class="resultado">
+                <div class="chips">
+                    <span class="chip">Pendiente</span>
+                    <span class="chip urgente">Urgente</span>
+                    <span class="chip listo">Listo</span>
+                    <span class="chip">Archivado</span>
+                </div>
+                <p class="titulo-fuente">Título con <code>--fuente-titulo</code> sin definir: usa Georgia</p>
+                <p class="anidado">Sin equipo ni usuario: respaldo final violeta</p>
+                <div class="equipo">
+                    <p class="anidado">Dentro de .equipo: usa --color-equipo (cian)</p>
+                </div>
+                <div class="caja valida">Caja de 200px: <code>--ancho</code> no existe, se usa el respaldo.</div>
+                <div class="caja invalida">Caja con <code>--ancho: azul</code>: la variable SÍ existe pero no es una medida. El respaldo se ignora y <code>width</code> vuelve a su valor inicial (<code>auto</code>), por eso ocupa todo el ancho.</div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.chip {
+    background: var(--chip-fondo, #e5e7eb);
+    color: var(--chip-texto, #374151);
+}
+
+.chip.urgente {
+    --chip-fondo: #fee2e2;
+    --chip-texto: #b91c1c;
+}
+
+.chip.listo {
+    --chip-fondo: #dcfce7;
+}
+
+.titulo-fuente {
+    font-family: var(--fuente-titulo, Georgia, "Times New Roman", serif);
+}
+
+.anidado {
+    color: var(--color-usuario, var(--color-equipo, #7c3aed));
+}
+
+.equipo {
+    --color-equipo: #0891b2;
+}
+
+.valida {
+    width: var(--ancho, 200px);
+}
+
+.invalida {
+    --ancho: azul;
+    width: var(--ancho, 200px);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Resumen</figcaption>
+<pre>var(--a, rojo)                 → si --a no existe, rojo
+var(--a, Georgia, serif)       → todo lo que va tras la
+                                 primera coma es el respaldo
+var(--a, var(--b, rojo))       → respaldos en cadena
+--a: azul; width: var(--a, 9px) → azul existe pero no sirve:
+                                 width vuelve a auto</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-herencia" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Herencia y alcance</h2>
+            <p>Las variables se heredan de padres a hijos. Si un contenedor <strong>redefine</strong> la variable, todo lo que tiene dentro usa el nuevo valor. Las tarjetas de producto tienen el mismo CSS en toda la tienda: su color depende de dónde estén.</p>
+            <div class="resultado">
+                <div class="tienda">
+                    <h3>Tienda Kiwi Hogar</h3>
+                    <div class="productos">
+                        <div class="producto"><span class="etiqueta">Cocina</span><strong>Tetera de vidrio</strong><span class="precio">$24.990</span></div>
+                        <div class="producto"><span class="etiqueta">Baño</span><strong>Set de toallas</strong><span class="precio">$18.500</span></div>
+                        <div class="producto"><span class="etiqueta">Living</span><strong>Lámpara de pie</strong><span class="precio">$39.900</span></div>
+                    </div>
+                    <div class="zona-ofertas">
+                        <h4>Zona de ofertas: aquí --resalte vale rojo</h4>
+                        <div class="productos">
+                            <div class="producto"><span class="etiqueta">-30%</span><strong>Cojín tejido</strong><span class="precio">$9.990</span></div>
+                            <div class="producto"><span class="etiqueta">-20%</span><strong>Reloj de pared</strong><span class="precio">$15.200</span></div>
+                            <div class="producto destacado"><span class="etiqueta">Eco</span><strong>Macetero de bambú</strong><span class="precio">$12.400</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tienda {
+    --resalte: #7c3aed;
+    border: 2px solid var(--resalte);
+}
+
+.zona-ofertas {
+    --resalte: #dc2626;
+}
+
+.producto.destacado {
+    --resalte: #059669;
+}
+
+.etiqueta {
+    background: var(--resalte);
+}
+
+.precio {
+    color: var(--resalte);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo se resuelve</figcaption>
+<pre>.tienda              --resalte: violeta
+├── producto          → hereda violeta
+└── .zona-ofertas    --resalte: rojo
+    ├── producto      → hereda rojo
+    └── .destacado   --resalte: verde
+                      → usa su propio valor
+
+Cada elemento usa el valor del ancestro MÁS CERCANO
+que la defina. No hace falta repetir reglas.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-cafeteria" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Paleta de marca de una cafetería</h2>
+            <p>Una marca suele tener 4 o 5 colores. Se declaran una vez con nombres que significan algo y se usan en todos los componentes: botón, tarjeta, insignias y precios.</p>
+            <div class="resultado">
+                <div class="cafeteria">
+                    <p class="marca">Café Aroma Lento</p>
+                    <div class="paleta">
+                        <span class="p1">--cafe-oscuro</span>
+                        <span class="p2">--cafe</span>
+                        <span class="p3">--crema</span>
+                        <span class="p4">--canela</span>
+                        <span class="p5">--menta</span>
+                    </div>
+                    <div class="menu">
+                        <article class="tarjeta">
+                            <img src="https://picsum.photos/id/425/400/280" alt="Taza de café sobre una mesa">
+                            <div class="cuerpo">
+                                <span class="insignia">Nuevo</span>
+                                <h3>Latte de avellana</h3>
+                                <p>Espresso doble, leche texturizada y jarabe de avellana tostada.</p>
+                                <div class="pie"><span class="precio">$3.900</span><button type="button" class="btn">Pedir</button></div>
+                            </div>
+                        </article>
+                        <article class="tarjeta">
+                            <img src="https://picsum.photos/id/431/400/280" alt="Café recién servido">
+                            <div class="cuerpo">
+                                <span class="insignia vegano">Vegano</span>
+                                <h3>Flat white de avena</h3>
+                                <p>Café de especialidad con bebida de avena y un toque de canela.</p>
+                                <div class="pie"><span class="precio">$4.200</span><button type="button" class="btn">Pedir</button></div>
+                            </div>
+                        </article>
+                        <article class="tarjeta">
+                            <img src="https://picsum.photos/id/1060/400/280" alt="Barista preparando café">
+                            <div class="cuerpo">
+                                <span class="insignia">Favorito</span>
+                                <h3>Cold brew</h3>
+                                <p>Infusión en frío por 18 horas, servida con hielo y naranja.</p>
+                                <div class="pie"><span class="precio">$3.500</span><button type="button" class="btn">Pedir</button></div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.cafeteria {
+    --cafe-oscuro: #3b2416;
+    --cafe: #6f4e37;
+    --crema: #f5ebe0;
+    --canela: #c97b4a;
+    --menta: #2f855a;
+    background: var(--crema);
+    color: var(--cafe-oscuro);
+}
+
+.insignia {
+    background: var(--canela);
+    color: #ffffff;
+}
+
+.insignia.vegano {
+    background: var(--menta);
+}
+
+.precio {
+    color: var(--canela);
+}
+
+.btn {
+    background: var(--cafe-oscuro);
+    color: var(--crema);
+}
+
+.btn:hover {
+    background: var(--canela);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Consejo: nombres por función</figcaption>
+<pre>Funciona, pero es frágil:
+--marron: #6f4e37;     ¿y si la marca cambia a verde?
+
+Mejor, por rol:
+--color-principal: #6f4e37;
+--color-acento: #c97b4a;
+--color-fondo: #f5ebe0;
+
+Si el rediseño cambia el principal a verde,
+el nombre --color-principal sigue teniendo sentido.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-laboratorio" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Laboratorio de variables</h2>
+            <p>Elige valores y mira cómo cambia la tarjeta. Cada opción cambia <strong>solo una variable</strong>; el resto del CSS no se toca. Funciona sin JavaScript, usando <code>:has()</code>.</p>
+            <div class="resultado">
+                <div class="controles">
+                    <fieldset>
+                        <legend>--tono</legend>
+                        <label><input type="radio" name="tono" id="tono-270" checked> 270 violeta</label>
+                        <label><input type="radio" name="tono" id="tono-200"> 200 azul</label>
+                        <label><input type="radio" name="tono" id="tono-150"> 150 verde</label>
+                        <label><input type="radio" name="tono" id="tono-25"> 25 naranja</label>
+                        <label><input type="radio" name="tono" id="tono-340"> 340 rosa</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>--radio</legend>
+                        <label><input type="radio" name="radio" id="radio-0"> 0</label>
+                        <label><input type="radio" name="radio" id="radio-8" checked> 8px</label>
+                        <label><input type="radio" name="radio" id="radio-24"> 24px</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>--espaciado</legend>
+                        <label><input type="radio" name="esp" id="esp-8"> 8px</label>
+                        <label><input type="radio" name="esp" id="esp-16" checked> 16px</label>
+                        <label><input type="radio" name="esp" id="esp-28"> 28px</label>
+                    </fieldset>
+                </div>
+                <div class="escenario">
+                    <article class="evento">
+                        <span class="fecha">SÁB 14 · 19:00</span>
+                        <h3>Noche de jazz en la terraza</h3>
+                        <p>Trío en vivo, tapas de la casa y vista a la ciudad. Cupos limitados.</p>
+                        <button type="button">Reservar entrada</button>
+                    </article>
+                </div>
+                <div class="css-actual">.evento {
+    --tono: <span class="v-tono"></span>;
+    --radio: <span class="v-radio"></span>;
+    --espaciado: <span class="v-esp"></span>;
+}</div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS del componente (no cambia)</figcaption>
+<pre>.evento {
+    --tono: 270;
+    --radio: 8px;
+    --espaciado: 16px;
+    gap: var(--espaciado);
+    padding: var(--espaciado);
+    border: 2px solid hsl(var(--tono) 70% 85%);
+    border-radius: var(--radio);
+    background: hsl(var(--tono) 90% 97%);
+}
+
+.evento h3 {
+    color: hsl(var(--tono) 60% 25%);
+}
+
+.evento button {
+    padding: calc(var(--espaciado) / 2) var(--espaciado);
+    border-radius: var(--radio);
+    background: hsl(var(--tono) 70% 50%);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Lo que hacen los radios</figcaption>
+<pre>body:has(#tono-200:checked) .evento { --tono: 200; }
+body:has(#radio-24:checked) .evento { --radio: 24px; }
+body:has(#esp-28:checked) .evento { --espaciado: 28px; }
+
+El tono (hue) es un ángulo de la rueda de color:
+0 rojo · 120 verde · 240 azul · 270 violeta</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-modo-oscuro" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Modo claro / oscuro con un interruptor</h2>
+            <p>La app usa solo variables para sus colores. El interruptor es un checkbox: cuando está marcado, <code>:has()</code> cambia los valores de las variables y toda la interfaz se repinta. No se reescribe ninguna regla de los componentes.</p>
+            <div class="resultado">
+                <div class="app">
+                    <div class="barra">
+                        <strong>Billetera Lumo</strong>
+                        <label class="interruptor"><input type="checkbox" id="interruptor-oscuro"> Modo oscuro</label>
+                    </div>
+                    <div class="resumen">
+                        <div class="dato"><span>Saldo disponible</span><strong>$1.284.500</strong></div>
+                        <div class="dato"><span>Gastos del mes</span><strong>$312.900</strong></div>
+                        <div class="dato"><span>Ahorro</span><strong>$450.000</strong></div>
+                    </div>
+                    <ul class="movimientos">
+                        <li><div>Supermercado Brisa<small>Hoy, 10:24</small></div><span>−$42.300</span></li>
+                        <li><div>Transferencia de Pía R.<small>Ayer, 18:02</small></div><span class="positivo">+$60.000</span></li>
+                        <li><div>Suscripción Cinefilia<small>12 nov</small></div><span>−$7.990</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.app {
+    --app-fondo: #f8fafc;
+    --app-superficie: #ffffff;
+    --app-texto: #0f172a;
+    --app-suave: #64748b;
+    --app-borde: #e2e8f0;
+    --app-acento: #7c3aed;
+    background: var(--app-fondo);
+    color: var(--app-texto);
+    transition: background 0.3s, color 0.3s;
+}
+
+.app:has(#interruptor-oscuro:checked) {
+    --app-fondo: #0f172a;
+    --app-superficie: #1e293b;
+    --app-texto: #f1f5f9;
+    --app-suave: #94a3b8;
+    --app-borde: #334155;
+    --app-acento: #a78bfa;
+}
+
+.dato {
+    border: 1px solid var(--app-borde);
+    background: var(--app-superficie);
+}
+
+.dato span {
+    color: var(--app-suave);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>El interruptor</figcaption>
+<pre>&lt;label class="interruptor"&gt;
+    &lt;input type="checkbox" id="interruptor-oscuro"&gt; Modo oscuro
+&lt;/label&gt;
+
+.interruptor input {
+    appearance: none;
+    width: 44px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--app-borde);
+}
+
+.interruptor input:checked {
+    background: var(--app-acento);
+}
+
+.interruptor input:checked::before {
+    transform: translateX(20px);
+}
+
+En un sitio real, JavaScript guarda la elección
+y pone una clase o atributo en &lt;html&gt;:
+html[data-tema="oscuro"] { --fondo: ...; }</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tema-auto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Tema automático con <code>prefers-color-scheme</code></h2>
+            <p>El navegador sabe si el sistema operativo está en modo claro u oscuro. Con <code>@media (prefers-color-scheme: dark)</code> se cambian las variables y el widget sigue al sistema. Prueba cambiar el modo de tu computador o celular y vuelve a mirar.</p>
+            <div class="resultado">
+                <div class="app-auto">
+                    <span class="indicador"></span>
+                    <div class="clima">
+                        <span class="temp">18°</span>
+                        <div><strong>Valle Sereno</strong><div class="detalle">Parcialmente nublado · Viento 12 km/h</div></div>
+                    </div>
+                    <div class="dias">
+                        <div>Jue<strong>21°</strong></div>
+                        <div>Vie<strong>19°</strong></div>
+                        <div>Sáb<strong>23°</strong></div>
+                        <div>Dom<strong>17°</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.app-auto {
+    --auto-fondo: #ffffff;
+    --auto-texto: #1f2937;
+    --auto-suave: #6b7280;
+    --auto-borde: #e5e7eb;
+    --auto-acento: #7c3aed;
+    background: var(--auto-fondo);
+    color: var(--auto-texto);
+}
+
+@media (prefers-color-scheme: dark) {
+    .app-auto {
+        --auto-fondo: #111827;
+        --auto-texto: #f9fafb;
+        --auto-suave: #9ca3af;
+        --auto-borde: #374151;
+        --auto-acento: #c4b5fd;
+    }
+}
+
+.temp {
+    color: var(--auto-acento);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Probarlo sin cambiar el sistema</figcaption>
+<pre>Chrome / Edge:
+DevTools → menú ⋮ → More tools → Rendering
+→ "Emulate CSS media feature prefers-color-scheme"
+→ elige dark o light.
+
+Firefox:
+DevTools → Inspector → botones ☀ / ☾ en Estilos.
+
+Fíjate que solo cambian las variables:
+las reglas de .temp, .dias, etc. son las mismas.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-temas-marca" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Tres temas para el mismo componente</h2>
+            <p>El formulario de suscripción tiene un solo bloque de CSS. Cada clase de tema solo redefine cuatro variables. Agregar un cuarto tema es escribir cuatro líneas.</p>
+            <div class="resultado">
+                <div class="temas">
+                    <form class="suscripcion tema-oceano" action="#ej-temas-marca">
+                        <h3>Boletín Brisa Marina</h3>
+                        <p>Mareas, rutas costeras y avistamientos, cada lunes.</p>
+                        <input type="email" placeholder="tu@correo.com" aria-label="Correo electrónico">
+                        <button type="button">Suscribirme</button>
+                    </form>
+                    <form class="suscripcion tema-bosque" action="#ej-temas-marca">
+                        <h3>Club Sendero Alto</h3>
+                        <p>Rutas de trekking y campamentos para el fin de semana.</p>
+                        <input type="email" placeholder="tu@correo.com" aria-label="Correo electrónico">
+                        <button type="button">Suscribirme</button>
+                    </form>
+                    <form class="suscripcion tema-atardecer" action="#ej-temas-marca">
+                        <h3>Ocaso Café Bar</h3>
+                        <p>Música en vivo y promociones de la hora feliz.</p>
+                        <input type="email" placeholder="tu@correo.com" aria-label="Correo electrónico">
+                        <button type="button">Suscribirme</button>
+                    </form>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.suscripcion {
+    --t-fondo: #f5f3ff;
+    --t-principal: #7c3aed;
+    --t-texto: #2e1065;
+    --t-suave: #6d28d9;
+    border-top: 4px solid var(--t-principal);
+    background: var(--t-fondo);
+    color: var(--t-texto);
+}
+
+.tema-oceano {
+    --t-fondo: #ecfeff;
+    --t-principal: #0891b2;
+    --t-texto: #164e63;
+    --t-suave: #0e7490;
+}
+
+.tema-bosque {
+    --t-fondo: #f0fdf4;
+    --t-principal: #15803d;
+    --t-texto: #14532d;
+    --t-suave: #166534;
+}
+
+.tema-atardecer {
+    --t-fondo: #fff7ed;
+    --t-principal: #ea580c;
+    --t-texto: #7c2d12;
+    --t-suave: #c2410c;
+}
+
+.suscripcion p { color: var(--t-suave); }
+.suscripcion input { border: 1px solid var(--t-principal); }
+.suscripcion button { background: var(--t-principal); }</pre>
+                </figure>
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form class="suscripcion tema-oceano"&gt;...&lt;/form&gt;
+&lt;form class="suscripcion tema-bosque"&gt;...&lt;/form&gt;
+&lt;form class="suscripcion tema-atardecer"&gt;...&lt;/form&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-botones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Variantes de botón con una sola variable</h2>
+            <p>Todos los estilos del botón (relleno, contorno, suave y hover) leen <code>--btn-color</code>. Una variante de color es una sola línea: <code>.peligro { --btn-color: rojo; }</code>.</p>
+            <div class="resultado">
+                <div class="fila">
+                    <button type="button" class="btn">Primario</button>
+                    <button type="button" class="btn exito">Guardar</button>
+                    <button type="button" class="btn aviso">Revisar</button>
+                    <button type="button" class="btn peligro">Eliminar</button>
+                    <button type="button" class="btn neutro">Cancelar</button>
+                </div>
+                <div class="fila">
+                    <button type="button" class="btn contorno">Primario</button>
+                    <button type="button" class="btn contorno exito">Guardar</button>
+                    <button type="button" class="btn contorno aviso">Revisar</button>
+                    <button type="button" class="btn contorno peligro">Eliminar</button>
+                    <button type="button" class="btn contorno neutro">Cancelar</button>
+                </div>
+                <div class="fila">
+                    <button type="button" class="btn suave">Primario</button>
+                    <button type="button" class="btn suave exito">Guardar</button>
+                    <button type="button" class="btn suave aviso">Revisar</button>
+                    <button type="button" class="btn suave peligro">Eliminar</button>
+                    <button type="button" class="btn suave neutro">Cancelar</button>
+                </div>
+                <div class="dialogo">
+                    <h3>¿Eliminar el proyecto «Huerta Urbana»?</h3>
+                    <p>Se borrarán 24 tareas y 8 archivos. Esta acción no se puede deshacer.</p>
+                    <div class="fila">
+                        <button type="button" class="btn contorno neutro">Cancelar</button>
+                        <button type="button" class="btn peligro">Sí, eliminar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.btn {
+    --btn-color: #7c3aed;
+    border: 2px solid var(--btn-color);
+    background: var(--btn-color);
+    color: #ffffff;
+}
+
+.btn:hover {
+    background: color-mix(in srgb, var(--btn-color) 80%, black);
+}
+
+.peligro { --btn-color: #dc2626; }
+.exito { --btn-color: #16a34a; }
+.aviso { --btn-color: #d97706; }
+.neutro { --btn-color: #475569; }
+
+.btn.contorno {
+    background: transparent;
+    color: var(--btn-color);
+}
+
+.btn.suave {
+    border-color: transparent;
+    background: color-mix(in srgb, var(--btn-color) 12%, white);
+    color: var(--btn-color);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué conviene</figcaption>
+<pre>5 colores × 3 estilos = 15 botones distintos
+
+Sin variables: 15 reglas con colores repetidos.
+Con variables:  3 reglas de estilo + 5 líneas de color.
+
+Las clases se combinan libremente:
+class="btn contorno peligro"
+class="btn suave exito"</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-escala" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Escala de espaciado y tipografía</h2>
+            <p>En vez de inventar medidas sueltas (13px, 17px, 22px...), se define una <strong>escala</strong> pequeña y todo el diseño usa solo esos valores. El resultado se ve ordenado y es fácil de ajustar.</p>
+            <div class="resultado">
+                <div class="sistema-escala">
+                    <div class="regla">
+                        <div class="e1"><span></span>--esp-1 · 4px</div>
+                        <div class="e2"><span></span>--esp-2 · 8px</div>
+                        <div class="e3"><span></span>--esp-3 · 12px</div>
+                        <div class="e4"><span></span>--esp-4 · 16px</div>
+                        <div class="e5"><span></span>--esp-5 · 24px</div>
+                        <div class="e6"><span></span>--esp-6 · 40px</div>
+                    </div>
+                    <article class="articulo">
+                        <img src="https://picsum.photos/id/1018/800/400" alt="Paisaje de montaña">
+                        <span class="categoria">Viajes</span>
+                        <h3>Cinco miradores secretos del valle de Quillén</h3>
+                        <p class="bajada">Rutas cortas, sin multitudes y con las mejores vistas al atardecer.</p>
+                        <div class="meta"><span>Por Renata Ossa</span><span>·</span><span>6 min de lectura</span><span>·</span><span>12 nov 2026</span></div>
+                        <p>El valle esconde puntos panorámicos a menos de una hora a pie desde el pueblo. Llevamos tres temporadas recorriéndolos y elegimos los que valen la pena aunque tengas poco tiempo.</p>
+                        <div class="etiquetas"><span>trekking</span><span>fotografía</span><span>escapadas</span></div>
+                    </article>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.sistema-escala {
+    --esp-1: 4px;
+    --esp-2: 8px;
+    --esp-3: 12px;
+    --esp-4: 16px;
+    --esp-5: 24px;
+    --esp-6: 40px;
+    --texto-sm: 0.85rem;
+    --texto-base: 1rem;
+    --texto-lg: 1.2rem;
+    --texto-xl: 1.75rem;
+}
+
+.articulo {
+    gap: var(--esp-3);
+    padding: var(--esp-5);
+}
+
+.articulo h3 { font-size: var(--texto-xl); }
+.bajada { font-size: var(--texto-lg); }
+.meta { gap: var(--esp-2); font-size: var(--texto-sm); }
+
+.etiquetas span {
+    padding: var(--esp-1) var(--esp-3);
+    font-size: var(--texto-sm);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Ventajas</figcaption>
+<pre>- Pocas decisiones: ¿más aire? sube un paso de la escala.
+- Consistencia: todas las tarjetas respiran igual.
+- Un cambio global: si --esp-5 pasa a 28px,
+  se actualizan todos los rellenos que la usan.
+- Muchos frameworks (Tailwind, Bootstrap) usan
+  exactamente esta idea con sus propios nombres.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-calc" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Variables con <code>calc()</code></h2>
+            <p>Con <code>calc()</code> una sola variable controla varias medidas a la vez. El avatar define <code>--tamano</code> y de ahí salen el ancho, el alto, el borde y el tamaño de la letra. La galería define <code>--columnas</code> y <code>--separacion</code>.</p>
+            <div class="resultado">
+                <div class="avatares">
+                    <span class="avatar sm">AM</span>
+                    <span class="avatar">JP</span>
+                    <span class="avatar lg">CR</span>
+                    <span class="avatar xl">VT</span>
+                </div>
+                <p class="rotulo">.galeria.col-2</p>
+                <div class="galeria col-2">
+                    <img src="https://picsum.photos/id/10/300/300" alt="Bosque">
+                    <img src="https://picsum.photos/id/11/300/300" alt="Lago">
+                </div>
+                <p class="rotulo">.galeria (3 por defecto)</p>
+                <div class="galeria">
+                    <img src="https://picsum.photos/id/12/300/300" alt="Costa">
+                    <img src="https://picsum.photos/id/13/300/300" alt="Playa">
+                    <img src="https://picsum.photos/id/14/300/300" alt="Mar">
+                </div>
+                <p class="rotulo">.galeria.col-4</p>
+                <div class="galeria col-4">
+                    <img src="https://picsum.photos/id/15/300/300" alt="Río">
+                    <img src="https://picsum.photos/id/16/300/300" alt="Montaña">
+                    <img src="https://picsum.photos/id/17/300/300" alt="Camino">
+                    <img src="https://picsum.photos/id/18/300/300" alt="Campo">
+                    <img src="https://picsum.photos/id/19/300/300" alt="Puente">
+                    <img src="https://picsum.photos/id/20/300/300" alt="Escritorio">
+                    <img src="https://picsum.photos/id/22/300/300" alt="Persona caminando">
+                    <img src="https://picsum.photos/id/24/300/300" alt="Libro">
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.avatar {
+    --tamano: 48px;
+    width: var(--tamano);
+    height: var(--tamano);
+    border: calc(var(--tamano) / 16) solid #ddd6fe;
+    font-size: calc(var(--tamano) * 0.4);
+}
+
+.avatar.sm { --tamano: 32px; }
+.avatar.lg { --tamano: 72px; }
+.avatar.xl { --tamano: 104px; }
+
+.galeria {
+    --columnas: 3;
+    --separacion: 8px;
+    display: grid;
+    grid-template-columns: repeat(var(--columnas), 1fr);
+    gap: var(--separacion);
+}
+
+.galeria.col-2 { --columnas: 2; --separacion: 12px; }
+.galeria.col-4 { --columnas: 4; --separacion: 4px; }
+
+.galeria img {
+    border-radius: calc(var(--separacion) * 1.5);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Operaciones válidas</figcaption>
+<pre>calc(var(--a) + var(--b))     suma de medidas: 8px + 4px
+calc(var(--tam) * 0.4)        medida × número
+calc(var(--tam) / 16)         medida ÷ número
+calc(var(--n) * 1px)          número → píxeles
+calc(var(--n) * 1%)           número → porcentaje
+calc(var(--n) * 1deg)         número → grados
+
+repeat(var(--columnas), 1fr)  también funciona sin calc()</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-consultas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Variables dentro de media y container queries</h2>
+            <p>En lugar de repetir toda la regla en cada <code>@media</code> o <code>@container</code>, solo se cambia el valor de la variable. Arrastra la esquina inferior derecha del recuadro para achicarlo o agrandarlo.</p>
+            <div class="resultado">
+                <div class="redimensionable">
+                    <div class="indicador"></div>
+                    <div class="productos">
+                        <div class="producto"><img src="https://picsum.photos/id/26/400/300" alt="Accesorios de viaje"><div><h3>Kit viajero</h3><span class="precio">$29.990</span></div></div>
+                        <div class="producto"><img src="https://picsum.photos/id/30/400/300" alt="Taza de cerámica"><div><h3>Taza Nórdica</h3><span class="precio">$8.500</span></div></div>
+                        <div class="producto"><img src="https://picsum.photos/id/96/400/300" alt="Mochila"><div><h3>Mochila Cumbre</h3><span class="precio">$45.000</span></div></div>
+                        <div class="producto"><img src="https://picsum.photos/id/119/400/300" alt="Computador portátil"><div><h3>Soporte de notebook</h3><span class="precio">$19.900</span></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.redimensionable {
+    container-type: inline-size;
+    resize: horizontal;
+    overflow: auto;
+}
+
+.productos {
+    --columnas: 1;
+    --alto-img: 120px;
+    --texto-nombre: 0.95rem;
+    display: grid;
+    grid-template-columns: repeat(var(--columnas), 1fr);
+}
+
+.producto img { height: var(--alto-img); }
+.producto h3 { font-size: var(--texto-nombre); }
+
+@container (min-width: 480px) {
+    .productos { --columnas: 2; }
+}
+
+@container (min-width: 720px) {
+    .productos { --columnas: 4; --alto-img: 140px; }
+}
+
+@media (min-width: 1100px) {
+    .productos { --texto-nombre: 1.05rem; }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Ojo</figcaption>
+<pre>SÍ funciona: cambiar variables DENTRO de la consulta
+@media (min-width: 900px) {
+    .x { --columnas: 4; }
+}
+
+NO funciona: usar variables EN la condición
+@media (min-width: var(--escritorio)) { ... }
+@container (min-width: var(--ancho)) { ... }
+
+Los puntos de corte se escriben con números fijos.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-color-mix" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Generar colores con <code>color-mix()</code></h2>
+            <p>Con un solo color base se pueden fabricar el fondo claro, el borde y el texto oscuro mezclándolo con blanco o negro. Cada categoría del tablero de proyectos define solo <code>--color</code>.</p>
+            <div class="resultado">
+                <div class="tonos">
+                    <span>10% blanco</span>
+                    <span>30%</span>
+                    <span>60%</span>
+                    <span>--color</span>
+                    <span>70% negro</span>
+                    <span>40%</span>
+                </div>
+                <div class="categorias">
+                    <div class="categoria diseno"><strong>Diseño</strong><p>Pantallas de la app y guía de estilos.</p><span class="contador">12 tareas</span></div>
+                    <div class="categoria backend"><strong>Backend</strong><p>API de pagos y notificaciones.</p><span class="contador">8 tareas</span></div>
+                    <div class="categoria marketing"><strong>Marketing</strong><p>Campaña de lanzamiento de verano.</p><span class="contador">5 tareas</span></div>
+                    <div class="categoria soporte"><strong>Soporte</strong><p>Preguntas frecuentes y tickets.</p><span class="contador">17 tareas</span></div>
+                    <div class="categoria"><strong>General</strong><p>Reuniones y documentación interna.</p><span class="contador">3 tareas</span></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.categoria {
+    --color: #7c3aed;
+    border: 1px solid color-mix(in srgb, var(--color) 35%, white);
+    background: color-mix(in srgb, var(--color) 10%, white);
+    color: color-mix(in srgb, var(--color) 75%, black);
+}
+
+.diseno { --color: #db2777; }
+.backend { --color: #2563eb; }
+.marketing { --color: #ea580c; }
+.soporte { --color: #059669; }
+
+.categoria strong::before {
+    background: var(--color);
+}
+
+.contador {
+    background: var(--color);
+    color: #ffffff;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo se lee</figcaption>
+<pre>color-mix(in srgb, var(--color) 10%, white)
+          │        │            │    └ con qué se mezcla
+          │        │            └ cuánto del primer color
+          │        └ color base
+          └ espacio de color (srgb, oklch...)
+
+10% color + 90% blanco → fondo muy claro
+75% color + 25% negro  → texto oscuro y legible
+
+Compatible con Chrome 111+, Safari 16.2+, Firefox 113+.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-alertas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Alertas que generan su color con <code>hsl()</code></h2>
+            <p>Un color HSL tiene tono, saturación y luminosidad. Si el tono (<code>--h</code>) es variable y la saturación y luminosidad son fijas, cada alerta solo necesita un número para tener fondo, borde, ícono y texto combinados.</p>
+            <div class="resultado">
+                <div class="alerta"><span class="icono">i</span><div><strong>Mantención programada</strong><p>El sábado de 02:00 a 04:00 el portal no estará disponible. <a href="#ej-alertas">Más información</a></p></div></div>
+                <div class="alerta exito"><span class="icono">✓</span><div><strong>Pago recibido</strong><p>Tu pedido #4821 está confirmado y llegará el jueves.</p></div></div>
+                <div class="alerta aviso"><span class="icono">!</span><div><strong>Tu plan vence en 3 días</strong><p>Renueva ahora para no perder tus proyectos. <a href="#ej-alertas">Renovar</a></p></div></div>
+                <div class="alerta error"><span class="icono">×</span><div><strong>No pudimos guardar los cambios</strong><p>Revisa tu conexión e inténtalo otra vez.</p></div></div>
+                <div class="alerta novedad"><span class="icono">★</span><div><strong>Novedad: exportar a PDF</strong><p>Ya puedes descargar tus informes con un clic.</p></div></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.alerta {
+    --h: 215;
+    border-left: 5px solid hsl(var(--h) 70% 45%);
+    background: hsl(var(--h) 90% 96%);
+    color: hsl(var(--h) 60% 22%);
+}
+
+.alerta .icono {
+    background: hsl(var(--h) 70% 45%);
+}
+
+.alerta a {
+    color: hsl(var(--h) 70% 35%);
+}
+
+.exito { --h: 142; }
+.aviso { --h: 38; }
+.error { --h: 0; }
+.novedad { --h: 270; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Rueda de tonos</figcaption>
+<pre>  0  rojo        error
+ 38  ámbar       aviso
+142  verde       éxito
+215  azul        información
+270  violeta     novedad
+
+Mismo tono, distinta luminosidad:
+hsl(215 90% 96%)  fondo casi blanco
+hsl(215 70% 45%)  borde e ícono
+hsl(215 60% 22%)  texto oscuro</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-medidores" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Barras de progreso, gráfico y estrellas</h2>
+            <p>Cada elemento recibe un número en <code>--valor</code> (o <code>--calificacion</code>) mediante una clase, y el CSS lo convierte en un ancho, un alto o un degradado. Con un contador, el mismo número se muestra como texto.</p>
+            <div class="resultado">
+                <div class="bloques">
+                    <div>
+                        <h3>Avance del curso</h3>
+                        <div class="tarea v-100"><div class="cabecera"><span>HTML</span></div><div class="barra"><span></span></div></div>
+                        <div class="tarea v-80"><div class="cabecera"><span>CSS</span></div><div class="barra"><span></span></div></div>
+                        <div class="tarea v-45"><div class="cabecera"><span>JavaScript</span></div><div class="barra"><span></span></div></div>
+                        <div class="tarea v-15"><div class="cabecera"><span>Proyecto final</span></div><div class="barra"><span></span></div></div>
+                    </div>
+                    <div>
+                        <h3>Ventas por mes (millones)</h3>
+                        <div class="grafico">
+                            <div class="v-30"></div>
+                            <div class="v-55"></div>
+                            <div class="v-40"></div>
+                            <div class="v-70"></div>
+                            <div class="v-90"></div>
+                            <div class="v-60"></div>
+                        </div>
+                        <div class="meses"><span>Jun</span><span>Jul</span><span>Ago</span><span>Sep</span><span>Oct</span><span>Nov</span></div>
+                    </div>
+                </div>
+                <div class="resenas">
+                    <div class="resena"><strong>Hostal Las Gaviotas</strong><span class="estrellas c-5" role="img" aria-label="5 de 5 estrellas">★★★★★</span><span>5.0</span></div>
+                    <div class="resena"><strong>Cabañas Pino Azul</strong><span class="estrellas c-4-5" role="img" aria-label="4.5 de 5 estrellas">★★★★★</span><span>4.5</span></div>
+                    <div class="resena"><strong>Hotel Plaza Arcilla</strong><span class="estrellas c-3-5" role="img" aria-label="3.5 de 5 estrellas">★★★★★</span><span>3.5</span></div>
+                    <div class="resena"><strong>Motel Ruta 9</strong><span class="estrellas c-2" role="img" aria-label="2 de 5 estrellas">★★★★★</span><span>2.0</span></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS: barras y gráfico</figcaption>
+<pre>.v-15 { --valor: 15; }
+.v-30 { --valor: 30; }
+...
+.v-100 { --valor: 100; }
+
+.barra span {
+    width: calc(var(--valor) * 1%);
+}
+
+.cabecera::after {
+    counter-reset: porcentaje var(--valor);
+    content: counter(porcentaje) "%";
+}
+
+.grafico div {
+    height: calc(var(--valor) * 1%);
+}
+
+.grafico div::after {
+    counter-reset: valor var(--valor);
+    content: counter(valor);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS: estrellas</figcaption>
+<pre>.c-5 { --calificacion: 5; }
+.c-4-5 { --calificacion: 4.5; }
+.c-3-5 { --calificacion: 3.5; }
+.c-2 { --calificacion: 2; }
+
+.estrellas {
+    --calificacion: 0;
+    background: linear-gradient(90deg, #f59e0b calc(var(--calificacion) / 5 * 100%), #d1d5db 0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+4.5 / 5 * 100% = 90% amarillo, el resto gris.
+background-clip: text recorta el degradado
+con la forma de las letras ★★★★★.
+
+&lt;span class="estrellas c-4-5" role="img"
+      aria-label="4.5 de 5 estrellas"&gt;★★★★★&lt;/span&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-perfil" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Tarjeta de perfil con color personalizable</h2>
+            <p>Muchas apps dejan que cada usuario elija su color. La tarjeta lee <code>--color-acento</code> para la portada, el anillo de la foto, el rol y el botón. Cada usuario solo aporta una clase con su color.</p>
+            <div class="resultado">
+                <div class="perfiles">
+                    <article class="perfil">
+                        <div class="portada"></div>
+                        <img src="https://picsum.photos/id/64/168/168" alt="Foto de Inés Vidal">
+                        <h3>Inés Vidal</h3>
+                        <p class="rol">Diseñadora UX</p>
+                        <div class="stats"><div><strong>48</strong><span>Proyectos</span></div><div><strong>1,2k</strong><span>Seguidores</span></div></div>
+                        <button type="button">Seguir</button>
+                    </article>
+                    <article class="perfil usuario-marta">
+                        <div class="portada"></div>
+                        <img src="https://picsum.photos/id/1027/168/168" alt="Foto de Marta Quiroga">
+                        <h3>Marta Quiroga</h3>
+                        <p class="rol">Fotógrafa</p>
+                        <div class="stats"><div><strong>132</strong><span>Fotos</span></div><div><strong>3,4k</strong><span>Seguidores</span></div></div>
+                        <button type="button">Seguir</button>
+                    </article>
+                    <article class="perfil usuario-tomas">
+                        <div class="portada"></div>
+                        <img src="https://picsum.photos/id/91/168/168" alt="Foto de Tomás Leiva">
+                        <h3>Tomás Leiva</h3>
+                        <p class="rol">Desarrollador web</p>
+                        <div class="stats"><div><strong>27</strong><span>Repos</span></div><div><strong>860</strong><span>Seguidores</span></div></div>
+                        <button type="button">Seguir</button>
+                    </article>
+                    <article class="perfil usuario-lucia">
+                        <div class="portada"></div>
+                        <img src="https://picsum.photos/id/1005/168/168" alt="Foto de Lucía Ferrada">
+                        <h3>Lucía Ferrada</h3>
+                        <p class="rol">Chef pastelera</p>
+                        <div class="stats"><div><strong>95</strong><span>Recetas</span></div><div><strong>12k</strong><span>Seguidores</span></div></div>
+                        <button type="button">Seguir</button>
+                    </article>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.perfil {
+    --color-acento: #7c3aed;
+}
+
+.usuario-marta { --color-acento: #0891b2; }
+.usuario-tomas { --color-acento: #ea580c; }
+.usuario-lucia { --color-acento: #db2777; }
+
+.portada {
+    background: linear-gradient(135deg, var(--color-acento), color-mix(in srgb, var(--color-acento) 40%, white));
+}
+
+.perfil img {
+    border: 4px solid var(--color-acento);
+}
+
+.rol {
+    color: var(--color-acento);
+}
+
+.perfil button {
+    background: var(--color-acento);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;article class="perfil usuario-marta"&gt;
+    &lt;div class="portada"&gt;&lt;/div&gt;
+    &lt;img src="..." alt="Foto de Marta Quiroga"&gt;
+    &lt;h3&gt;Marta Quiroga&lt;/h3&gt;
+    &lt;p class="rol"&gt;Fotógrafa&lt;/p&gt;
+    ...
+&lt;/article&gt;
+
+En una app real el color viene de la base de datos
+y JavaScript lo escribe en la variable del elemento.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tokens" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Design tokens: el sistema de diseño Prisma</h2>
+            <p>Los equipos grandes guardan todas sus decisiones de diseño (colores, radios, sombras, fuentes) como variables con nombres ordenados. A eso se le llama <strong>design tokens</strong>. Diseñadores y programadores hablan con los mismos nombres.</p>
+            <div class="resultado">
+                <div class="sistema">
+                    <div class="tabla-scroll">
+                        <table>
+                            <thead>
+                                <tr><th>Token</th><th>Valor</th><th>Muestra</th><th>Uso</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>--color-primario-100</td><td>#ede9fe</td><td><span class="muestra m-p100"></span></td><td>fondos suaves</td></tr>
+                                <tr><td>--color-primario-500</td><td>#7c3aed</td><td><span class="muestra m-p500"></span></td><td>botones, enlaces</td></tr>
+                                <tr><td>--color-primario-700</td><td>#5b21b6</td><td><span class="muestra m-p700"></span></td><td>títulos, hover</td></tr>
+                                <tr><td>--color-gris-100</td><td>#f3f4f6</td><td><span class="muestra m-g100"></span></td><td>fondos de sección</td></tr>
+                                <tr><td>--color-gris-700</td><td>#374151</td><td><span class="muestra m-g700"></span></td><td>texto</td></tr>
+                                <tr><td>--color-exito</td><td>#16a34a</td><td><span class="muestra m-exito"></span></td><td>confirmaciones</td></tr>
+                                <tr><td>--color-error</td><td>#dc2626</td><td><span class="muestra m-error"></span></td><td>errores</td></tr>
+                                <tr><td>--radio-sm</td><td>4px</td><td><span class="muestra m-radio-sm"></span></td><td>insignias, campos</td></tr>
+                                <tr><td>--radio-md</td><td>8px</td><td><span class="muestra m-radio-md"></span></td><td>botones</td></tr>
+                                <tr><td>--radio-lg</td><td>16px</td><td><span class="muestra m-radio-lg"></span></td><td>tarjetas, modales</td></tr>
+                                <tr><td>--sombra-sm</td><td>0 1px 2px</td><td><span class="muestra m-sombra-sm"></span></td><td>campos</td></tr>
+                                <tr><td>--sombra-md</td><td>0 4px 12px</td><td><span class="muestra m-sombra-md"></span></td><td>botones</td></tr>
+                                <tr><td>--sombra-lg</td><td>0 12px 32px</td><td><span class="muestra m-sombra-lg"></span></td><td>tarjetas flotantes</td></tr>
+                                <tr><td>--fuente-titulo</td><td>Georgia, serif</td><td><span class="m-titulo">Aa</span></td><td>títulos</td></tr>
+                                <tr><td>--fuente-mono</td><td>Courier New</td><td><span class="m-mono">0123</span></td><td>código, cifras</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tarjeta-ds">
+                        <span class="estado">Beta</span>
+                        <h3>Componente hecho solo con tokens</h3>
+                        <p>Ningún color, radio ni sombra está escrito a mano: todo sale de la tabla de arriba.</p>
+                        <button type="button">Probar ahora</button>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS del componente</figcaption>
+<pre>.sistema {
+    --color-primario-100: #ede9fe;
+    --color-primario-500: #7c3aed;
+    --color-primario-700: #5b21b6;
+    --color-gris-700: #374151;
+    --radio-sm: 4px;
+    --radio-md: 8px;
+    --radio-lg: 16px;
+    --sombra-md: 0 4px 12px rgb(0 0 0 / 0.12);
+    --sombra-lg: 0 12px 32px rgb(0 0 0 / 0.18);
+    --fuente-titulo: Georgia, "Times New Roman", serif;
+    ...
+}
+
+.tarjeta-ds {
+    border-radius: var(--radio-lg);
+    box-shadow: var(--sombra-lg);
+}
+
+.tarjeta-ds h3 {
+    color: var(--color-primario-700);
+    font-family: var(--fuente-titulo);
+}
+
+.tarjeta-ds .estado {
+    border-radius: var(--radio-sm);
+    background: var(--color-primario-100);
+}
+
+.tarjeta-ds button {
+    border-radius: var(--radio-md);
+    background: var(--color-primario-500);
+    box-shadow: var(--sombra-md);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>En un proyecto real: :root</figcaption>
+<pre>:root {
+    --color-primario-500: #7c3aed;
+    --radio-md: 8px;
+    --sombra-md: 0 4px 12px rgb(0 0 0 / 0.12);
+}
+
+:root es el elemento &lt;html&gt;. Lo que se declara ahí
+llega a toda la página: es el lugar natural de los tokens.
+
+En esta lección los tokens están en .sistema para no
+afectar a los demás ejemplos. Esta misma página usa
+:root en css/base.css: --fondo, --texto, --acento...
+
+Nomenclatura habitual:
+--{categoría}-{nombre}-{variante}
+--color-primario-500   --radio-lg   --sombra-md</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-property" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Animar variables con <code>@property</code></h2>
+            <p>Una variable normal es solo texto: el navegador no sabe si es un color o un ángulo, por eso <strong>salta</strong> de un valor a otro. Con <code>@property</code> se le da un tipo y entonces se puede animar: un borde de degradado que gira, un contador de ventas y un botón cuyo degradado cambia suave.</p>
+            <div class="resultado">
+                <div class="escena">
+                    <div class="tarjeta-promo">
+                        <div>
+                            <h3>Cyber Día Nimbo</h3>
+                            <p>Hasta 40% de descuento en toda la tienda, solo por 24 horas.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="contador"></div>
+                        <p>pedidos entregados este mes</p>
+                    </div>
+                </div>
+                <div class="botones">
+                    <button type="button" class="btn-salto">Sin @property (salta)</button>
+                    <button type="button" class="btn-suave">Con @property (suave)</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>@property --giro {
+    syntax: "&lt;angle&gt;";
+    inherits: false;
+    initial-value: 0deg;
+}
+
+@keyframes girar-borde {
+    to {
+        --giro: 360deg;
+    }
+}
+
+.tarjeta-promo {
+    padding: 3px;
+    background: conic-gradient(from var(--giro), #7c3aed, #db2777, #f59e0b, #7c3aed);
+    animation: girar-borde 4s linear infinite;
+}
+
+.tarjeta-promo &gt; div {
+    background: #ffffff;
+}
+
+@property --cifra {
+    syntax: "&lt;integer&gt;";
+    inherits: false;
+    initial-value: 0;
+}
+
+@keyframes contar-ventas {
+    from { --cifra: 0; }
+    to { --cifra: 1250; }
+}
+
+.contador {
+    counter-reset: cifra var(--cifra);
+    animation: contar-ventas 3s ease-out infinite alternate;
+}
+
+.contador::after {
+    content: counter(cifra);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS: botones y compatibilidad</figcaption>
+<pre>@property --mezcla {
+    syntax: "&lt;color&gt;";
+    inherits: false;
+    initial-value: #7c3aed;
+}
+
+.btn-salto {
+    --sin-registrar: #7c3aed;
+    background: linear-gradient(135deg, var(--sin-registrar), #db2777);
+    transition: --sin-registrar 0.6s;
+}
+
+.btn-salto:hover { --sin-registrar: #0891b2; }
+
+.btn-suave {
+    background: linear-gradient(135deg, var(--mezcla), #db2777);
+    transition: --mezcla 0.6s;
+}
+
+.btn-suave:hover { --mezcla: #0891b2; }
+
+Tipos de syntax: &lt;color&gt; &lt;length&gt; &lt;percentage&gt;
+&lt;number&gt; &lt;integer&gt; &lt;angle&gt; &lt;time&gt; "*"
+
+Compatibilidad: Chrome 85+, Safari 16.4+,
+Firefox 128+. En navegadores antiguos la animación
+no corre, pero la página se sigue viendo bien.</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="15-css-transiciones-animaciones.html">Anterior: transiciones y animaciones</a> |
+            <a href="index.html">Índice</a> |
+            <a href="17-css-formularios-estilizados.html">Siguiente: formularios con estilo</a>
+        </nav>
+    </footer>
+</body>
+</html>

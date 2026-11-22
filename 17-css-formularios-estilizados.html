@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17. CSS: formularios con estilo</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <link rel="stylesheet" href="css/17-css-formularios-estilizados.css">
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>17. CSS: formularios con estilo</h1>
+        <p>En la lección 05 construimos formularios con HTML puro y en la 08 los validamos con selectores. Ahora los vamos a dejar <strong>como los de una aplicación real</strong>: campos con estados claros, etiquetas flotantes, interruptores, tarjetas seleccionables, estrellas, pagos y códigos de verificación. Todo con CSS, sin una línea de JavaScript.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-reset">Reset de controles</a></li>
+            <li><a href="#ej-campo">Campo completo</a></li>
+            <li><a href="#ej-flotante">Etiqueta flotante</a></li>
+            <li><a href="#ej-iconos">Íconos y botones</a></li>
+            <li><a href="#ej-validacion">Validación</a></li>
+            <li><a href="#ej-accent">accent-color</a></li>
+            <li><a href="#ej-checkbox">Checkbox</a></li>
+            <li><a href="#ej-planes">Planes</a></li>
+            <li><a href="#ej-switch">Interruptores</a></li>
+            <li><a href="#ej-select">Select</a></li>
+            <li><a href="#ej-range">Range</a></li>
+            <li><a href="#ej-archivo">Archivos</a></li>
+            <li><a href="#ej-textarea">Textarea</a></li>
+            <li><a href="#ej-estrellas">Estrellas</a></li>
+            <li><a href="#ej-login">Login</a></li>
+            <li><a href="#ej-pago">Pago</a></li>
+            <li><a href="#ej-pasos">Encuesta por pasos</a></li>
+            <li><a href="#ej-otp">Código OTP</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Las herramientas para estilizar formularios</h2>
+            <p>Un control de formulario tiene <strong>estados</strong> (enfocado, marcado, inválido, desactivado…) y <strong>partes internas</strong> (el texto de ayuda, el botón del archivo, la bolita del slider). Las pseudo-clases eligen el estado y los pseudo-elementos llegan a las partes.</p>
+            <table>
+                <thead>
+                    <tr><th>Pseudo-clase</th><th>Se activa cuando…</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>:hover</code></td><td>el puntero está encima</td></tr>
+                    <tr><td><code>:focus</code></td><td>el control tiene el foco (clic o teclado)</td></tr>
+                    <tr><td><code>:focus-visible</code></td><td>tiene el foco y el navegador cree que hay que mostrarlo (sobre todo con teclado)</td></tr>
+                    <tr><td><code>:focus-within</code></td><td>el elemento <em>o algo dentro</em> tiene el foco</td></tr>
+                    <tr><td><code>:checked</code></td><td>un checkbox o radio está marcado</td></tr>
+                    <tr><td><code>:disabled</code> / <code>:enabled</code></td><td>el control está desactivado o activo</td></tr>
+                    <tr><td><code>:read-only</code> / <code>[readonly]</code></td><td>se puede leer pero no editar</td></tr>
+                    <tr><td><code>:required</code> / <code>:optional</code></td><td>tiene o no el atributo <code>required</code></td></tr>
+                    <tr><td><code>:valid</code> / <code>:invalid</code></td><td>cumple o no sus reglas, <em>desde que carga la página</em></td></tr>
+                    <tr><td><code>:user-valid</code> / <code>:user-invalid</code></td><td>igual, pero solo después de que la persona interactuó</td></tr>
+                    <tr><td><code>:placeholder-shown</code></td><td>el placeholder se está viendo (el campo está vacío)</td></tr>
+                    <tr><td><code>:has(...)</code></td><td>el elemento contiene algo que cumple la condición</td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Pseudo-elemento / propiedad</th><th>Qué estiliza</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>::placeholder</code></td><td>el texto de ejemplo dentro del campo</td></tr>
+                    <tr><td><code>::selection</code></td><td>el texto que la persona selecciona</td></tr>
+                    <tr><td><code>::file-selector-button</code></td><td>el botón “Elegir archivo”</td></tr>
+                    <tr><td><code>::-webkit-slider-thumb</code> / <code>::-moz-range-thumb</code></td><td>la bolita del range (Chrome/Safari y Firefox)</td></tr>
+                    <tr><td><code>appearance: none</code></td><td>quita el dibujo nativo para dibujar uno propio</td></tr>
+                    <tr><td><code>accent-color</code></td><td>cambia el color de checkbox, radio, range y progress en una línea</td></tr>
+                    <tr><td><code>caret-color</code></td><td>el color del cursor de texto</td></tr>
+                    <tr><td><code>field-sizing: content</code></td><td>el campo crece con lo que se escribe</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Nunca quitar el outline sin reemplazo</figcaption>
+<pre>input:focus {
+    outline: none;
+}
+
+Así, quien navega con teclado (Tab) no sabe
+dónde está. Si no te gusta el anillo nativo,
+cámbialo por otro igual de visible:
+
+input:focus {
+    border-color: #2563eb;
+    outline: 3px solid #93c5fd;
+    outline-offset: 1px;
+}
+
+outline no ocupa espacio ni mueve nada y
+sigue el border-radius del campo.</pre>
+                </figure>
+                <figure>
+                    <figcaption>Tamaños que importan en el celular</figcaption>
+<pre>Mínimo 44 × 44 px para todo lo que se toca
+(botones, checkbox con su label, radios).
+Un dedo no es un puntero de mouse.
+
+font-size de 16px o más en los campos.
+Con menos, Safari del iPhone hace zoom
+al tocar el campo y descoloca la página.
+
+font: inherit en los controles hace que
+hereden los 16px del body.</pre>
+                </figure>
+                <figure>
+                    <figcaption>:invalid vs :user-invalid</figcaption>
+<pre>:invalid
+    se activa apenas carga la página.
+    Un campo required vacío ya sale en rojo
+    antes de que la persona escriba nada.
+
+:user-invalid
+    espera a que la persona escriba y salga
+    del campo (o intente enviar).
+    Es lo que se ve en los sitios reales.
+
+Soporte: todos los navegadores actuales
+(Chrome 119+, Firefox 88+, Safari 16.5+).</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-reset" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Reset de controles: antes y después</h2>
+            <p>Los controles <strong>no heredan</strong> la fuente de la página: usan una letra más chica y del sistema. Con cuatro líneas quedan parejos y listos para estilizar.</p>
+            <div class="resultado">
+                <div class="comparar">
+                    <form class="panel" action="#" onsubmit="return false">
+                        <h3>Antes: estilos del navegador</h3>
+                        <label for="rs-antes-nombre">Nombre</label>
+                        <input type="text" id="rs-antes-nombre" placeholder="Ana Ríos">
+                        <label for="rs-antes-ciudad">Ciudad</label>
+                        <select id="rs-antes-ciudad">
+                            <option>Lima</option>
+                            <option>Quito</option>
+                            <option>Bogotá</option>
+                        </select>
+                        <label for="rs-antes-msg">Mensaje</label>
+                        <textarea id="rs-antes-msg" rows="2"></textarea>
+                        <button type="submit">Enviar</button>
+                    </form>
+                    <form class="panel despues" action="#" onsubmit="return false">
+                        <h3>Después: con reset</h3>
+                        <label for="rs-despues-nombre">Nombre</label>
+                        <input type="text" id="rs-despues-nombre" placeholder="Ana Ríos">
+                        <label for="rs-despues-ciudad">Ciudad</label>
+                        <select id="rs-despues-ciudad">
+                            <option>Lima</option>
+                            <option>Quito</option>
+                            <option>Bogotá</option>
+                        </select>
+                        <label for="rs-despues-msg">Mensaje</label>
+                        <textarea id="rs-despues-msg" rows="2"></textarea>
+                        <button type="submit">Enviar</button>
+                    </form>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.despues input,
+.despues select,
+.despues textarea,
+.despues button {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 4px 0 0;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: inherit;
+    font: inherit;
+}
+
+.despues textarea {
+    resize: vertical;
+}
+
+.despues button {
+    appearance: none;
+    background: #2563eb;
+    color: #ffffff;
+    ...
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Qué hace cada línea</figcaption>
+<pre>font: inherit       misma letra y tamaño que la página
+color: inherit      mismo color de texto
+box-sizing          el padding no agranda el ancho
+width: 100%         todos los campos del mismo ancho
+appearance: none    borra el dibujo nativo del botón
+resize: vertical    el textarea solo crece hacia abajo</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-campo" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Un campo de texto completo y sus estados</h2>
+            <p>Etiqueta arriba, ayuda abajo y un estilo distinto para cada estado. Pasa el mouse, haz clic y usa Tab para recorrerlos.</p>
+            <div class="resultado">
+                <form action="#" onsubmit="return false">
+                    <div class="campo">
+                        <label for="cp-nombre">Nombre completo <span class="marca">*</span></label>
+                        <input type="text" id="cp-nombre" placeholder="Ej.: Ana Ríos" autocomplete="name" required aria-describedby="cp-nombre-ayuda">
+                        <p class="ayuda" id="cp-nombre-ayuda">Tal como aparece en tu documento de identidad.</p>
+                    </div>
+                    <div class="campo">
+                        <label for="cp-correo">Correo electrónico</label>
+                        <input type="email" id="cp-correo" placeholder="nombre@correo.com" autocomplete="email" aria-describedby="cp-correo-ayuda">
+                        <p class="ayuda" id="cp-correo-ayuda">Te enviaremos ahí la confirmación.</p>
+                    </div>
+                    <div class="campo">
+                        <label for="cp-usuario">Usuario (solo lectura)</label>
+                        <input type="text" id="cp-usuario" value="ana.rios" readonly aria-describedby="cp-usuario-ayuda">
+                        <p class="ayuda" id="cp-usuario-ayuda">El usuario no se puede cambiar, pero sí copiar.</p>
+                    </div>
+                    <div class="campo">
+                        <label for="cp-cliente">Código de cliente (desactivado)</label>
+                        <input type="text" id="cp-cliente" value="CL-004821" disabled>
+                    </div>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML de un campo</figcaption>
+<pre>&lt;div class="campo"&gt;
+    &lt;label for="cp-nombre"&gt;Nombre completo&lt;/label&gt;
+    &lt;input type="text" id="cp-nombre"
+           aria-describedby="cp-nombre-ayuda"&gt;
+    &lt;p class="ayuda" id="cp-nombre-ayuda"&gt;
+        Tal como aparece en tu documento.
+    &lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS de los estados</figcaption>
+<pre>.campo {
+    display: grid;
+    gap: 6px;
+}
+
+input {
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: inherit;
+    transition: border-color 0.15s, outline-color 0.15s;
+}
+
+input:hover {
+    border-color: #94a3b8;
+}
+
+input:focus {
+    border-color: #2563eb;
+    outline: 3px solid #93c5fd;
+    outline-offset: 1px;
+}
+
+input[readonly] {
+    border-style: dashed;
+    background: #f8fafc;
+}
+
+input:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.campo:focus-within label {
+    color: #2563eb;
+}
+
+.campo:has(input:disabled) label {
+    color: #94a3b8;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-flotante" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Etiqueta flotante (floating label)</h2>
+            <p>La etiqueta empieza dentro del campo y sube cuando escribes. El truco: un <code>placeholder=" "</code> (un espacio) y <code>:placeholder-shown</code> para saber si el campo está vacío.</p>
+            <div class="resultado">
+                <div class="formularios">
+                    <form action="#" onsubmit="return false">
+                        <h3>Estilo relleno</h3>
+                        <div class="flotante">
+                            <input type="email" id="fl-correo" placeholder=" " autocomplete="email">
+                            <label for="fl-correo">Correo electrónico</label>
+                        </div>
+                        <div class="flotante">
+                            <input type="tel" id="fl-telefono" placeholder=" " autocomplete="tel">
+                            <label for="fl-telefono">Teléfono</label>
+                        </div>
+                    </form>
+                    <form class="contorno" action="#" onsubmit="return false">
+                        <h3>Estilo contorno</h3>
+                        <div class="flotante">
+                            <input type="text" id="fl-empresa" placeholder=" " autocomplete="organization">
+                            <label for="fl-empresa">Empresa</label>
+                        </div>
+                        <div class="flotante">
+                            <input type="text" id="fl-cargo" placeholder=" " value="Diseñadora UX">
+                            <label for="fl-cargo">Cargo</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML: el label va DESPUÉS del input</figcaption>
+<pre>&lt;div class="flotante"&gt;
+    &lt;input type="email" id="fl-correo" placeholder=" "&gt;
+    &lt;label for="fl-correo"&gt;Correo electrónico&lt;/label&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.flotante {
+    position: relative;
+}
+
+.flotante input {
+    padding: 22px 14px 8px;
+}
+
+.flotante label {
+    position: absolute;
+    top: 15px;
+    left: 14px;
+    pointer-events: none;
+    transform-origin: left top;
+    transition: transform 0.15s, color 0.15s;
+}
+
+input:focus + label,
+input:not(:placeholder-shown) + label {
+    transform: translateY(-10px) scale(0.75);
+}
+
+.contorno label {
+    background: #ffffff;
+    padding: 0 4px;
+}
+
+.contorno input:focus + label,
+.contorno input:not(:placeholder-shown) + label {
+    transform: translateY(-23px) scale(0.8);
+}</pre>
+                </figure>
+            </div>
+            <p>El label sigue siendo un <code>&lt;label&gt;</code> real conectado con <code>for</code>: el lector de pantalla lo anuncia y al hacer clic sobre él se enfoca el campo. <code>pointer-events: none</code> deja que el clic pase al input que está debajo.</p>
+        </section>
+
+        <section id="ej-iconos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Campos con íconos, prefijos y botones dentro</h2>
+            <p>El truco más usado: la <strong>caja</strong> es la que tiene borde, y el input va dentro sin borde. Con <code>:focus-within</code> la caja se ilumina cuando el input recibe el foco.</p>
+            <div class="resultado">
+                <form class="demos" action="#" onsubmit="return false">
+                    <div>
+                        <label class="titulo" for="ico-buscar">Buscar en la tienda</label>
+                        <div class="caja buscador">
+                            <span class="icono" aria-hidden="true">🔍</span>
+                            <input type="search" id="ico-buscar" placeholder="Zapatillas, mochilas…">
+                            <button type="submit">Buscar</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="titulo" for="ico-clave">Contraseña</label>
+                        <div class="caja">
+                            <span class="icono" aria-hidden="true">🔒</span>
+                            <input type="password" id="ico-clave" value="secreto123" autocomplete="current-password">
+                            <button type="button" class="ver"><span aria-hidden="true">👁</span><span class="oculto">Mostrar contraseña</span></button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="titulo" for="ico-monto">Monto a transferir</label>
+                        <div class="caja">
+                            <span class="prefijo" aria-hidden="true">$</span>
+                            <input type="number" id="ico-monto" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
+                            <span class="sufijo">USD</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="titulo" for="ico-correo">Icono posicionado con absolute</label>
+                        <div class="con-icono">
+                            <span class="icono" aria-hidden="true">✉</span>
+                            <input type="email" id="ico-correo" placeholder="nombre@correo.com">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML del buscador</figcaption>
+<pre>&lt;label for="ico-buscar"&gt;Buscar en la tienda&lt;/label&gt;
+&lt;div class="caja buscador"&gt;
+    &lt;span class="icono" aria-hidden="true"&gt;🔍&lt;/span&gt;
+    &lt;input type="search" id="ico-buscar"&gt;
+    &lt;button type="submit"&gt;Buscar&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.caja {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 4px 4px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+.caja:focus-within {
+    border-color: #2563eb;
+    outline: 3px solid #93c5fd;
+}
+
+.caja input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+}
+
+.con-icono {
+    position: relative;
+}
+
+.con-icono .icono {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+}
+
+.con-icono input {
+    padding-left: 42px;
+}</pre>
+                </figure>
+            </div>
+            <p>Aquí sí se puede poner <code>outline: none</code> en el input, porque la caja que lo rodea muestra el anillo. El botón del ojo es solo visual: cambiar <code>type="password"</code> a <code>type="text"</code> requiere JavaScript.</p>
+        </section>
+
+        <section id="ej-validacion" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Validación amable con <code>:user-invalid</code></h2>
+            <p>En la lección 08 usamos <code>:invalid</code>. Compara: el de la izquierda está rojo antes de tocarlo; el de la derecha espera a que escribas y salgas del campo.</p>
+            <div class="resultado">
+                <form class="comparar" action="#" onsubmit="return false">
+                    <div>
+                        <label for="vl-con-invalid">Con :invalid</label>
+                        <input type="email" id="vl-con-invalid" class="solo-invalid" required>
+                    </div>
+                    <div>
+                        <label for="vl-con-user">Con :user-invalid</label>
+                        <input type="email" id="vl-con-user" required>
+                    </div>
+                </form>
+                <form action="#" onsubmit="return false">
+                    <div class="campo">
+                        <label for="vl-correo">Correo</label>
+                        <input type="email" id="vl-correo" required autocomplete="email" aria-describedby="vl-correo-error">
+                        <p class="error" id="vl-correo-error">Escribe un correo válido, por ejemplo nombre@correo.com</p>
+                    </div>
+                    <div class="campo">
+                        <label for="vl-clave">Contraseña</label>
+                        <input type="password" id="vl-clave" required minlength="8" autocomplete="new-password" aria-describedby="vl-clave-error">
+                        <p class="error" id="vl-clave-error">Mínimo 8 caracteres.</p>
+                    </div>
+                    <div class="campo">
+                        <label for="vl-postal">Código postal</label>
+                        <input type="text" id="vl-postal" required pattern="[0-9]{5}" inputmode="numeric" autocomplete="postal-code" aria-describedby="vl-postal-error">
+                        <p class="error" id="vl-postal-error">Son 5 números, sin letras ni espacios.</p>
+                    </div>
+                    <div class="campo">
+                        <label for="vl-edad">Edad</label>
+                        <input type="number" id="vl-edad" required min="18" max="120" aria-describedby="vl-edad-error">
+                        <p class="error" id="vl-edad-error">Debes ser mayor de 18 años.</p>
+                    </div>
+                    <button type="submit">Crear cuenta</button>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>input:user-invalid {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+input:user-valid {
+    border-color: #16a34a;
+}
+
+.error {
+    display: none;
+    color: #dc2626;
+}
+
+.campo:has(input:user-invalid) .error {
+    display: block;
+}
+
+.campo:has(input:user-valid) label::after {
+    content: " ✓";
+    color: #16a34a;
+}
+
+form:invalid button {
+    background: #94a3b8;
+    cursor: not-allowed;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Las reglas vienen del HTML</figcaption>
+<pre>type="email"          debe tener forma de correo
+required              no puede quedar vacío
+minlength="8"         mínimo 8 caracteres
+pattern="[0-9]{5}"    exactamente 5 números
+min="18" max="120"    rango para type="number"
+
+aria-describedby une el mensaje de error con el
+campo, así el lector de pantalla también lo lee.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-accent" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2><code>accent-color</code>: la marca en una sola línea</h2>
+            <p>Antes de reinventar un checkbox, prueba esto: una propiedad pinta checkbox, radio, range y progress con el color de tu marca. Con <code>color-scheme: dark</code> los controles nativos se vuelven oscuros.</p>
+            <div class="resultado">
+                <form class="paneles" action="#" onsubmit="return false">
+                    <div class="panel">
+                        <h3>Por defecto</h3>
+                        <label><input type="checkbox" id="ac-def-check" checked> Recordarme</label>
+                        <label><input type="radio" name="ac-def-radio" id="ac-def-radio" checked> Envío normal</label>
+                        <label for="ac-def-range">Volumen</label>
+                        <input type="range" id="ac-def-range" value="60">
+                        <label for="ac-def-prog">Descarga</label>
+                        <progress id="ac-def-prog" value="70" max="100">70%</progress>
+                    </div>
+                    <div class="panel azul">
+                        <h3>accent-color azul</h3>
+                        <label><input type="checkbox" id="ac-azul-check" checked> Recordarme</label>
+                        <label><input type="radio" name="ac-azul-radio" id="ac-azul-radio" checked> Envío normal</label>
+                        <label for="ac-azul-range">Volumen</label>
+                        <input type="range" id="ac-azul-range" value="60">
+                        <label for="ac-azul-prog">Descarga</label>
+                        <progress id="ac-azul-prog" value="70" max="100">70%</progress>
+                    </div>
+                    <div class="panel verde">
+                        <h3>accent-color verde</h3>
+                        <label><input type="checkbox" id="ac-verde-check" checked> Recordarme</label>
+                        <label><input type="radio" name="ac-verde-radio" id="ac-verde-radio" checked> Envío normal</label>
+                        <label for="ac-verde-range">Volumen</label>
+                        <input type="range" id="ac-verde-range" value="60">
+                        <label for="ac-verde-prog">Descarga</label>
+                        <progress id="ac-verde-prog" value="70" max="100">70%</progress>
+                    </div>
+                    <div class="panel oscuro">
+                        <h3>Modo oscuro</h3>
+                        <label><input type="checkbox" id="ac-osc-check" checked> Recordarme</label>
+                        <label><input type="radio" name="ac-osc-radio" id="ac-osc-radio" checked> Envío normal</label>
+                        <label for="ac-osc-range">Volumen</label>
+                        <input type="range" id="ac-osc-range" value="60">
+                        <label for="ac-osc-prog">Descarga</label>
+                        <progress id="ac-osc-prog" value="70" max="100">70%</progress>
+                    </div>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.azul {
+    accent-color: #2563eb;
+}
+
+.verde {
+    accent-color: #16a34a;
+}
+
+.oscuro {
+    background: #0f172a;
+    color: #e2e8f0;
+    color-scheme: dark;
+    accent-color: #60a5fa;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>¿Cuándo alcanza con accent-color?</figcaption>
+<pre>✔ Cambiar el color de la marca
+✔ Funciona en todos los navegadores actuales
+✔ Conserva el foco, el teclado y la accesibilidad
+✘ No cambia la forma, el tamaño del ✓ ni el radio
+
+Si necesitas otra forma → appearance: none
+(los ejemplos 7, 8 y 9).</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-checkbox" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Checkbox personalizado con <code>appearance: none</code></h2>
+            <p>Borramos el dibujo nativo y dibujamos uno propio: el cuadrado es el mismo input y el ✓ es su <code>::before</code>. Sigue siendo un checkbox real: funciona con Tab y barra espaciadora.</p>
+            <div class="resultado">
+                <form action="#" onsubmit="return false">
+                    <fieldset class="lista">
+                        <legend>Lista de pendientes</legend>
+                        <label class="opcion tarea"><input type="checkbox" id="ck-leche" checked> <span>Comprar leche y pan</span></label>
+                        <label class="opcion tarea"><input type="checkbox" id="ck-informe"> <span>Enviar informe mensual</span></label>
+                        <label class="opcion tarea"><input type="checkbox" id="ck-dentista"> <span>Pedir cita con el dentista</span></label>
+                        <label class="opcion tarea redondo"><input type="checkbox" id="ck-plantas"> <span>Regar las plantas (versión redonda)</span></label>
+                        <label class="opcion"><input type="checkbox" id="ck-archivado" disabled> <span>Tarea archivada (desactivada)</span></label>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>input[type="checkbox"] {
+    appearance: none;
+    display: grid;
+    place-content: center;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    border: 2px solid #94a3b8;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+input[type="checkbox"]::before {
+    content: "✓";
+    color: #ffffff;
+    font-weight: 700;
+    transform: scale(0);
+    transition: transform 0.15s;
+}
+
+input[type="checkbox"]:checked {
+    border-color: #2563eb;
+    background: #2563eb;
+}
+
+input[type="checkbox"]:checked::before {
+    transform: scale(1);
+}
+
+input[type="checkbox"]:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+.tarea:has(:checked) span {
+    color: #94a3b8;
+    text-decoration: line-through;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué el label envuelve al input</figcaption>
+<pre>&lt;label class="opcion"&gt;
+    &lt;input type="checkbox" id="ck-leche"&gt;
+    &lt;span&gt;Comprar leche y pan&lt;/span&gt;
+&lt;/label&gt;
+
+.opcion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+}
+
+Toda la fila es clicable y mide 44px de alto:
+fácil de tocar con el dedo.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-planes" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Planes: control segmentado y tarjetas seleccionables</h2>
+            <p>Dos usos de los radios que se ven en cualquier página de precios. Arriba, un <strong>control segmentado</strong> Mensual/Anual que cambia los precios. Abajo, <strong>tarjetas</strong> que se marcan enteras gracias a <code>:has(:checked)</code>.</p>
+            <div class="resultado">
+                <form action="#" onsubmit="return false">
+                    <fieldset class="segmentado">
+                        <legend class="oculto">Frecuencia de pago</legend>
+                        <input type="radio" name="pl-periodo" id="pl-mensual" checked>
+                        <label for="pl-mensual">Mensual</label>
+                        <input type="radio" name="pl-periodo" id="pl-anual">
+                        <label for="pl-anual">Anual <span class="descuento">-20%</span></label>
+                    </fieldset>
+                    <fieldset class="planes">
+                        <legend class="oculto">Elige tu plan</legend>
+                        <label class="plan">
+                            <input type="radio" name="pl-plan" id="pl-basico">
+                            <span class="nombre">Básico</span>
+                            <span class="precio"><span class="mensual">$9</span><span class="anual">$86</span> <small class="mensual">/mes</small><small class="anual">/año</small></span>
+                            <span class="detalle">1 usuario · 10 GB · soporte por correo</span>
+                        </label>
+                        <label class="plan">
+                            <input type="radio" name="pl-plan" id="pl-pro" checked>
+                            <span class="insignia">Recomendado</span>
+                            <span class="nombre">Pro</span>
+                            <span class="precio"><span class="mensual">$19</span><span class="anual">$182</span> <small class="mensual">/mes</small><small class="anual">/año</small></span>
+                            <span class="detalle">5 usuarios · 100 GB · soporte por chat</span>
+                        </label>
+                        <label class="plan">
+                            <input type="radio" name="pl-plan" id="pl-empresa">
+                            <span class="nombre">Empresa</span>
+                            <span class="precio"><span class="mensual">$49</span><span class="anual">$470</span> <small class="mensual">/mes</small><small class="anual">/año</small></span>
+                            <span class="detalle">Usuarios ilimitados · 1 TB · soporte 24/7</span>
+                        </label>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Control segmentado</figcaption>
+<pre>&lt;fieldset class="segmentado"&gt;
+    &lt;legend class="oculto"&gt;Frecuencia de pago&lt;/legend&gt;
+    &lt;input type="radio" name="pl-periodo" id="pl-mensual" checked&gt;
+    &lt;label for="pl-mensual"&gt;Mensual&lt;/label&gt;
+    &lt;input type="radio" name="pl-periodo" id="pl-anual"&gt;
+    &lt;label for="pl-anual"&gt;Anual&lt;/label&gt;
+&lt;/fieldset&gt;
+
+.segmentado {
+    display: inline-flex;
+    padding: 4px;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.segmentado input {
+    position: absolute;
+    opacity: 0;
+}
+
+.segmentado input:checked + label {
+    background: #ffffff;
+    color: #2563eb;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
+}
+
+.segmentado input:focus-visible + label {
+    outline: 3px solid #93c5fd;
+}
+
+.anual { display: none; }
+body:has(#pl-anual:checked) .anual { display: inline; }
+body:has(#pl-anual:checked) .mensual { display: none; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Tarjetas</figcaption>
+<pre>.plan {
+    position: relative;
+    display: grid;
+    padding: 18px;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    cursor: pointer;
+}
+
+.plan:hover {
+    border-color: #93c5fd;
+}
+
+.plan:has(:checked) {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.plan:has(:focus-visible) {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+.plan input {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    accent-color: #2563eb;
+}</pre>
+                </figure>
+            </div>
+            <p>Ojo: los radios se esconden con <code>opacity: 0</code> y no con <code>display: none</code>. Así siguen recibiendo el foco y se pueden cambiar con las flechas del teclado.</p>
+        </section>
+
+        <section id="ej-switch" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Interruptores (switch) de configuración</h2>
+            <p>Un checkbox con <code>appearance: none</code> se convierte en la pista y su <code>::before</code> en la bolita. Activa “No molestar” y mira cómo se apagan los demás.</p>
+            <div class="resultado">
+                <form class="panel" action="#" onsubmit="return false">
+                    <div class="ajuste maestro">
+                        <label for="sw-silencio">No molestar<span>Silencia todo durante 8 horas</span></label>
+                        <input type="checkbox" role="switch" class="interruptor" id="sw-silencio">
+                    </div>
+                    <div class="ajuste">
+                        <label for="sw-correo"><strong>Correos</strong><span>Resumen semanal de actividad</span></label>
+                        <input type="checkbox" role="switch" class="interruptor" id="sw-correo" checked>
+                    </div>
+                    <div class="ajuste">
+                        <label for="sw-push"><strong>Notificaciones push</strong><span>Mensajes nuevos y menciones</span></label>
+                        <input type="checkbox" role="switch" class="interruptor" id="sw-push" checked>
+                    </div>
+                    <div class="ajuste">
+                        <label for="sw-sms"><strong>SMS</strong><span>Solo alertas de seguridad</span></label>
+                        <input type="checkbox" role="switch" class="interruptor" id="sw-sms">
+                    </div>
+                    <div class="ajuste">
+                        <label for="sw-ofertas"><strong>Ofertas</strong><span>Disponible solo en el plan Pro</span></label>
+                        <input type="checkbox" role="switch" class="interruptor" id="sw-ofertas" disabled>
+                    </div>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="ajuste"&gt;
+    &lt;label for="sw-correo"&gt;
+        &lt;strong&gt;Correos&lt;/strong&gt;
+        &lt;span&gt;Resumen semanal de actividad&lt;/span&gt;
+    &lt;/label&gt;
+    &lt;input type="checkbox" role="switch"
+           class="interruptor" id="sw-correo" checked&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.interruptor {
+    appearance: none;
+    position: relative;
+    width: 48px;
+    height: 28px;
+    border-radius: 999px;
+    background: #cbd5e1;
+    transition: background 0.2s;
+}
+
+.interruptor::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform 0.2s;
+}
+
+.interruptor:checked {
+    background: #2563eb;
+}
+
+.interruptor:checked::before {
+    transform: translateX(20px);
+}
+
+.interruptor:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+.panel:has(#sw-silencio:checked) .ajuste:not(.maestro) {
+    opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .interruptor,
+    .interruptor::before {
+        transition: none;
+    }
+}</pre>
+                </figure>
+            </div>
+            <p><code>role="switch"</code> hace que el lector de pantalla diga “interruptor, activado” en vez de “casilla, marcada”. La cuenta 48 − 22 − 3 − 3 = 20 da cuánto se mueve la bolita.</p>
+        </section>
+
+        <section id="ej-select" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Select personalizado</h2>
+            <p>Con <code>appearance: none</code> el select pierde su flecha. Hay dos formas de ponerle una propia: un <code>::after</code> en una envoltura, o una imagen SVG de fondo.</p>
+            <div class="resultado">
+                <form action="#" onsubmit="return false">
+                    <div class="campo">
+                        <label for="sl-pais">País (flecha con ::after)</label>
+                        <div class="selector">
+                            <select id="sl-pais" autocomplete="country-name">
+                                <option>Argentina</option>
+                                <option>Chile</option>
+                                <option selected>Colombia</option>
+                                <option>México</option>
+                                <option>Perú</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label for="sl-sucursal">Sucursal (flecha SVG)</label>
+                        <select id="sl-sucursal" class="con-svg">
+                            <optgroup label="Zona norte">
+                                <option>Plaza Norte</option>
+                                <option>Los Olivos</option>
+                            </optgroup>
+                            <optgroup label="Zona sur">
+                                <option>Costa Azul</option>
+                                <option>Villa Sol</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="sl-orden">Ordenar productos</label>
+                        <select id="sl-orden" class="con-svg pastilla">
+                            <option>Más vendidos</option>
+                            <option>Precio: menor a mayor</option>
+                            <option>Precio: mayor a menor</option>
+                            <option>Novedades</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>select {
+    appearance: none;
+    width: 100%;
+    padding: 10px 40px 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background-color: #ffffff;
+    font: inherit;
+    cursor: pointer;
+}
+
+.selector {
+    position: relative;
+}
+
+.selector::after {
+    content: "▾";
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    color: #2563eb;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.con-svg {
+    background-image: url("data:image/svg+xml,%3Csvg ...%3E");
+    background-position: right 14px center;
+    background-repeat: no-repeat;
+}
+
+.pastilla {
+    border: 0;
+    border-radius: 999px;
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Detalles</figcaption>
+<pre>¿Por qué una envoltura?
+    &lt;select&gt; no admite ::before ni ::after,
+    por eso la flecha va en el div que lo rodea.
+
+¿Por qué padding-right: 40px?
+    Para que el texto largo no pase por
+    debajo de la flecha.
+
+¿Y la lista desplegable?
+    Las opciones las dibuja el sistema.
+    Chrome 135+ permite estilizarlas con
+    appearance: base-select; el resto de
+    navegadores todavía no.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-range" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Slider (range) personalizado</h2>
+            <p>El input range tiene dos partes: la <strong>pista</strong> y la <strong>bolita</strong> (thumb). La bolita necesita un selector distinto para cada motor de navegador.</p>
+            <div class="resultado">
+                <form action="#" onsubmit="return false">
+                    <div class="campo">
+                        <label for="rg-volumen">Volumen</label>
+                        <div class="fila">
+                            <span aria-hidden="true">🔈</span>
+                            <input type="range" id="rg-volumen" min="0" max="100" value="65">
+                            <span aria-hidden="true">🔊</span>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label for="rg-precio">Precio máximo</label>
+                        <input type="range" id="rg-precio" min="0" max="500" step="10" value="220">
+                        <div class="extremos"><span>$0</span><span>$250</span><span>$500</span></div>
+                    </div>
+                    <div class="campo">
+                        <label for="rg-picante">Nivel de picante</label>
+                        <input type="range" id="rg-picante" class="grueso" min="1" max="5" value="2">
+                        <div class="extremos"><span>Suave</span><span>Muy picante</span></div>
+                    </div>
+                    <div class="campo">
+                        <label for="rg-brillo">Brillo (desactivado)</label>
+                        <input type="range" id="rg-brillo" value="40" disabled>
+                    </div>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>input[type="range"] {
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background: #dbeafe;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border: 4px solid #ffffff;
+    border-radius: 50%;
+    background: #2563eb;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+}
+
+input[type="range"]::-moz-range-thumb {
+    box-sizing: border-box;
+    width: 24px;
+    height: 24px;
+    border: 4px solid #ffffff;
+    border-radius: 50%;
+    background: #2563eb;
+}
+
+input[type="range"]::-moz-range-progress {
+    height: 8px;
+    background: #2563eb;
+}
+
+input[type="range"]:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 6px;
+}
+
+.grueso {
+    height: 14px;
+    background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Reglas separadas, a propósito</figcaption>
+<pre>::-webkit-slider-thumb    Chrome, Edge, Safari
+::-moz-range-thumb        Firefox
+::-moz-range-progress     Firefox: la parte ya recorrida
+
+No se pueden juntar con coma:
+    a::-webkit-slider-thumb,
+    a::-moz-range-thumb { ... }
+
+Si un navegador no entiende UNO de los selectores,
+descarta la regla ENTERA.
+
+Pintar la parte recorrida en Chrome necesita
+JavaScript (o accent-color, como en el ejemplo 6).</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-archivo" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Subir archivos: botón y zona de arrastre</h2>
+            <p>El botón “Elegir archivo” se estiliza con <code>::file-selector-button</code>. Para la zona de arrastre, el input se estira invisible sobre toda la caja: soltar un archivo encima funciona de forma nativa.</p>
+            <div class="resultado">
+                <form action="#" onsubmit="return false">
+                    <div class="campo">
+                        <label for="ar-cv">Curriculum (PDF)</label>
+                        <input type="file" id="ar-cv" accept=".pdf">
+                    </div>
+                    <div class="campo">
+                        <label for="ar-fotos">Fotos del producto</label>
+                        <div class="zona">
+                            <span class="grande" aria-hidden="true">📷</span>
+                            <strong>Arrastra tus fotos aquí</strong>
+                            <span class="detalle">o haz clic para elegirlas · JPG o PNG, hasta 5 MB</span>
+                            <span class="listo">✓ Archivos seleccionados</span>
+                            <input type="file" id="ar-fotos" accept="image/png, image/jpeg" multiple required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Botón del archivo</figcaption>
+<pre>input[type="file"] {
+    color: #475569;
+    font: inherit;
+}
+
+input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #ffffff;
+    font: inherit;
+    cursor: pointer;
+}
+
+input[type="file"]:hover::file-selector-button {
+    background: #1d4ed8;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Zona de arrastre</figcaption>
+<pre>.zona {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    padding: 32px 16px;
+    border: 2px dashed #93c5fd;
+    border-radius: 14px;
+}
+
+.zona input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.zona:has(input:focus-visible) {
+    outline: 3px solid #93c5fd;
+}
+
+.zona:has(input:valid) {
+    border-style: solid;
+    border-color: #16a34a;
+    background: #f0fdf4;
+}
+
+.zona:has(input:valid) .listo {
+    display: block;
+}</pre>
+                </figure>
+            </div>
+            <p>El input es <code>required</code>: vacío es <code>:invalid</code> y con archivos pasa a <code>:valid</code>. Así la zona se pone verde sin JavaScript. Mostrar el nombre de cada archivo o resaltar la zona mientras se arrastra sí necesita JavaScript.</p>
+        </section>
+
+        <section id="ej-textarea" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Textarea que crece, cursor y selección</h2>
+            <p>Una caja de comentarios como la de una red social. <code>field-sizing: content</code> hace que el campo crezca mientras escribes; <code>caret-color</code>, <code>::placeholder</code> y <code>::selection</code> le dan los detalles finales. Selecciona texto para ver el resaltado.</p>
+            <div class="resultado">
+                <form action="#" onsubmit="return false">
+                    <p class="aviso">Tu navegador todavía no soporta <code>field-sizing</code>: los campos tienen tamaño fijo, pero el formulario funciona igual.</p>
+                    <div class="comentario">
+                        <label for="tx-comentario">Deja tu comentario</label>
+                        <textarea id="tx-comentario" rows="3" minlength="10" maxlength="280" placeholder="¿Qué te pareció la clase? Escribe al menos 10 caracteres…" aria-describedby="tx-contador">Me gustó mucho el ejemplo de los interruptores.</textarea>
+                        <div class="pie">
+                            <span class="contador" id="tx-contador">Mínimo 10 · máximo 280 caracteres</span>
+                            <button type="submit">Publicar</button>
+                        </div>
+                    </div>
+                    <p class="frase">
+                        <label for="tx-nombre">Hola, me llamo</label>
+                        <input type="text" id="tx-nombre" placeholder="tu nombre" autocomplete="given-name">
+                        <label for="tx-ciudad">y vivo en</label>
+                        <input type="text" id="tx-ciudad" placeholder="tu ciudad" autocomplete="address-level2">.
+                    </p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>textarea {
+    min-height: 90px;
+    max-height: 260px;
+    resize: vertical;
+    field-sizing: content;
+    caret-color: #2563eb;
+}
+
+textarea::placeholder {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+textarea::selection {
+    background: #fde68a;
+    color: #0f172a;
+}
+
+.comentario:focus-within {
+    border-color: #2563eb;
+    outline: 3px solid #93c5fd;
+}
+
+.comentario:has(textarea:user-invalid) .contador {
+    color: #dc2626;
+}
+
+.frase input {
+    min-width: 4ch;
+    border: 0;
+    border-bottom: 2px dashed #2563eb;
+    field-sizing: content;
+    caret-color: #dc2626;
+}
+
+.aviso { display: none; }
+
+@supports not (field-sizing: content) {
+    .aviso { display: block; }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Notas</figcaption>
+<pre>field-sizing: content
+    Chrome y Edge 123+. Firefox y Safari todavía no:
+    allí el campo queda con su tamaño normal.
+    Por eso @supports muestra un aviso.
+
+min-height / max-height
+    ponen límites al crecimiento.
+
+resize: vertical
+    la persona puede estirarlo, pero solo hacia abajo
+    (horizontal rompe el diseño).
+
+maxlength="280"
+    el navegador no deja escribir más.
+    Un contador "37 / 280" en vivo necesita JavaScript.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-estrellas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Calificación con estrellas, solo CSS</h2>
+            <p>Cinco radios escritos <strong>al revés</strong> (5, 4, 3, 2, 1) y mostrados al derecho con <code>flex-direction: row-reverse</code>. Así el combinador <code>~</code>, que solo mira hacia adelante, pinta las estrellas de la izquierda.</p>
+            <div class="resultado">
+                <form action="#" onsubmit="return false">
+                    <fieldset class="tarjeta">
+                        <legend>¿Cómo calificas tu pedido?</legend>
+                        <div class="estrellas">
+                            <input type="radio" name="est" id="est-5"><label for="est-5"><span class="oculto">5 estrellas</span></label>
+                            <input type="radio" name="est" id="est-4"><label for="est-4"><span class="oculto">4 estrellas</span></label>
+                            <input type="radio" name="est" id="est-3"><label for="est-3"><span class="oculto">3 estrellas</span></label>
+                            <input type="radio" name="est" id="est-2"><label for="est-2"><span class="oculto">2 estrellas</span></label>
+                            <input type="radio" name="est" id="est-1"><label for="est-1"><span class="oculto">1 estrella</span></label>
+                        </div>
+                        <p class="mensaje">
+                            <span class="m0">Toca una estrella</span>
+                            <span class="m1">Muy malo 😞</span>
+                            <span class="m2">Malo 😕</span>
+                            <span class="m3">Regular 😐</span>
+                            <span class="m4">Bueno 🙂</span>
+                            <span class="m5">¡Excelente! 🤩</span>
+                        </p>
+                    </fieldset>
+                    <div class="producto">
+                        <span class="promedio" role="img" aria-label="4,2 de 5 estrellas"></span>
+                        <strong>4,2</strong>
+                        <span>(318 reseñas)</span>
+                    </div>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="estrellas"&gt;
+    &lt;input type="radio" name="est" id="est-5"&gt;
+    &lt;label for="est-5"&gt;&lt;span class="oculto"&gt;5 estrellas&lt;/span&gt;&lt;/label&gt;
+    &lt;input type="radio" name="est" id="est-4"&gt;
+    &lt;label for="est-4"&gt;&lt;span class="oculto"&gt;4 estrellas&lt;/span&gt;&lt;/label&gt;
+    ...
+    &lt;input type="radio" name="est" id="est-1"&gt;
+    &lt;label for="est-1"&gt;&lt;span class="oculto"&gt;1 estrella&lt;/span&gt;&lt;/label&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.estrellas {
+    display: inline-flex;
+    flex-direction: row-reverse;
+}
+
+.estrellas input {
+    position: absolute;
+    opacity: 0;
+}
+
+.estrellas label {
+    color: #cbd5e1;
+    font-size: 2.4rem;
+    cursor: pointer;
+}
+
+.estrellas label::before {
+    content: "★";
+}
+
+.estrellas input:checked ~ label,
+.estrellas label:hover,
+.estrellas label:hover ~ label {
+    color: #f59e0b;
+}
+
+.estrellas input:focus-visible + label {
+    outline: 3px solid #93c5fd;
+}
+
+.tarjeta:has(#est-5:checked) .m5 { display: inline; }
+
+.promedio::before {
+    content: "★★★★★";
+    background: linear-gradient(90deg, #f59e0b 84%, #cbd5e1 84%);
+    background-clip: text;
+    color: transparent;
+}</pre>
+                </figure>
+            </div>
+            <p>La línea de abajo es otra idea: un promedio de 4,2 se dibuja con un degradado cortado al 84% (4,2 ÷ 5) y recortado a la forma del texto.</p>
+        </section>
+
+        <section id="ej-login" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Ingreso y registro: una tarjeta pulida</h2>
+            <p>Todo lo anterior junto: pestañas con radios, campos con foco claro, enlace de recuperación, “Recordarme” con <code>accent-color</code>, un separador hecho con pseudo-elementos y botones con <code>:hover</code>, <code>:active</code> y <code>:focus-visible</code>.</p>
+            <div class="resultado">
+                <div class="tarjeta">
+                    <p class="marca">◆ Nubo</p>
+                    <fieldset class="pestanas">
+                        <legend class="oculto">Elige una opción</legend>
+                        <input type="radio" name="lg-modo" id="lg-ingresar" checked>
+                        <label for="lg-ingresar">Ingresar</label>
+                        <input type="radio" name="lg-modo" id="lg-registro">
+                        <label for="lg-registro">Crear cuenta</label>
+                    </fieldset>
+                    <form class="ingreso" action="#" onsubmit="return false">
+                        <h3>Bienvenido de nuevo</h3>
+                        <p class="sub">Ingresa con tu correo y contraseña.</p>
+                        <div class="campo">
+                            <label for="lg-correo">Correo</label>
+                            <input type="email" id="lg-correo" autocomplete="email" required>
+                        </div>
+                        <div class="campo">
+                            <div class="fila-label">
+                                <label for="lg-clave">Contraseña</label>
+                                <a href="#ej-login">¿La olvidaste?</a>
+                            </div>
+                            <input type="password" id="lg-clave" autocomplete="current-password" required>
+                        </div>
+                        <label class="recordar"><input type="checkbox" id="lg-recordar" checked> Recordarme en este equipo</label>
+                        <button type="submit" class="boton">Ingresar</button>
+                        <div class="separador">o</div>
+                        <button type="button" class="boton secundario">Recibir un enlace por correo</button>
+                    </form>
+                    <form class="registro" action="#" onsubmit="return false">
+                        <h3>Crea tu cuenta</h3>
+                        <p class="sub">Gratis durante 14 días, sin tarjeta.</p>
+                        <div class="campo">
+                            <label for="lg-nombre">Nombre</label>
+                            <input type="text" id="lg-nombre" autocomplete="name" required>
+                        </div>
+                        <div class="campo">
+                            <label for="lg-correo-nuevo">Correo</label>
+                            <input type="email" id="lg-correo-nuevo" autocomplete="email" required>
+                        </div>
+                        <div class="campo">
+                            <label for="lg-clave-nueva">Contraseña</label>
+                            <input type="password" id="lg-clave-nueva" autocomplete="new-password" minlength="8" required>
+                        </div>
+                        <label class="recordar"><input type="checkbox" id="lg-terminos" required> Acepto los términos y condiciones</label>
+                        <button type="submit" class="boton">Crear cuenta</button>
+                        <p class="legal">Nunca compartiremos tu correo.</p>
+                    </form>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS (lo nuevo)</figcaption>
+<pre>.tarjeta {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 28px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgb(15 23 42 / 0.08);
+}
+
+.pestanas input:checked + label {
+    border-bottom-color: #2563eb;
+    color: #2563eb;
+}
+
+.registro { display: none; }
+body:has(#lg-registro:checked) .registro { display: grid; }
+body:has(#lg-registro:checked) .ingreso { display: none; }
+
+.separador {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.separador::before,
+.separador::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+}
+
+.boton:hover {
+    background: #1d4ed8;
+}
+
+.boton:active {
+    transform: translateY(1px);
+}
+
+.boton:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>autocomplete: el navegador te ayuda</figcaption>
+<pre>autocomplete="email"              rellena el correo guardado
+autocomplete="current-password"   ofrece la contraseña guardada
+autocomplete="new-password"       sugiere una contraseña segura
+autocomplete="name"               nombre completo
+
+Bien puestos, el gestor de contraseñas del
+navegador y del celular funciona solo.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-pago" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Checkout: pago con tarjeta</h2>
+            <p>Un formulario de pago con método seleccionable, campos en una grilla y un resumen al costado. <code>inputmode</code> muestra el teclado numérico en el celular y <code>autocomplete</code> deja que el navegador rellene la tarjeta guardada.</p>
+            <div class="resultado">
+                <div class="checkout">
+                    <form action="#" onsubmit="return false">
+                        <fieldset class="metodos">
+                            <legend>Método de pago</legend>
+                            <label class="metodo"><input type="radio" name="pg-metodo" id="pg-tarjeta" checked><span aria-hidden="true">💳</span>Tarjeta</label>
+                            <label class="metodo"><input type="radio" name="pg-metodo" id="pg-transferencia"><span aria-hidden="true">🏦</span>Transferencia</label>
+                            <label class="metodo"><input type="radio" name="pg-metodo" id="pg-efectivo"><span aria-hidden="true">💵</span>Efectivo</label>
+                        </fieldset>
+                        <div class="campos datos-tarjeta">
+                            <div class="campo ancho">
+                                <label for="pg-titular">Nombre en la tarjeta</label>
+                                <input type="text" id="pg-titular" autocomplete="cc-name" placeholder="ANA RÍOS">
+                            </div>
+                            <div class="campo ancho numero">
+                                <label for="pg-numero">Número de tarjeta</label>
+                                <input type="text" id="pg-numero" inputmode="numeric" autocomplete="cc-number" pattern="[0-9 ]{13,23}" placeholder="1234 5678 9012 3456">
+                                <span class="marcas" aria-hidden="true"><span>VISA</span><span>MC</span></span>
+                            </div>
+                            <div class="campo">
+                                <label for="pg-vence">Vencimiento</label>
+                                <input type="text" id="pg-vence" inputmode="numeric" autocomplete="cc-exp" placeholder="MM / AA">
+                            </div>
+                            <div class="campo">
+                                <label for="pg-cvc">CVC</label>
+                                <input type="text" id="pg-cvc" inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="123">
+                            </div>
+                            <div class="campo">
+                                <label for="pg-pais">País</label>
+                                <select id="pg-pais" autocomplete="country-name">
+                                    <option>Chile</option>
+                                    <option>Ecuador</option>
+                                    <option>Perú</option>
+                                </select>
+                            </div>
+                            <div class="campo">
+                                <label for="pg-postal">Código postal</label>
+                                <input type="text" id="pg-postal" inputmode="numeric" autocomplete="postal-code">
+                            </div>
+                        </div>
+                        <p class="datos-transferencia">Al confirmar te mostraremos los datos de la cuenta bancaria de Tienda Lumo. Tu pedido se envía cuando recibamos la transferencia.</p>
+                        <p class="datos-efectivo">Recibirás un código para pagar en cualquier agente o tienda de conveniencia. Tienes 48 horas.</p>
+                        <button type="submit" class="pagar">Pagar $54,90</button>
+                        <p class="seguro">🔒 Pago cifrado · Tus datos no se guardan</p>
+                    </form>
+                    <aside class="resumen" aria-label="Resumen del pedido">
+                        <h3>Tu pedido</h3>
+                        <div class="linea"><span>Mochila urbana</span><span>$39,90</span></div>
+                        <div class="linea"><span>Botella térmica</span><span>$10,00</span></div>
+                        <div class="linea"><span>Envío</span><span>$5,00</span></div>
+                        <div class="linea total"><span>Total</span><span>$54,90</span></div>
+                    </aside>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.checkout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+}
+
+.campos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.ancho {
+    grid-column: 1 / -1;
+}
+
+.metodo:has(:checked) {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.numero {
+    position: relative;
+}
+
+.numero input {
+    padding-right: 90px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+}
+
+.marcas {
+    position: absolute;
+    right: 10px;
+    bottom: 12px;
+}
+
+body:has(#pg-transferencia:checked) .datos-tarjeta { display: none; }
+body:has(#pg-transferencia:checked) .datos-transferencia { display: block; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Atributos que cambian todo en el celular</figcaption>
+<pre>inputmode="numeric"     teclado de solo números
+autocomplete="cc-name"  nombre del titular
+autocomplete="cc-number" número de tarjeta
+autocomplete="cc-exp"   vencimiento
+autocomplete="cc-csc"   código de seguridad
+
+¿Por qué type="text" y no type="number"?
+El número de tarjeta no es una cantidad:
+no se suma, puede llevar espacios y
+type="number" le pondría flechitas.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-pasos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Encuesta paso a paso con indicador</h2>
+            <p>Tres radios escondidos guardan “en qué paso estamos”. Cada paso es un <code>fieldset</code> que se muestra con <code>:has()</code>, y los botones Siguiente/Atrás son labels de esos radios. Solo visual: en una app real lo controlaría JavaScript.</p>
+            <div class="resultado">
+                <form class="tarjeta" action="#" onsubmit="return false">
+                    <input type="radio" name="ps-paso" id="ps-1" class="control-paso" checked>
+                    <input type="radio" name="ps-paso" id="ps-2" class="control-paso">
+                    <input type="radio" name="ps-paso" id="ps-3" class="control-paso">
+                    <ol class="indicador">
+                        <li class="ind-1"><label for="ps-1"><span class="num">1</span>Tus datos</label></li>
+                        <li class="ind-2"><label for="ps-2"><span class="num">2</span>Experiencia</label></li>
+                        <li class="ind-3"><label for="ps-3"><span class="num">3</span>Comentarios</label></li>
+                    </ol>
+                    <div class="barra"><div class="relleno"></div></div>
+                    <fieldset class="paso paso-1">
+                        <legend>Cuéntanos quién eres</legend>
+                        <div class="campo">
+                            <label for="ps-nombre">Nombre</label>
+                            <input type="text" id="ps-nombre" autocomplete="given-name">
+                        </div>
+                        <div class="campo">
+                            <label for="ps-correo">Correo (opcional)</label>
+                            <input type="email" id="ps-correo" autocomplete="email">
+                        </div>
+                        <div class="acciones">
+                            <label for="ps-2" class="boton">Siguiente →</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="paso paso-2">
+                        <legend>Tu experiencia</legend>
+                        <p class="pregunta">Del 0 al 10, ¿qué tan probable es que nos recomiendes?</p>
+                        <div class="escala">
+                            <input type="radio" name="ps-nps" id="ps-nps-0"><label for="ps-nps-0">0</label>
+                            <input type="radio" name="ps-nps" id="ps-nps-1"><label for="ps-nps-1">1</label>
+                            <input type="radio" name="ps-nps" id="ps-nps-2"><label for="ps-nps-2">2</label>
+                            <input type="radio" name="ps-nps" id="ps-nps-3"><label for="ps-nps-3">3</label>
+                            <input type="radio" name="ps-nps" id="ps-nps-4"><label for="ps-nps-4">4</label>
+                            <input type="radio" name="ps-nps" id="ps-nps-5"><label for="ps-nps-5">5</label>
+                            <input type="radio" name="ps-nps" id="ps-nps-6"><label for="ps-nps-6">6</label>
+                            <input type="radio" name="ps-nps" id="ps-nps-7"><label for="ps-nps-7">7</label>
+                            <input type="radio" name="ps-nps" id="ps-nps-8"><label for="ps-nps-8">8</label>
+                            <input type="radio" name="ps-nps" id="ps-nps-9"><label for="ps-nps-9">9</label>
+                            <input type="radio" name="ps-nps" id="ps-nps-10"><label for="ps-nps-10">10</label>
+                        </div>
+                        <div class="extremos"><span>Nada probable</span><span>Muy probable</span></div>
+                        <div class="acciones">
+                            <label for="ps-1" class="boton atras">← Atrás</label>
+                            <label for="ps-3" class="boton">Siguiente →</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="paso paso-3">
+                        <legend>¿Algo más que quieras decirnos?</legend>
+                        <div class="campo">
+                            <label for="ps-comentario">Comentario</label>
+                            <textarea id="ps-comentario" rows="3"></textarea>
+                        </div>
+                        <div class="acciones">
+                            <label for="ps-2" class="boton atras">← Atrás</label>
+                            <button type="submit" class="boton">Enviar encuesta</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML (resumido)</figcaption>
+<pre>&lt;input type="radio" name="ps-paso" id="ps-1" class="control-paso" checked&gt;
+&lt;input type="radio" name="ps-paso" id="ps-2" class="control-paso"&gt;
+&lt;input type="radio" name="ps-paso" id="ps-3" class="control-paso"&gt;
+
+&lt;ol class="indicador"&gt;
+    &lt;li class="ind-1"&gt;&lt;label for="ps-1"&gt;&lt;span class="num"&gt;1&lt;/span&gt;Tus datos&lt;/label&gt;&lt;/li&gt;
+    ...
+&lt;/ol&gt;
+
+&lt;fieldset class="paso paso-1"&gt;
+    &lt;legend&gt;Cuéntanos quién eres&lt;/legend&gt;
+    ...
+    &lt;label for="ps-2" class="boton"&gt;Siguiente →&lt;/label&gt;
+&lt;/fieldset&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.paso {
+    display: none;
+}
+
+body:has(#ps-1:checked) .paso-1,
+body:has(#ps-2:checked) .paso-2,
+body:has(#ps-3:checked) .paso-3 {
+    display: grid;
+    gap: 14px;
+}
+
+body:has(#ps-2:checked) .ind-2 .num {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+}
+
+body:has(#ps-2:checked) .ind-1 .num {
+    border-color: #16a34a;
+    background: #dcfce7;
+    color: transparent;
+}
+
+body:has(#ps-2:checked) .ind-1 .num::before {
+    content: "✓";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #16a34a;
+}
+
+.relleno {
+    width: 33%;
+    transition: width 0.3s;
+}
+
+body:has(#ps-2:checked) .relleno { width: 66%; }
+body:has(#ps-3:checked) .relleno { width: 100%; }
+
+.escala {
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    gap: 4px;
+}
+
+.escala input:checked + label {
+    background: #2563eb;
+    color: #ffffff;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-otp" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Código de verificación (OTP)</h2>
+            <p>Seis cajitas de un dígito, como las que llegan por SMS. Cada caja cambia al llenarse gracias a <code>:placeholder-shown</code>, y el botón se activa cuando ya no queda ninguna vacía.</p>
+            <div class="resultado">
+                <div class="tarjeta">
+                    <h3>Verifica tu teléfono</h3>
+                    <p class="sub">Enviamos un código de 6 dígitos al +56 9 •••• 4821</p>
+                    <form action="#" onsubmit="return false">
+                        <fieldset>
+                            <legend class="oculto">Código de verificación</legend>
+                            <div class="digitos">
+                                <label for="otp-1" class="oculto">Dígito 1</label>
+                                <input type="text" id="otp-1" inputmode="numeric" pattern="[0-9]" maxlength="1" placeholder="·" autocomplete="one-time-code">
+                                <label for="otp-2" class="oculto">Dígito 2</label>
+                                <input type="text" id="otp-2" inputmode="numeric" pattern="[0-9]" maxlength="1" placeholder="·">
+                                <label for="otp-3" class="oculto">Dígito 3</label>
+                                <input type="text" id="otp-3" inputmode="numeric" pattern="[0-9]" maxlength="1" placeholder="·">
+                                <label for="otp-4" class="oculto">Dígito 4</label>
+                                <input type="text" id="otp-4" inputmode="numeric" pattern="[0-9]" maxlength="1" placeholder="·">
+                                <label for="otp-5" class="oculto">Dígito 5</label>
+                                <input type="text" id="otp-5" inputmode="numeric" pattern="[0-9]" maxlength="1" placeholder="·">
+                                <label for="otp-6" class="oculto">Dígito 6</label>
+                                <input type="text" id="otp-6" inputmode="numeric" pattern="[0-9]" maxlength="1" placeholder="·">
+                            </div>
+                        </fieldset>
+                        <button type="submit" class="verificar">Verificar</button>
+                    </form>
+                    <p class="reenviar">¿No te llegó? <a href="#ej-otp">Reenviar código</a> en 0:45</p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML de una caja</figcaption>
+<pre>&lt;label for="otp-1" class="oculto"&gt;Dígito 1&lt;/label&gt;
+&lt;input type="text" id="otp-1"
+       inputmode="numeric"
+       pattern="[0-9]"
+       maxlength="1"
+       placeholder="·"
+       autocomplete="one-time-code"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.digitos {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.digitos input {
+    width: 48px;
+    height: 58px;
+    border: 2px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-align: center;
+    caret-color: #2563eb;
+}
+
+.digitos input:nth-of-type(3) {
+    margin-right: 12px;
+}
+
+.digitos input:focus {
+    border-color: #2563eb;
+    outline: 3px solid #93c5fd;
+    transform: translateY(-2px);
+}
+
+.digitos input:not(:placeholder-shown) {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.digitos input:user-invalid {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+form:not(:has(input:placeholder-shown)) .verificar {
+    background: #2563eb;
+    cursor: pointer;
+}</pre>
+                </figure>
+            </div>
+            <p><code>autocomplete="one-time-code"</code> hace que el celular ofrezca pegar el código del SMS. Pasar solo a la siguiente caja al escribir un dígito necesita JavaScript; por eso muchos sitios usan un único input con <code>letter-spacing</code> grande.</p>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="16-css-variables-temas.html">Anterior: variables y temas</a> |
+            <a href="index.html">Índice</a>
+        </nav>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>07. Imágenes y contenido incrustado</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>07. Imágenes y contenido incrustado</h1>
+        <p>Una página puede mostrar imágenes propias o de otros sitios, adaptarlas a cada pantalla, dibujar gráficos con SVG e incrustar páginas completas como videos, mapas o documentos PDF.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-rutas">Rutas</a></li>
+            <li><a href="#ej-galeria">Imagen con enlace</a></li>
+            <li><a href="#ej-lazy">Carga diferida</a></li>
+            <li><a href="#ej-srcset">srcset por ancho</a></li>
+            <li><a href="#ej-densidad">srcset por densidad</a></li>
+            <li><a href="#ej-picture">picture</a></li>
+            <li><a href="#ej-formatos">Formatos</a></li>
+            <li><a href="#ej-figure">figure</a></li>
+            <li><a href="#ej-mapa-imagen">Mapa de imagen</a></li>
+            <li><a href="#ej-svg">SVG</a></li>
+            <li><a href="#ej-canvas">canvas</a></li>
+            <li><a href="#ej-emojis">Emojis e íconos</a></li>
+            <li><a href="#ej-youtube">YouTube</a></li>
+            <li><a href="#ej-osm">Mapa</a></li>
+            <li><a href="#ej-visor">Página propia</a></li>
+            <li><a href="#ej-srcdoc">srcdoc</a></li>
+            <li><a href="#ej-sandbox">sandbox</a></li>
+            <li><a href="#ej-pdf">PDF</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Elementos de esta lección</h2>
+            <p>Todas las imágenes deben llevar <code>alt</code> (texto alternativo) y conviene indicar <code>width</code> y <code>height</code> para que la página no "salte" mientras cargan.</p>
+            <table>
+                <thead>
+                    <tr><th>Elemento</th><th>Para qué sirve</th><th>Atributos clave</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>img</code></td><td>mostrar una imagen</td><td><code>src</code>, <code>alt</code>, <code>width</code>, <code>height</code>, <code>loading</code></td></tr>
+                    <tr><td><code>img</code> + <code>srcset</code></td><td>varias versiones de la misma imagen</td><td><code>srcset</code>, <code>sizes</code></td></tr>
+                    <tr><td><code>picture</code> + <code>source</code></td><td>imagen distinta según pantalla o formato</td><td><code>media</code>, <code>type</code>, <code>srcset</code></td></tr>
+                    <tr><td><code>figure</code> + <code>figcaption</code></td><td>imagen con pie de foto</td><td>&mdash;</td></tr>
+                    <tr><td><code>map</code> + <code>area</code></td><td>zonas cliqueables dentro de una imagen</td><td><code>usemap</code>, <code>shape</code>, <code>coords</code></td></tr>
+                    <tr><td><code>svg</code></td><td>gráficos vectoriales dentro del HTML</td><td><code>viewBox</code>, <code>width</code>, <code>height</code></td></tr>
+                    <tr><td><code>canvas</code></td><td>lienzo para dibujar con JavaScript</td><td><code>width</code>, <code>height</code></td></tr>
+                    <tr><td><code>iframe</code></td><td>una página dentro de otra</td><td><code>src</code>, <code>title</code>, <code>allow</code>, <code>sandbox</code>, <code>srcdoc</code></td></tr>
+                    <tr><td><code>object</code></td><td>incrustar un recurso externo (PDF)</td><td><code>data</code>, <code>type</code></td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="ej-rutas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Imágenes: ruta remota y ruta local</h2>
+            <p>La primera foto vive en otro servidor (URL absoluta): si ese sitio la borra, deja de verse. La segunda está dentro del proyecto, en <code>assets/imgs/</code>, y se escribe desde la ubicación de esta página (ruta relativa).</p>
+            <div class="resultado">
+                <h3>Ruta remota (URL absoluta)</h3>
+                <img src="https://www.w3schools.com/html/pic_trulli.jpg" alt="Casas trulli de techo cónico en Alberobello, Italia" width="500" height="333">
+                <h3>Ruta local (ruta relativa)</h3>
+                <img src="assets/imgs/pic_trulli.jpg" alt="Casas trulli de techo cónico en Alberobello, Italia" width="500" height="333">
+                <h3>Ruta equivocada: se muestra el texto alternativo</h3>
+                <img src="assets/imgs/no-existe.jpg" alt="Foto del menú del día del restaurante" width="300" height="120">
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;img src="https://www.w3schools.com/html/pic_trulli.jpg"
+     alt="Casas trulli de techo cónico en Alberobello, Italia"
+     width="500" height="333"&gt;
+
+&lt;img src="assets/imgs/pic_trulli.jpg"
+     alt="Casas trulli de techo cónico en Alberobello, Italia"
+     width="500" height="333"&gt;
+
+&lt;img src="assets/imgs/no-existe.jpg"
+     alt="Foto del menú del día del restaurante"
+     width="300" height="120"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Tipos de ruta</figcaption>
+<pre>https://sitio.com/foto.jpg   absoluta (otro servidor)
+assets/imgs/foto.jpg         relativa: desde esta carpeta
+../imgs/foto.jpg             sube una carpeta
+/imgs/foto.jpg               desde la raíz del sitio
+
+Un buen alt describe la imagen como
+si se la contaras a alguien por
+teléfono. Si es decorativa: alt="".</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-galeria" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Imagen con enlace: galería de miniaturas</h2>
+            <p>Una imagen dentro de <code>&lt;a&gt;</code> funciona como botón. Al hacer clic en cada miniatura se abre la foto completa en otra pestaña, como en un portal inmobiliario.</p>
+            <div class="resultado">
+                <h3>Departamento en arriendo &middot; 2 dormitorios</h3>
+                <a href="assets/imgs/pic_trulli.jpg" target="_blank" rel="noopener noreferrer"><img src="assets/imgs/pic_trulli.jpg" alt="Ver la fachada en tamaño completo" width="200" height="133"></a>
+                <a href="https://picsum.photos/id/1048/1200/800" target="_blank" rel="noopener noreferrer"><img src="https://picsum.photos/id/1048/300/200" alt="Ver el living en tamaño completo" width="200" height="133"></a>
+                <a href="https://picsum.photos/id/1081/1200/800" target="_blank" rel="noopener noreferrer"><img src="https://picsum.photos/id/1081/300/200" alt="Ver la vista desde el balcón en tamaño completo" width="200" height="133"></a>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;a href="assets/imgs/pic_trulli.jpg" target="_blank"
+   rel="noopener noreferrer"&gt;
+    &lt;img src="assets/imgs/pic_trulli.jpg"
+         alt="Ver la fachada en tamaño completo"
+         width="200" height="133"&gt;
+&lt;/a&gt;
+&lt;a href="https://picsum.photos/id/1048/1200/800" ...&gt;
+    &lt;img src="https://picsum.photos/id/1048/300/200" ...&gt;
+&lt;/a&gt;
+...</pre>
+                </figure>
+                <figure>
+                    <figcaption>Detalles</figcaption>
+<pre>La miniatura es pequeña (300x200)
+y el enlace apunta a la grande
+(1200x800): la página carga rápido.
+
+Si la imagen es el único contenido
+del enlace, su alt describe a dónde
+lleva el enlace.
+
+rel="noopener noreferrer" protege
+la página al abrir otra pestaña.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-lazy" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Carga diferida: catálogo de productos</h2>
+            <p><code>loading="lazy"</code> le dice al navegador que descargue la imagen solo cuando el usuario se acerque a ella. Ideal para catálogos largos. Abre las herramientas de desarrollador (pestaña Red) y desplázate para verlo.</p>
+            <div class="resultado">
+                <h3>Accesorios de escritorio</h3>
+                <figure>
+                    <img src="https://picsum.photos/id/0/300/200" alt="Portátil sobre un escritorio de madera" width="300" height="200" loading="lazy">
+                    <figcaption>Soporte para portátil &mdash; $24,90</figcaption>
+                </figure>
+                <figure>
+                    <img src="https://picsum.photos/id/1/300/200" alt="Persona escribiendo en un teclado" width="300" height="200" loading="lazy">
+                    <figcaption>Teclado mecánico silencioso &mdash; $59,00</figcaption>
+                </figure>
+                <figure>
+                    <img src="https://picsum.photos/id/180/300/200" alt="Portátil y libreta sobre una mesa" width="300" height="200" loading="lazy">
+                    <figcaption>Libreta de tapa dura &mdash; $8,50</figcaption>
+                </figure>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;figure&gt;
+    &lt;img src="https://picsum.photos/id/0/300/200"
+         alt="Portátil sobre un escritorio de madera"
+         width="300" height="200" loading="lazy"&gt;
+    &lt;figcaption&gt;Soporte para portátil &amp;mdash; $24,90&lt;/figcaption&gt;
+&lt;/figure&gt;
+...</pre>
+                </figure>
+                <figure>
+                    <figcaption>Valores de loading</figcaption>
+<pre>eager  descarga de inmediato (por defecto)
+lazy   descarga al acercarse
+
+No uses lazy en la imagen principal
+de la parte de arriba de la página:
+retrasaría lo primero que se ve.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-srcset" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Varias resoluciones con srcset y sizes</h2>
+            <p>El navegador elige el archivo más adecuado según el ancho de la pantalla. Un celular descarga la versión pequeña; un monitor grande, la de 1200 px.</p>
+            <div class="resultado">
+                <img
+                    src="https://picsum.photos/id/1018/600/400"
+                    srcset="https://picsum.photos/id/1018/400/267 400w,
+                            https://picsum.photos/id/1018/800/533 800w,
+                            https://picsum.photos/id/1018/1200/800 1200w"
+                    sizes="(max-width: 600px) 100vw, 600px"
+                    alt="Paisaje de montañas con un lago"
+                    width="600" height="400">
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;img
+    src="https://picsum.photos/id/1018/600/400"
+    srcset="https://picsum.photos/id/1018/400/267 400w,
+            https://picsum.photos/id/1018/800/533 800w,
+            https://picsum.photos/id/1018/1200/800 1200w"
+    sizes="(max-width: 600px) 100vw, 600px"
+    alt="Paisaje de montañas con un lago"
+    width="600" height="400"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo se lee</figcaption>
+<pre>srcset: "tengo estos archivos y
+        este es su ancho real (w)"
+sizes:  "en pantallas de hasta 600px
+        la imagen ocupa todo el ancho
+        (100vw); si no, ocupa 600px"
+
+src es el respaldo para navegadores
+que no entienden srcset.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-densidad" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>srcset por densidad de píxeles: foto de perfil</h2>
+            <p>Las pantallas Retina tienen 2 o 3 píxeles físicos por cada píxel CSS. Con los descriptores <code>1x</code>, <code>2x</code> y <code>3x</code> se entrega una versión más nítida a esas pantallas, manteniendo el mismo tamaño visible.</p>
+            <div class="resultado">
+                <p><strong>Camila Ríos</strong> &middot; Diseñadora gráfica</p>
+                <img
+                    src="https://picsum.photos/id/64/150/150"
+                    srcset="https://picsum.photos/id/64/150/150 1x,
+                            https://picsum.photos/id/64/300/300 2x,
+                            https://picsum.photos/id/64/450/450 3x"
+                    alt="Foto de perfil de Camila Ríos"
+                    width="150" height="150">
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;img
+    src="https://picsum.photos/id/64/150/150"
+    srcset="https://picsum.photos/id/64/150/150 1x,
+            https://picsum.photos/id/64/300/300 2x,
+            https://picsum.photos/id/64/450/450 3x"
+    alt="Foto de perfil de Camila Ríos"
+    width="150" height="150"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>w o x</figcaption>
+<pre>x   tamaño fijo en pantalla
+    (logos, avatares, íconos)
+w   tamaño que cambia con la pantalla
+    (fotos de portada), junto a sizes
+
+No se mezclan x y w en el mismo srcset.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-picture" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Imagen distinta según el tamaño con picture</h2>
+            <p>Achica la ventana del navegador: en pantallas pequeñas aparece un recorte cuadrado y en pantallas grandes una franja horizontal. A esto se le llama "dirección de arte".</p>
+            <div class="resultado">
+                <picture>
+                    <source media="(max-width: 600px)" srcset="https://picsum.photos/id/1025/400/400">
+                    <source media="(max-width: 1000px)" srcset="https://picsum.photos/id/1025/800/400">
+                    <img src="https://picsum.photos/id/1025/1000/300" alt="Un perro envuelto en una manta" width="1000" height="300">
+                </picture>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;picture&gt;
+    &lt;source media="(max-width: 600px)"
+            srcset="https://picsum.photos/id/1025/400/400"&gt;
+    &lt;source media="(max-width: 1000px)"
+            srcset="https://picsum.photos/id/1025/800/400"&gt;
+    &lt;img src="https://picsum.photos/id/1025/1000/300"
+         alt="Un perro envuelto en una manta"
+         width="1000" height="300"&gt;
+&lt;/picture&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Orden de lectura</figcaption>
+<pre>El navegador revisa los source de
+arriba hacia abajo y usa el primero
+cuya condición se cumple.
+
+El img es obligatorio: es el que
+realmente se muestra y el respaldo
+si ningún source aplica. El alt
+va siempre en el img.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-formatos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>picture para formatos modernos: WebP con respaldo JPG</h2>
+            <p>WebP y AVIF pesan mucho menos que JPG. Con <code>type</code> el navegador usa el formato moderno si lo entiende y, si no, cae al <code>img</code> en JPG.</p>
+            <div class="resultado">
+                <h3>Hostal Los Coihues &middot; desayuno incluido</h3>
+                <picture>
+                    <source srcset="https://picsum.photos/id/1080/600/400.webp" type="image/webp">
+                    <img src="https://picsum.photos/id/1080/600/400.jpg" alt="Fresas frescas en un plato de desayuno" width="600" height="400">
+                </picture>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;picture&gt;
+    &lt;source srcset="https://picsum.photos/id/1080/600/400.webp"
+            type="image/webp"&gt;
+    &lt;img src="https://picsum.photos/id/1080/600/400.jpg"
+         alt="Fresas frescas en un plato de desayuno"
+         width="600" height="400"&gt;
+&lt;/picture&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Formatos de imagen</figcaption>
+<pre>jpg   fotos (sin transparencia)
+png   capturas, transparencia
+gif   animaciones simples
+svg   logos e íconos vectoriales
+webp  fotos livianas, transparencia
+avif  aún más liviano que webp
+
+Clic derecho &gt; Abrir imagen en otra
+pestaña: verás que se cargó .webp.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-figure" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Figura con pie de foto</h2>
+            <p><code>figure</code> une la imagen con su leyenda. También puede agrupar varias imágenes bajo un mismo pie, como en un reportaje.</p>
+            <div class="resultado">
+                <figure>
+                    <img src="assets/imgs/pic_trulli.jpg" alt="Casas trulli de techo cónico" width="400" height="267">
+                    <figcaption>Trulli de Alberobello, Patrimonio de la Humanidad desde 1996.</figcaption>
+                </figure>
+                <figure>
+                    <img src="https://picsum.photos/id/1036/200/133" alt="Montañas nevadas bajo un cielo nublado" width="200" height="133">
+                    <img src="https://picsum.photos/id/1039/200/133" alt="Cascada entre rocas y vegetación" width="200" height="133">
+                    <figcaption>Figura 2. Antes y después del deshielo en el parque nacional Cumbres Altas. Fotos: Diego Salas.</figcaption>
+                </figure>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;figure&gt;
+    &lt;img src="assets/imgs/pic_trulli.jpg"
+         alt="Casas trulli de techo cónico"
+         width="400" height="267"&gt;
+    &lt;figcaption&gt;Trulli de Alberobello, Patrimonio...&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+    &lt;img src="https://picsum.photos/id/1036/200/133" alt="Montañas nevadas..." ...&gt;
+    &lt;img src="https://picsum.photos/id/1039/200/133" alt="Cascada entre rocas..." ...&gt;
+    &lt;figcaption&gt;Figura 2. Antes y después del deshielo...&lt;/figcaption&gt;
+&lt;/figure&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>alt vs figcaption</figcaption>
+<pre>alt         reemplaza la imagen cuando
+            no se ve (qué se ve en ella)
+figcaption  se muestra siempre y aporta
+            contexto (lugar, fecha, autor)</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-mapa-imagen" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Mapa de imagen: zonas cliqueables sobre una foto</h2>
+            <p>Con <code>map</code> y <code>area</code> se definen zonas de la imagen que funcionan como enlaces. Pasa el mouse por los techos de los tres trulli y por la puerta central: el cursor cambia a una mano.</p>
+            <div class="resultado">
+                <img src="assets/imgs/pic_trulli.jpg" alt="Calle con tres trulli; cada techo enlaza a más información" width="500" height="333" usemap="#mapa-trulli">
+                <map name="mapa-trulli">
+                    <area shape="poly" coords="0,125,95,40,170,130" href="https://es.wikipedia.org/wiki/Trullo" target="_blank" rel="noopener noreferrer" alt="Trullo de la izquierda: qué es un trullo">
+                    <area shape="poly" coords="185,140,262,30,345,140" href="https://es.wikipedia.org/wiki/Alberobello" target="_blank" rel="noopener noreferrer" alt="Trullo central: la ciudad de Alberobello">
+                    <area shape="poly" coords="370,135,430,55,500,130" href="https://es.wikipedia.org/wiki/Apulia" target="_blank" rel="noopener noreferrer" alt="Trullo de la derecha: la región de Apulia">
+                    <area shape="rect" coords="255,215,295,290" href="#ej-mapa-imagen" alt="Puerta del trullo central">
+                    <area shape="circle" coords="168,295,30" href="#ej-mapa-imagen" alt="Macetero con flores">
+                </map>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;img src="assets/imgs/pic_trulli.jpg" alt="Calle con tres trulli..."
+     width="500" height="333" usemap="#mapa-trulli"&gt;
+&lt;map name="mapa-trulli"&gt;
+    &lt;area shape="poly" coords="0,125,95,40,170,130"
+          href="https://es.wikipedia.org/wiki/Trullo"
+          target="_blank" rel="noopener noreferrer"
+          alt="Trullo de la izquierda: qué es un trullo"&gt;
+    &lt;area shape="poly" coords="185,140,262,30,345,140" ...&gt;
+    &lt;area shape="poly" coords="370,135,430,55,500,130" ...&gt;
+    &lt;area shape="rect" coords="255,215,295,290"
+          href="#" alt="Puerta del trullo central"&gt;
+    &lt;area shape="circle" coords="168,295,30"
+          href="#" alt="Macetero con flores"&gt;
+&lt;/map&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Coordenadas (en píxeles)</figcaption>
+<pre>rect    x1,y1,x2,y2   esquinas
+circle  x,y,radio     centro y radio
+poly    x1,y1,x2,y2,...  vértices
+
+(0,0) es la esquina superior izquierda.
+usemap="#nombre" conecta con map name.
+
+Ojo: las zonas no se adaptan si la
+imagen cambia de tamaño con CSS.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-svg" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>SVG dentro del HTML: logo, íconos y gráfico de barras</h2>
+            <p>SVG describe dibujos con formas (círculos, rectángulos, líneas, texto). Es vectorial: se ve nítido a cualquier tamaño y pesa muy poco.</p>
+            <div class="resultado">
+                <h3>Logo</h3>
+                <svg width="220" height="80" viewBox="0 0 220 80" role="img" aria-label="Logo de Panadería Sol">
+                    <circle cx="40" cy="40" r="30" fill="#f59e0b"/>
+                    <circle cx="40" cy="40" r="16" fill="#fde68a"/>
+                    <text x="85" y="50" font-family="sans-serif" font-size="24" font-weight="bold" fill="#92400e">Pan Sol</text>
+                </svg>
+                <h3>Íconos</h3>
+                <p>
+                    <svg width="32" height="32" viewBox="0 0 24 24" role="img" aria-label="Inicio">
+                        <path d="M3 11 L12 3 L21 11 V21 H15 V15 H9 V21 H3 Z" fill="none" stroke="#1f2937" stroke-width="2"/>
+                    </svg>
+                    <svg width="32" height="32" viewBox="0 0 24 24" role="img" aria-label="Buscar">
+                        <circle cx="10" cy="10" r="6" fill="none" stroke="#1f2937" stroke-width="2"/>
+                        <line x1="15" y1="15" x2="21" y2="21" stroke="#1f2937" stroke-width="2"/>
+                    </svg>
+                    <svg width="32" height="32" viewBox="0 0 24 24" role="img" aria-label="Favorito">
+                        <path d="M12 21 L3 12 A5 5 0 0 1 12 6 A5 5 0 0 1 21 12 Z" fill="#dc2626"/>
+                    </svg>
+                    <svg width="64" height="64" viewBox="0 0 24 24" role="img" aria-label="Favorito, versión grande">
+                        <path d="M12 21 L3 12 A5 5 0 0 1 12 6 A5 5 0 0 1 21 12 Z" fill="#dc2626"/>
+                    </svg>
+                </p>
+                <h3>Ventas por trimestre (miles de $)</h3>
+                <svg width="320" height="200" viewBox="0 0 320 200" role="img" aria-label="Gráfico de barras: T1 40, T2 65, T3 90, T4 55">
+                    <line x1="30" y1="170" x2="310" y2="170" stroke="#64748b"/>
+                    <rect x="45" y="130" width="40" height="40" fill="#6366f1"/>
+                    <rect x="115" y="105" width="40" height="65" fill="#6366f1"/>
+                    <rect x="185" y="80" width="40" height="90" fill="#4f46e5"/>
+                    <rect x="255" y="115" width="40" height="55" fill="#6366f1"/>
+                    <text x="65" y="188" text-anchor="middle" font-size="12">T1</text>
+                    <text x="135" y="188" text-anchor="middle" font-size="12">T2</text>
+                    <text x="205" y="188" text-anchor="middle" font-size="12">T3</text>
+                    <text x="275" y="188" text-anchor="middle" font-size="12">T4</text>
+                    <text x="65" y="124" text-anchor="middle" font-size="12">40</text>
+                    <text x="135" y="99" text-anchor="middle" font-size="12">65</text>
+                    <text x="205" y="74" text-anchor="middle" font-size="12">90</text>
+                    <text x="275" y="109" text-anchor="middle" font-size="12">55</text>
+                </svg>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;svg width="220" height="80" viewBox="0 0 220 80"
+     role="img" aria-label="Logo de Panadería Sol"&gt;
+    &lt;circle cx="40" cy="40" r="30" fill="#f59e0b"/&gt;
+    &lt;circle cx="40" cy="40" r="16" fill="#fde68a"/&gt;
+    &lt;text x="85" y="50" font-family="sans-serif" font-size="24"
+          font-weight="bold" fill="#92400e"&gt;Pan Sol&lt;/text&gt;
+&lt;/svg&gt;
+
+&lt;svg width="32" height="32" viewBox="0 0 24 24"
+     role="img" aria-label="Buscar"&gt;
+    &lt;circle cx="10" cy="10" r="6" fill="none"
+            stroke="#1f2937" stroke-width="2"/&gt;
+    &lt;line x1="15" y1="15" x2="21" y2="21"
+          stroke="#1f2937" stroke-width="2"/&gt;
+&lt;/svg&gt;
+
+&lt;svg width="320" height="200" viewBox="0 0 320 200"
+     role="img" aria-label="Gráfico de barras: T1 40, ..."&gt;
+    &lt;line x1="30" y1="170" x2="310" y2="170" stroke="#64748b"/&gt;
+    &lt;rect x="45" y="130" width="40" height="40" fill="#6366f1"/&gt;
+    ...
+    &lt;text x="65" y="188" text-anchor="middle" font-size="12"&gt;T1&lt;/text&gt;
+    ...
+&lt;/svg&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Formas básicas</figcaption>
+<pre>circle  cx, cy, r
+rect    x, y, width, height
+line    x1, y1, x2, y2
+path    d="M x y L x y ... Z"
+text    x, y
+
+viewBox="0 0 24 24" define el sistema
+de coordenadas: el mismo ícono se
+dibuja a 32px o a 64px sin perder
+nitidez (mira el corazón grande).
+
+En SVG la y crece hacia abajo: una
+barra más alta empieza en una y menor.
+
+Un .svg también se puede usar como
+archivo: &lt;img src="logo.svg" alt="..."&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-canvas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>canvas: un lienzo en blanco</h2>
+            <p><code>canvas</code> reserva un rectángulo de píxeles donde JavaScript puede dibujar: juegos, firmas digitales, editores de fotos. Sin JavaScript queda vacío y transparente, por eso el recuadro de abajo parece no tener nada. Lo usaremos en las lecciones de JavaScript.</p>
+            <div class="resultado">
+                <p>Firma aquí con el dedo o el mouse:</p>
+                <canvas width="400" height="150" role="img" aria-label="Zona para firmar">
+                    Tu navegador no puede mostrar la zona de firma. Firma el documento impreso y envíalo escaneado.
+                </canvas>
+                <p>(El lienzo de 400 &times; 150 píxeles está justo encima de este texto.)</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;canvas width="400" height="150"
+        role="img" aria-label="Zona para firmar"&gt;
+    Tu navegador no puede mostrar la zona de firma.
+    Firma el documento impreso y envíalo escaneado.
+&lt;/canvas&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>SVG vs canvas</figcaption>
+<pre>svg     formas que siguen existiendo en
+        el HTML; nítido al ampliar
+        (logos, íconos, gráficos)
+canvas  píxeles pintados por JavaScript;
+        muy rápido con miles de objetos
+        (juegos, dibujo libre)
+
+El texto interior solo aparece si el
+navegador no soporta canvas.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-emojis" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Emojis como texto frente a íconos como imagen</h2>
+            <p>Un emoji es un carácter de texto: crece con el tamaño de la letra, no necesita descargarse y se ve distinto en cada sistema operativo. Una imagen se ve igual en todas partes, pero hay que descargarla.</p>
+            <div class="resultado">
+                <h3>Reseñas del Café Aroma <span role="img" aria-label="taza de café">☕</span></h3>
+                <p>Calificación: <span role="img" aria-label="4 de 5 estrellas">⭐⭐⭐⭐</span> (128 opiniones)</p>
+                <p><small>Envío gratis <span role="img" aria-label="camión">🚚</span></small></p>
+                <p>Con imagen: <img src="assets/imgs/pic_trulli.jpg" alt="Alberobello" width="24" height="16"> Viaje a Italia</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Reseñas del Café Aroma
+    &lt;span role="img" aria-label="taza de café"&gt;☕&lt;/span&gt;&lt;/h3&gt;
+&lt;p&gt;Calificación:
+    &lt;span role="img" aria-label="4 de 5 estrellas"&gt;⭐⭐⭐⭐&lt;/span&gt;
+    (128 opiniones)&lt;/p&gt;
+&lt;p&gt;&lt;small&gt;Envío gratis
+    &lt;span role="img" aria-label="camión"&gt;🚚&lt;/span&gt;&lt;/small&gt;&lt;/p&gt;
+&lt;p&gt;Con imagen: &lt;img src="assets/imgs/pic_trulli.jpg"
+    alt="Alberobello" width="24" height="16"&gt; Viaje a Italia&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Recordatorio: el favicon</figcaption>
+<pre>El ícono de la pestaña del navegador
+también es una imagen. Va en el &lt;head&gt;:
+
+&lt;link rel="icon" href="favicon.ico"&gt;
+&lt;link rel="icon" href="logo.svg"
+      type="image/svg+xml"&gt;
+&lt;link rel="apple-touch-icon"
+      href="icono-180.png"&gt;
+
+role="img" + aria-label hace que el
+lector de pantalla diga "4 de 5
+estrellas" y no "estrella estrella...".</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-youtube" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Iframe: video de YouTube</h2>
+            <p>Un <code>iframe</code> muestra otra página dentro de la nuestra. YouTube entrega este código en <em>Compartir &rarr; Insertar</em>.</p>
+            <div class="resultado">
+                <iframe width="560" height="315"
+                    src="https://www.youtube.com/embed/5bExPGw9yKw"
+                    title="Video de YouTube incrustado"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    loading="lazy"
+                    allowfullscreen></iframe>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;iframe width="560" height="315"
+    src="https://www.youtube.com/embed/5bExPGw9yKw"
+    title="Video de YouTube incrustado"
+    allow="accelerometer; autoplay; clipboard-write;
+           encrypted-media; gyroscope; picture-in-picture;
+           web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    loading="lazy"
+    allowfullscreen&gt;&lt;/iframe&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Atributos</figcaption>
+<pre>src             la dirección /embed/, no /watch
+title           obligatorio para accesibilidad
+allow           permisos que damos al iframe
+                (autoplay, pantalla en pantalla...)
+allowfullscreen permite el botón de pantalla
+                completa
+loading="lazy"  lo carga al acercarse
+
+width="560" es fijo: en un celular se
+sale de la pantalla. En CSS se hace
+adaptable con width: 100% y
+aspect-ratio: 16 / 9.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-osm" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Iframe: mapa de OpenStreetMap</h2>
+            <p>Para la página de "Cómo llegar" de un negocio. OpenStreetMap genera este código en <em>Compartir &rarr; HTML</em>; Google Maps funciona igual.</p>
+            <div class="resultado">
+                <iframe width="560" height="350"
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=17.2280%2C40.7790%2C17.2450%2C40.7880&amp;layer=mapnik&amp;marker=40.7835%2C17.2365"
+                    title="Mapa de Alberobello, Italia"
+                    loading="lazy"></iframe>
+                <p><a href="https://www.openstreetmap.org/?mlat=40.7835&amp;mlon=17.2365#map=16/40.7835/17.2365" target="_blank" rel="noopener noreferrer">Ver el mapa más grande</a></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;iframe width="560" height="350"
+    src="https://www.openstreetmap.org/export/embed.html?bbox=...&amp;amp;layer=mapnik&amp;amp;marker=40.7835%2C17.2365"
+    title="Mapa de Alberobello, Italia"
+    loading="lazy"&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;a href="https://www.openstreetmap.org/?mlat=40.7835&amp;amp;mlon=17.2365#map=16/40.7835/17.2365"
+      target="_blank" rel="noopener noreferrer"&gt;Ver el mapa más grande&lt;/a&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Detalles</figcaption>
+<pre>bbox    zona visible (lon/lat de las
+        esquinas)
+marker  dónde va el pin
+
+En HTML el &amp; de una URL se escribe
+&amp;amp; dentro de un atributo.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-visor" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Iframe con una página propia y enlaces que la cambian</h2>
+            <p>Un iframe también puede mostrar páginas del proyecto. Si le damos un <code>name</code>, los enlaces con ese <code>target</code> se abren dentro de él. Prueba los botones de las lecciones.</p>
+            <div class="resultado">
+                <nav aria-label="Lecciones en el visor">
+                    <a href="01-estructura.html" target="visor-lecciones">Lección 01</a> |
+                    <a href="02-texto.html" target="visor-lecciones">Lección 02</a> |
+                    <a href="03-enlaces-listas.html" target="visor-lecciones">Lección 03</a>
+                </nav>
+                <iframe src="01-estructura.html" name="visor-lecciones" width="560" height="300" title="Visor de lecciones del curso" loading="lazy"></iframe>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;nav aria-label="Lecciones en el visor"&gt;
+    &lt;a href="01-estructura.html" target="visor-lecciones"&gt;Lección 01&lt;/a&gt; |
+    &lt;a href="02-texto.html" target="visor-lecciones"&gt;Lección 02&lt;/a&gt; |
+    &lt;a href="03-enlaces-listas.html" target="visor-lecciones"&gt;Lección 03&lt;/a&gt;
+&lt;/nav&gt;
+&lt;iframe src="01-estructura.html" name="visor-lecciones"
+        width="560" height="300"
+        title="Visor de lecciones del curso"
+        loading="lazy"&gt;&lt;/iframe&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>¿Todo se puede incrustar?</figcaption>
+<pre>No. Muchos sitios (bancos, redes
+sociales, Google) prohíben que los
+muestren en un iframe para evitar
+engaños. El navegador muestra un
+recuadro de error.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-srcdoc" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Contenido escrito directamente con srcdoc</h2>
+            <p>En vez de una dirección, <code>srcdoc</code> recibe el HTML completo dentro del atributo. Los servicios de correo lo usan para mostrar la vista previa de un email sin que sus estilos afecten al resto de la página.</p>
+            <div class="resultado">
+                <iframe width="560" height="120" title="Ejemplo de srcdoc"
+                    srcdoc="&lt;h2&gt;Hola desde srcdoc&lt;/h2&gt;&lt;p&gt;Este HTML está escrito dentro del atributo.&lt;/p&gt;"></iframe>
+                <h3>Vista previa de un correo</h3>
+                <iframe width="560" height="200" title="Vista previa del correo de confirmación"
+                    srcdoc="&lt;p&gt;&lt;strong&gt;De:&lt;/strong&gt; Tienda Pixel &amp;lt;pedidos@tiendapixel.example&amp;gt;&lt;/p&gt;&lt;h1&gt;¡Gracias por tu compra, Tomás!&lt;/h1&gt;&lt;p&gt;Tu pedido &lt;b&gt;#48213&lt;/b&gt; llegará el jueves.&lt;/p&gt;"></iframe>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;iframe width="560" height="120" title="Ejemplo de srcdoc"
+    srcdoc="&amp;lt;h2&amp;gt;Hola desde srcdoc&amp;lt;/h2&amp;gt;
+            &amp;lt;p&amp;gt;Este HTML está escrito dentro del atributo.&amp;lt;/p&amp;gt;"&gt;
+&lt;/iframe&gt;
+
+&lt;iframe width="560" height="200"
+    title="Vista previa del correo de confirmación"
+    srcdoc="&amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;De:&amp;lt;/strong&amp;gt; Tienda Pixel ...
+            &amp;lt;h1&amp;gt;¡Gracias por tu compra, Tomás!&amp;lt;/h1&amp;gt;
+            &amp;lt;p&amp;gt;Tu pedido &amp;lt;b&amp;gt;#48213&amp;lt;/b&amp;gt; llegará el jueves.&amp;lt;/p&amp;gt;"&gt;
+&lt;/iframe&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué &amp;lt; y &amp;gt;</figcaption>
+<pre>Dentro de un atributo, &lt; y &gt; se
+escriben como &amp;lt; y &amp;gt; (y las
+comillas como &amp;quot;) para no cerrar
+el atributo antes de tiempo.
+
+Si un iframe tiene src y srcdoc,
+gana srcdoc.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-sandbox" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Iframe con permisos limitados: sandbox</h2>
+            <p>Con <code>sandbox</code> el contenido del iframe no puede ejecutar scripts, enviar formularios, abrir ventanas ni navegar la página principal. Útil para mostrar contenido que escribió un usuario. Prueba el botón "Enviar": no pasa nada.</p>
+            <div class="resultado">
+                <iframe width="560" height="120" title="Ejemplo de sandbox" sandbox
+                    srcdoc="&lt;p&gt;Con &lt;code&gt;sandbox&lt;/code&gt; este contenido no puede ejecutar scripts ni enviar formularios.&lt;/p&gt;"></iframe>
+                <h3>Comentario de un usuario, aislado</h3>
+                <iframe width="560" height="140" title="Comentario de usuario en un entorno aislado" sandbox
+                    srcdoc="&lt;p&gt;&lt;b&gt;usuario_anónimo:&lt;/b&gt; ¡Gana un premio! Escribe tu clave:&lt;/p&gt;&lt;form action=&quot;https://example.com&quot;&gt;&lt;input type=&quot;password&quot; placeholder=&quot;Clave&quot;&gt; &lt;button&gt;Enviar&lt;/button&gt;&lt;/form&gt;"></iframe>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;iframe width="560" height="120" title="Ejemplo de sandbox" sandbox
+    srcdoc="&amp;lt;p&amp;gt;Con &amp;lt;code&amp;gt;sandbox&amp;lt;/code&amp;gt; este contenido..."&gt;
+&lt;/iframe&gt;
+
+&lt;iframe width="560" height="140"
+    title="Comentario de usuario en un entorno aislado" sandbox
+    srcdoc="... &amp;lt;form action=&amp;quot;https://example.com&amp;quot;&amp;gt;
+            &amp;lt;input type=&amp;quot;password&amp;quot; ...&amp;gt;
+            &amp;lt;button&amp;gt;Enviar&amp;lt;/button&amp;gt;&amp;lt;/form&amp;gt;"&gt;
+&lt;/iframe&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Devolver permisos uno a uno</figcaption>
+<pre>sandbox                   bloquea todo
+sandbox="allow-forms"     permite formularios
+sandbox="allow-scripts"   permite JavaScript
+sandbox="allow-popups"    permite abrir ventanas
+sandbox="allow-forms allow-scripts"  varios
+
+Usa siempre el atributo title en un
+iframe: los lectores de pantalla lo
+anuncian.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-pdf" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Documento PDF incrustado con object</h2>
+            <p><code>object</code> muestra el PDF con el visor del navegador. Si no puede (por ejemplo, en muchos celulares), muestra el contenido de respaldo: un enlace para descargarlo.</p>
+            <div class="resultado">
+                <h3>Reglamento del club deportivo (PDF)</h3>
+                <object data="https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf" type="application/pdf" width="560" height="400" title="Reglamento del club en PDF">
+                    <p>Tu navegador no puede mostrar el PDF. <a href="https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf" target="_blank" rel="noopener noreferrer">Descárgalo aquí</a>.</p>
+                </object>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;object data="https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf"
+        type="application/pdf" width="560" height="400"
+        title="Reglamento del club en PDF"&gt;
+    &lt;p&gt;Tu navegador no puede mostrar el PDF.
+        &lt;a href="https://mozilla.github.io/.../compressed.tracemonkey-pldi-09.pdf"
+           target="_blank" rel="noopener noreferrer"&gt;Descárgalo aquí&lt;/a&gt;.&lt;/p&gt;
+&lt;/object&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Alternativas</figcaption>
+<pre>&lt;iframe src="reglamento.pdf" width="560"
+        height="400" title="Reglamento"&gt;&lt;/iframe&gt;
+
+&lt;embed src="reglamento.pdf"
+       type="application/pdf"
+       width="560" height="400"&gt;
+
+&lt;a href="reglamento.pdf" download&gt;
+    Descargar reglamento&lt;/a&gt;
+
+Algunos servidores prohíben que sus PDF
+se muestren en otras páginas; en ese
+caso solo funciona el enlace.</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="06-semantica-multimedia.html">Anterior: semántica y multimedia</a> |
+            <a href="index.html">Índice</a> |
+            <a href="08-css-selectores.html">Siguiente: CSS selectores</a>
+        </nav>
+    </footer>
+</body>
+</html>

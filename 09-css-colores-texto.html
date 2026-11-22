@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>09. CSS: colores y texto</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;700;800&family=Pacifico&family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Roboto+Mono&display=swap">
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <link rel="stylesheet" href="css/09-css-colores-texto.css">
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>09. CSS: colores y texto</h1>
+        <p>El color y la tipografía son lo primero que nota quien visita una página. Con pocas propiedades se pasa de un documento plano a una marca con personalidad.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-formatos">Formatos</a></li>
+            <li><a href="#ej-hsl">HSL</a></li>
+            <li><a href="#ej-transparencia">Transparencia</a></li>
+            <li><a href="#ej-estados">Etiquetas</a></li>
+            <li><a href="#ej-current">currentColor</a></li>
+            <li><a href="#ej-degradados">Degradados</a></li>
+            <li><a href="#ej-hero">Portada</a></li>
+            <li><a href="#ej-tarjeta">Google Fonts</a></li>
+            <li><a href="#ej-familias">Familias</a></li>
+            <li><a href="#ej-unidades">Unidades</a></li>
+            <li><a href="#ej-periodico">Periódico</a></li>
+            <li><a href="#ej-cita">Cita</a></li>
+            <li><a href="#ej-subrayados">Subrayados</a></li>
+            <li><a href="#ej-sombras">Sombras</a></li>
+            <li><a href="#ej-texto-degradado">Texto con degradado</a></li>
+            <li><a href="#ej-truncar">Truncar</a></li>
+            <li><a href="#ej-legibilidad">Legibilidad</a></li>
+            <li><a href="#ej-contraste">Contraste</a></li>
+            <li><a href="#ej-precios-recibo">Precios</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Propiedades principales</h2>
+            <table>
+                <thead>
+                    <tr><th>Propiedad</th><th>Ejemplo</th><th>Para qué sirve</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>color</code></td><td><code>color: #1f2937;</code></td><td>color del texto</td></tr>
+                    <tr><td><code>background</code></td><td><code>background: #eef2ff;</code></td><td>color, degradado o imagen de fondo</td></tr>
+                    <tr><td><code>font-family</code></td><td><code>font-family: "Inter", sans-serif;</code></td><td>tipo de letra, con alternativas</td></tr>
+                    <tr><td><code>font-size</code></td><td><code>font-size: 1.25rem;</code></td><td>tamaño del texto</td></tr>
+                    <tr><td><code>font-weight</code></td><td><code>font-weight: 700;</code></td><td>grosor: de 100 a 900</td></tr>
+                    <tr><td><code>font-style</code></td><td><code>font-style: italic;</code></td><td>cursiva</td></tr>
+                    <tr><td><code>line-height</code></td><td><code>line-height: 1.6;</code></td><td>alto de cada línea</td></tr>
+                    <tr><td><code>letter-spacing</code></td><td><code>letter-spacing: 0.1em;</code></td><td>espacio entre letras</td></tr>
+                    <tr><td><code>text-align</code></td><td><code>text-align: center;</code></td><td>alineación horizontal</td></tr>
+                    <tr><td><code>text-transform</code></td><td><code>text-transform: uppercase;</code></td><td>mayúsculas, minúsculas o capitalizar</td></tr>
+                    <tr><td><code>text-decoration</code></td><td><code>text-decoration: underline wavy red;</code></td><td>subrayado, tachado o línea superior</td></tr>
+                    <tr><td><code>text-shadow</code></td><td><code>text-shadow: 2px 2px 4px #000;</code></td><td>sombra del texto</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="ej-formatos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Cuatro formas de escribir el mismo color</h2>
+            <p>Las cuatro muestras son idénticas. Cambia solo la forma de escribirlo.</p>
+            <div class="resultado">
+                <div class="muestras">
+                    <div class="muestra m1">tomato</div>
+                    <div class="muestra m2">#ff6347</div>
+                    <div class="muestra m3">rgb(255 99 71)</div>
+                    <div class="muestra m4">hsl(9 100% 64%)</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.m1 { background: tomato; }
+.m2 { background: #ff6347; }
+.m3 { background: rgb(255 99 71); }
+.m4 { background: hsl(9 100% 64%); }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo se lee cada uno</figcaption>
+<pre>tomato       uno de los 148 nombres de CSS
+
+#ff6347      rojo ff, verde 63, azul 47
+             en hexadecimal (00 a ff)
+
+rgb(...)     rojo, verde y azul de 0 a 255
+
+hsl(...)     tono (0-360 en la rueda),
+             saturación % y luminosidad %</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-hsl" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>HSL: una paleta completa cambiando un solo número</h2>
+            <p>Arriba, nueve tonos del mismo color variando la luminosidad. Abajo, alertas que comparten la misma receta y solo cambian el tono.</p>
+            <div class="resultado">
+                <div class="tonos">
+                    <span>95%</span><span>88%</span><span>80%</span><span>70%</span><span>60%</span><span>50%</span><span>40%</span><span>30%</span><span>20%</span>
+                </div>
+                <div class="alerta exito"><strong>Listo.</strong> Tu pedido fue registrado correctamente.</div>
+                <div class="alerta aviso"><strong>Atención.</strong> Tu suscripción vence en 3 días.</div>
+                <div class="alerta error"><strong>Error.</strong> No se pudo procesar el pago.</div>
+                <div class="alerta info"><strong>Novedad.</strong> Ya puedes descargar tu certificado.</div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Tonos</figcaption>
+<pre>span:nth-child(1) { background: hsl(250 80% 95%); }
+span:nth-child(2) { background: hsl(250 80% 88%); }
+span:nth-child(3) { background: hsl(250 80% 80%); }
+...
+span:nth-child(9) { background: hsl(250 80% 20%); }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Alertas</figcaption>
+<pre>.exito {
+    border-color: hsl(142 70% 40%);
+    background:   hsl(142 70% 94%);
+    color:        hsl(142 70% 22%);
+}
+
+.error {
+    border-color: hsl(0 75% 50%);
+    background:   hsl(0 75% 95%);
+    color:        hsl(0 75% 30%);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-transparencia" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Transparencia: <code>opacity</code> frente a color con alfa</h2>
+            <p>Los tres paneles dejan ver la foto, pero en el primero también el texto se vuelve transparente.</p>
+            <div class="resultado">
+                <div class="fondo">
+                    <div class="panel con-opacity"><strong>opacity: 0.6</strong><br>Todo el panel, texto incluido, se aclara.</div>
+                    <div class="panel con-rgba"><strong>rgb(255 255 255 / 0.6)</strong><br>Solo el fondo es transparente. El texto sigue nítido.</div>
+                    <div class="panel con-hex"><strong>#0f172a99</strong><br>Hexadecimal de 8 dígitos: los dos últimos son el alfa.</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.fondo {
+    background: url("../assets/imgs/pic_trulli.jpg") center / cover;
+}
+
+.con-opacity {
+    background: #ffffff;
+    opacity: 0.6;
+}
+
+.con-rgba {
+    background: rgb(255 255 255 / 0.6);
+}
+
+.con-hex {
+    background: #0f172a99;
+    color: #ffffff;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Valores de alfa</figcaption>
+<pre>0     totalmente transparente
+0.5   mitad
+1     totalmente opaco
+
+En hexadecimal:
+00 = 0   80 = 0.5   99 = 0.6   ff = 1</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-estados" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Etiquetas de estado en un panel de pedidos</h2>
+            <p>Fondo claro y texto oscuro del mismo tono: el patrón que usan casi todos los paneles de administración.</p>
+            <div class="resultado">
+                <table>
+                    <thead><tr><th>Pedido</th><th>Cliente</th><th>Estado</th></tr></thead>
+                    <tbody>
+                        <tr><td>#1042</td><td>Ana Pérez</td><td><span class="estado entregado">Entregado</span></td></tr>
+                        <tr><td>#1043</td><td>Bruno Díaz</td><td><span class="estado enviado">Enviado</span></td></tr>
+                        <tr><td>#1044</td><td>Carla Ruiz</td><td><span class="estado pendiente">Pendiente</span></td></tr>
+                        <tr><td>#1045</td><td>Diego Gómez</td><td><span class="estado cancelado">Cancelado</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;span class="estado entregado"&gt;Entregado&lt;/span&gt;
+&lt;span class="estado pendiente"&gt;Pendiente&lt;/span&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.estado {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.pendiente { background: #fef3c7; color: #92400e; }
+.enviado   { background: #dbeafe; color: #1e40af; }
+.entregado { background: #dcfce7; color: #166534; }
+.cancelado {
+    background: #fee2e2;
+    color: #991b1b;
+    text-decoration: line-through;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-current" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2><code>currentColor</code>: botones de redes sociales</h2>
+            <p>Cada botón define un único <code>color</code>. El borde y la sombra lo copian solos. Pasa el mouse por encima.</p>
+            <div class="resultado">
+                <p class="social">
+                    <a href="#ej-current" class="facebook">Facebook</a>
+                    <a href="#ej-current" class="youtube">YouTube</a>
+                    <a href="#ej-current" class="whatsapp">WhatsApp</a>
+                    <a href="#ej-current" class="github">GitHub</a>
+                </p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.social a {
+    border: 2px solid currentColor;
+}
+
+.social a:hover {
+    box-shadow: 0 4px 0 currentColor;
+}
+
+.facebook { color: #1877f2; }
+.youtube  { color: #ff0000; }
+.whatsapp { color: #128c4a; }
+.github   { color: #24292f; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Ventaja</figcaption>
+<pre>Para agregar otra red social
+basta una línea:
+
+.instagram { color: #c13584; }
+
+El borde, la sombra y el texto
+se actualizan juntos.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-degradados" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Degradados: lineal, radial, cónico y repetido</h2>
+            <p>Todos son imágenes generadas por CSS. No hay ningún archivo de imagen.</p>
+            <div class="resultado">
+                <div class="tiles">
+                    <div class="tile g1">Lineal<br>90deg</div>
+                    <div class="tile g2">Lineal<br>3 colores</div>
+                    <div class="tile g3">Radial</div>
+                    <div class="tile redondo g4">Rueda de color</div>
+                    <div class="tile redondo g5">Gráfico<br>de pastel</div>
+                    <div class="tile g6"></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.g1 { background: linear-gradient(90deg, #4f46e5, #ec4899); }
+
+.g2 { background: linear-gradient(135deg,
+        #f59e0b 0%, #ef4444 50%, #7c3aed 100%); }
+
+.g3 { background: radial-gradient(circle at 30% 30%,
+        #fde68a, #f97316 60%, #7c2d12); }
+
+.g4 { background: conic-gradient(#ef4444, #f59e0b,
+        #22c55e, #3b82f6, #a855f7, #ef4444); }
+
+.g5 { background: conic-gradient(#4f46e5 0 45%,
+        #ec4899 0 75%, #cbd5e1 0); }
+
+.g6 { background: repeating-linear-gradient(45deg,
+        #fbbf24 0 14px, #1f2937 14px 28px); }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Dónde se usa</figcaption>
+<pre>Lineal     botones, fondos de portada
+Radial     brillos, focos de luz
+Cónico     gráficos de pastel, ruedas
+Repetido   cinta de "en construcción",
+           barras de progreso rayadas</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-hero" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Portada de agencia de viajes: degradado sobre foto</h2>
+            <p>Un degradado oscuro encima de la imagen garantiza que el texto blanco se lea sobre cualquier foto.</p>
+            <div class="resultado">
+                <div class="hero">
+                    <h3>Descubre el sur de Italia</h3>
+                    <p>7 días entre trulli, olivos y el mar Adriático.</p>
+                    <a href="#ej-hero">Reservar ahora</a>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.hero {
+    padding: 72px 24px;
+    background:
+        linear-gradient(rgb(15 23 42 / 0.8), rgb(15 23 42 / 0.2)),
+        url("../assets/imgs/pic_trulli.jpg") center / cover;
+    color: #ffffff;
+    text-align: center;
+}
+
+.hero p {
+    color: rgb(255 255 255 / 0.85);
+}
+
+.hero a {
+    background: #f59e0b;
+    color: #1f2937;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Capas de fondo</figcaption>
+<pre>background acepta varias capas
+separadas por coma.
+
+La primera queda ARRIBA:
+
+1. degradado semitransparente
+2. foto
+
+Por eso el degradado oscurece
+la foto sin taparla.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tarjeta" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Google Fonts: tarjeta de presentación</h2>
+            <p>Tres tipografías con una función cada una: título elegante, texto de lectura y datos con letra de máquina.</p>
+            <div class="resultado">
+                <div class="tarjeta">
+                    <h3>Valeria Ortiz</h3>
+                    <p class="cargo">Diseñadora web</p>
+                    <p class="datos">valeria@estudio.com<br>+507 6000-0000<br>www.valeriaortiz.dev</p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML: en el &lt;head&gt;</figcaption>
+<pre>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+&lt;link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Playfair+Display:wght@700&amp;family=Roboto+Mono&amp;display=swap"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tarjeta {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: "Inter", sans-serif;
+}
+
+.tarjeta h3 {
+    color: #fbbf24;
+    font-family: "Playfair Display", serif;
+    font-size: 2.2rem;
+}
+
+.cargo {
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+}
+
+.datos {
+    font-family: "Roboto Mono", monospace;
+    line-height: 1.9;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-familias" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>La tipografía comunica: logos de negocios</h2>
+            <p>Solo cambian <code>font-family</code>, color y un par de ajustes. Cada fuente sugiere un tipo de negocio distinto.</p>
+            <div class="resultado">
+                <div class="logos">
+                    <div class="logo"><span class="panaderia">Dulce Hogar</span><small>Pacifico · cursive</small></div>
+                    <div class="logo"><span class="gimnasio">Iron Gym</span><small>Bebas Neue · display</small></div>
+                    <div class="logo"><span class="abogados">Ruiz &amp; Asociados</span><small>Playfair Display · serif</small></div>
+                    <div class="logo"><span class="programacion">&lt;codeLab/&gt;</span><small>Roboto Mono · monospace</small></div>
+                    <div class="logo"><span class="tecnologia">nubify</span><small>Inter 800 · sans-serif</small></div>
+                    <div class="logo"><span class="clasico">Librería Central</span><small>Georgia · small-caps</small></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.panaderia {
+    font-family: "Pacifico", cursive;
+}
+
+.gimnasio {
+    font-family: "Bebas Neue", sans-serif;
+    letter-spacing: 0.08em;
+}
+
+.tecnologia {
+    font-family: "Inter", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}
+
+.clasico {
+    font-family: Georgia, "Times New Roman", serif;
+    font-variant: small-caps;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Familias genéricas</figcaption>
+<pre>serif       con remates: formal, editorial
+sans-serif  sin remates: moderna, pantallas
+monospace   ancho fijo: código, datos
+cursive     manuscrita: cercana, artesanal
+system-ui   la fuente del sistema operativo
+
+Siempre termina la lista con una genérica:
+si la primera no carga, se usa la siguiente.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-unidades" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Unidades: <code>em</code>, <code>rem</code> y tamaño fluido</h2>
+            <p>Con <code>em</code> el tamaño se multiplica en cada nivel anidado. Con <code>rem</code> siempre se calcula desde la raíz. Achica la ventana para ver el título fluido.</p>
+            <div class="resultado">
+                <div class="con-em">
+                    <div class="nivel">1.2em
+                        <div class="nivel">1.2em dentro de 1.2em
+                            <div class="nivel">tres niveles: crece cada vez</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="con-rem">
+                    <div class="nivel">1.2rem
+                        <div class="nivel">1.2rem dentro de 1.2rem
+                            <div class="nivel">tres niveles: siempre igual</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="fluido">Título que se adapta a la pantalla</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.con-em .nivel {
+    font-size: 1.2em;
+}
+
+.con-rem .nivel {
+    font-size: 1.2rem;
+}
+
+.fluido {
+    font-size: clamp(1.2rem, 5vw, 3rem);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Unidades comunes</figcaption>
+<pre>px    píxel, tamaño fijo
+em    relativo al font-size del padre
+rem   relativo al font-size de &lt;html&gt; (16px)
+%     relativo al padre
+vw    1% del ancho de la ventana
+ch    ancho del carácter "0"
+
+clamp(mínimo, ideal, máximo)</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-periodico" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Portada de periódico</h2>
+            <p>Mayúsculas espaciadas, doble línea, columnas de texto justificado. Cambia el ancho de la ventana: las columnas se reacomodan solas.</p>
+            <div class="resultado">
+                <div class="periodico">
+                    <p class="cabecera">El Diario Web</p>
+                    <p class="fecha">Jueves 19 de noviembre de 2026 · Edición digital</p>
+                    <h4>Las escuelas incorporan programación desde primaria</h4>
+                    <p class="bajada">El nuevo plan de estudios incluye HTML, CSS y lógica de programación a partir de los nueve años.</p>
+                    <div class="columnas">
+                        <p>A partir del próximo año escolar, los estudiantes de cuarto grado tendrán dos horas semanales dedicadas a crear páginas web. El objetivo es que entiendan cómo se construyen los sitios que usan todos los días.</p>
+                        <p>Los docentes recibirán capacitación durante las vacaciones. Según el ministerio, el programa comenzará con la estructura de documentos y avanzará hacia el diseño visual y la interacción.</p>
+                        <p>Las familias consultadas se mostraron a favor. "Mi hija ya hizo su primera página sobre dinosaurios", comentó una madre durante la presentación del plan.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.cabecera {
+    border-top: 4px double #1c1917;
+    border-bottom: 4px double #1c1917;
+    font-family: "Playfair Display", serif;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.fecha {
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+}
+
+.columnas {
+    columns: 220px 3;
+    column-gap: 28px;
+    column-rule: 1px solid #d6d3d1;
+    text-align: justify;
+    hyphens: auto;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption><code>columns: 220px 3</code></figcaption>
+<pre>"cada columna mide al menos 220px
+y como máximo hay 3"
+
+En pantalla ancha: 3 columnas
+En tablet:         2 columnas
+En celular:        1 columna
+
+hyphens: auto corta palabras con
+guion al final de línea. Funciona
+porque &lt;html lang="es"&gt;.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-cita" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Cita destacada en un blog</h2>
+            <div class="resultado">
+                <blockquote class="cita">
+                    Primero resuelve el problema. Después escribe el código.
+                    <cite>John Johnson</cite>
+                </blockquote>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;blockquote class="cita"&gt;
+    Primero resuelve el problema. Después escribe el código.
+    &lt;cite&gt;John Johnson&lt;/cite&gt;
+&lt;/blockquote&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.cita {
+    border-left: 6px solid #4f46e5;
+    background: #eef2ff;
+    color: #312e81;
+    font-family: "Playfair Display", serif;
+    font-size: 1.5rem;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+.cita cite {
+    display: block;
+    font-family: "Inter", sans-serif;
+    font-size: 0.85rem;
+    font-style: normal;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-subrayados" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Subrayados: un editor de documentos</h2>
+            <p>Corrector ortográfico, sugerencias, enlaces, abreviaturas, texto eliminado y resaltador. Todo con <code>text-decoration</code> y un degradado.</p>
+            <div class="resultado">
+                <p class="documento">
+                    El informe de <span class="ortografia">diciembr</span> muestra que las ventas <span class="gramatica">a aumentado</span> un 20 %.
+                    Puedes consultar el <a href="#ej-subrayados">detalle completo</a> en el anexo.
+                    Los datos fueron publicados por la <abbr title="Organización Mundial del Comercio">OMC</abbr>.
+                    El precio <span class="eliminado">era de $45</span> ahora es de $39.
+                    <span class="marcador">Lo más importante es mantener el crecimiento.</span>
+                </p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.ortografia {
+    text-decoration: underline wavy #dc2626;
+    text-underline-offset: 4px;
+}
+
+a {
+    text-decoration-color: #c7d2fe;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 5px;
+}
+
+abbr {
+    text-decoration: underline dotted;
+    cursor: help;
+}
+
+.eliminado {
+    text-decoration: line-through double #dc2626;
+}
+
+.marcador {
+    background: linear-gradient(transparent 55%, #fde047 55%);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Valores</figcaption>
+<pre>línea:   underline · overline · line-through
+estilo:  solid · double · dotted · dashed · wavy
+color:   cualquier color
+
+text-decoration: underline wavy red;
+                 línea     estilo color
+
+text-decoration: none;   quita el subrayado
+                         de los enlaces</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-sombras" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2><code>text-shadow</code>: seis estilos de letrero</h2>
+            <p>Una sombra puede ser un brillo, un relieve, un efecto 3D o simplemente mejorar la lectura sobre una foto.</p>
+            <div class="resultado">
+                <div class="paneles">
+                    <div class="panel neon">Neón</div>
+                    <div class="panel relieve">Relieve</div>
+                    <div class="panel tres-d">3D</div>
+                    <div class="panel contorno">Contorno</div>
+                    <div class="panel sobre-foto">Sobre foto</div>
+                    <div class="panel larga">Retro</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.neon {
+    text-shadow: 0 0 4px #ffffff, 0 0 12px #22d3ee,
+                 0 0 24px #22d3ee, 0 0 48px #0891b2;
+}
+
+.relieve {
+    text-shadow: 1px 1px 1px #ffffff, -1px -1px 1px #71717a;
+}
+
+.tres-d {
+    text-shadow: 1px 1px 0 #b45309, 2px 2px 0 #b45309,
+                 3px 3px 0 #b45309, 4px 4px 0 #b45309,
+                 6px 6px 8px rgb(0 0 0 / 0.35);
+}
+
+.contorno {
+    color: transparent;
+    -webkit-text-stroke: 2px #4f46e5;
+}
+
+.sobre-foto {
+    text-shadow: 0 2px 8px rgb(0 0 0 / 0.8);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Sintaxis</figcaption>
+<pre>text-shadow: 2px  3px  6px  #000;
+             ↑    ↑    ↑    ↑
+             x    y    desenfoque  color
+
+Varias sombras separadas por coma
+se apilan una sobre otra.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-texto-degradado" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Texto relleno de degradado o de foto</h2>
+            <p><code>background-clip: text</code> recorta el fondo con la forma de las letras.</p>
+            <div class="resultado">
+                <p class="marca">Creative Studio</p>
+                <p class="con-foto">Alberobello</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.marca {
+    background: linear-gradient(90deg, #4f46e5, #ec4899, #f59e0b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-family: "Bebas Neue", sans-serif;
+}
+
+.con-foto {
+    background: url("../assets/imgs/pic_trulli.jpg") center / cover;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Los tres pasos</figcaption>
+<pre>1. Poner un fondo (degradado o imagen)
+2. Recortarlo con background-clip: text
+3. Hacer el texto transparente
+   para que se vea el fondo
+
+-webkit- es un prefijo para que
+funcione también en Safari y Chrome
+antiguos.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-truncar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Truncar texto: bandeja de correo y tarjeta de noticia</h2>
+            <p>Una línea con puntos suspensivos y un párrafo cortado en tres líneas. Achica la ventana para ver cómo se ajustan.</p>
+            <div class="resultado">
+                <div class="contenedor">
+                    <ul class="bandeja">
+                        <li><div class="remitente">Banco Nacional</div><div class="asunto">Tu estado de cuenta del mes de noviembre ya está disponible para descargar</div></li>
+                        <li><div class="remitente">Profesor Martínez</div><div class="asunto">Recordatorio: la entrega del proyecto final es el viernes antes de las 11:59 p. m.</div></li>
+                        <li><div class="remitente">Tienda Online</div><div class="asunto">¡Tu pedido #1043 fue enviado! Sigue el paquete con el número de rastreo</div></li>
+                    </ul>
+                    <article class="noticia">
+                        <h4>Nueva versión del navegador</h4>
+                        <p>La actualización incluye soporte para nuevas propiedades de CSS, mejoras en el rendimiento de JavaScript y herramientas de desarrollo renovadas. Los desarrolladores podrán probar las funciones experimentales activándolas desde la configuración avanzada. Se espera que el resto de navegadores adopte los mismos cambios durante el próximo año.</p>
+                    </article>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Una línea</figcaption>
+<pre>.asunto {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Varias líneas</figcaption>
+<pre>.noticia p {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-legibilidad" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Legibilidad: el mismo texto, dos versiones</h2>
+            <p>Mismo contenido. Solo cambian tamaño, color, interlineado, ancho de línea y alineación.</p>
+            <div class="resultado">
+                <h3>Difícil de leer</h3>
+                <p class="mala">Aprender a programar no consiste en memorizar instrucciones, sino en desarrollar una forma de pensar. Se trata de dividir un problema grande en partes pequeñas, resolver cada una y luego unirlas. Al principio cuesta, pero con práctica constante cada ejercicio se vuelve más natural y los errores se convierten en pistas para mejorar.</p>
+                <h3>Fácil de leer</h3>
+                <p class="buena">Aprender a programar no consiste en memorizar instrucciones, sino en desarrollar una forma de pensar. Se trata de dividir un problema grande en partes pequeñas, resolver cada una y luego unirlas. Al principio cuesta, pero con práctica constante cada ejercicio se vuelve más natural y los errores se convierten en pistas para mejorar.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Difícil</figcaption>
+<pre>.mala {
+    color: #a3a3a3;
+    font-size: 0.8rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-align: justify;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Fácil</figcaption>
+<pre>.buena {
+    max-width: 65ch;
+    color: #334155;
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+65ch ≈ 65 caracteres por línea,
+el rango más cómodo para leer.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-contraste" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Contraste: colores que se leen y colores que no</h2>
+            <p>El mínimo recomendado para texto normal es <strong>4.5 : 1</strong>. Los marcos rojos no lo cumplen.</p>
+            <div class="resultado">
+                <div class="pares">
+                    <div class="par c1 mal">Comprar ahora<small>1.7 : 1</small></div>
+                    <div class="par c2 bien">Comprar ahora<small>8.8 : 1</small></div>
+                    <div class="par c3 mal">Texto de ayuda<small>2.5 : 1</small></div>
+                    <div class="par c4 bien">Texto de ayuda<small>7.6 : 1</small></div>
+                    <div class="par c5 mal">Confirmar<small>2.3 : 1</small></div>
+                    <div class="par c6 bien">Confirmar<small>5.0 : 1</small></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.c1 { background: #fbbf24; color: #ffffff; }
+.c2 { background: #fbbf24; color: #1f2937; }
+
+.c3 { background: #ffffff; color: #9ca3af; }
+.c4 { background: #ffffff; color: #4b5563; }
+
+.c5 { background: #22c55e; color: #ffffff; }
+.c6 { background: #15803d; color: #ffffff; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo comprobarlo</figcaption>
+<pre>En Chrome: clic derecho → Inspeccionar,
+selecciona el texto y haz clic en el
+cuadro de color. Aparece "Contrast ratio".
+
+1 : 1     sin contraste
+4.5 : 1   mínimo para texto normal
+3 : 1     mínimo para texto grande
+21 : 1    negro sobre blanco</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-precios-recibo" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 19</span>
+            <h2>Precios en una tienda y un recibo de compra</h2>
+            <p>Precio anterior tachado, centavos en superíndice y números de ancho fijo para que las cifras queden alineadas.</p>
+            <div class="resultado">
+                <div class="contenedor">
+                    <div class="producto">
+                        <h3>Audífonos inalámbricos</h3>
+                        <p class="antes">Antes <del>$59.99</del></p>
+                        <p class="ahora">$39<sup>.99</sup></p>
+                        <p class="ahorro">Ahorras 33 %</p>
+                    </div>
+                    <div class="recibo">
+                        <h4>Tienda Web</h4>
+                        <table>
+                            <tbody>
+                                <tr><td>Audífonos</td><td>39.99</td></tr>
+                                <tr><td>Funda</td><td>7.50</td></tr>
+                                <tr><td>Cable USB-C</td><td>11.11</td></tr>
+                                <tr><td>Envío</td><td>0.00</td></tr>
+                            </tbody>
+                            <tfoot>
+                                <tr><td>Total</td><td>58.60</td></tr>
+                            </tfoot>
+                        </table>
+                        <p class="gracias">¡Gracias por su compra!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p class="antes"&gt;Antes &lt;del&gt;$59.99&lt;/del&gt;&lt;/p&gt;
+&lt;p class="ahora"&gt;$39&lt;sup&gt;.99&lt;/sup&gt;&lt;/p&gt;
+&lt;p class="ahorro"&gt;Ahorras 33 %&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.ahora {
+    color: #dc2626;
+    font-size: 3rem;
+    font-weight: 800;
+}
+
+.ahora sup {
+    font-size: 1.2rem;
+}
+
+.recibo {
+    font-family: "Roboto Mono", monospace;
+}
+
+.recibo td:last-child {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="08-css-selectores.html">Anterior: selectores</a> |
+            <a href="index.html">Índice</a> |
+            <a href="10-css-modelo-caja.html">Siguiente: modelo de caja</a>
+        </nav>
+    </footer>
+</body>
+</html>

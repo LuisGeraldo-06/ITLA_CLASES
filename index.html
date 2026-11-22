@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso de programación web</title>
+    <meta name="description" content="Curso de HTML, CSS y JavaScript con ejemplos en vivo.">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <header class="portada">
+        <h1>Curso de programación web</h1>
+        <p>HTML, CSS y JavaScript paso a paso. Cada lección es una página con ejemplos en vivo y el código que los produce, listo para copiar.</p>
+        <ul class="partes">
+            <li><a href="#html"><img src="assets/imgs/logos/html5.svg" alt="" width="64" height="64">HTML</a></li>
+            <li><a href="#css"><img src="assets/imgs/logos/css3.svg" alt="" width="64" height="64">CSS</a></li>
+            <li><a href="#js"><img src="assets/imgs/logos/javascript.svg" alt="" width="64" height="64">JavaScript</a></li>
+        </ul>
+    </header>
+
+    <main class="indice">
+        <section id="html" class="parte parte-html">
+            <div class="parte-titulo">
+                <img src="assets/imgs/logos/html5.svg" alt="" width="40" height="40">
+                <h2>Parte 1: HTML</h2>
+                <span>la estructura</span>
+            </div>
+            <p>Los ejemplos no tienen estilos: así se ve el HTML tal como el navegador lo entiende.</p>
+            <ul class="tarjetas">
+                <li><a class="tarjeta" href="01-estructura.html"><span class="numero">01</span><h3>Estructura y encabezados</h3><p>El esqueleto de una página, el head, los títulos, párrafos y entidades.</p><span class="temas">&lt;html&gt; &lt;head&gt; &lt;h1&gt;</span></a></li>
+                <li><a class="tarjeta" href="02-texto.html"><span class="numero">02</span><h3>Texto y citas</h3><p>Énfasis, citas, fórmulas, código, fechas y abreviaturas.</p><span class="temas">&lt;strong&gt; &lt;blockquote&gt; &lt;kbd&gt;</span></a></li>
+                <li><a class="tarjeta" href="03-enlaces-listas.html"><span class="numero">03</span><h3>Enlaces, listas e imágenes</h3><p>Enlaces internos, externos, anclas, correo y teléfono. Listas y figuras.</p><span class="temas">&lt;a&gt; &lt;ul&gt; &lt;img&gt;</span></a></li>
+                <li><a class="tarjeta" href="04-tablas.html"><span class="numero">04</span><h3>Tablas</h3><p>Facturas, horarios, calendarios y tablas accesibles.</p><span class="temas">&lt;table&gt; colspan rowspan</span></a></li>
+                <li><a class="tarjeta" href="05-formularios.html"><span class="numero">05</span><h3>Formularios</h3><p>Todos los tipos de campo, validación nativa y cómo se envían los datos.</p><span class="temas">&lt;form&gt; &lt;input&gt; &lt;select&gt;</span></a></li>
+                <li><a class="tarjeta" href="06-semantica-multimedia.html"><span class="numero">06</span><h3>Semántica y multimedia</h3><p>Regiones de la página, acordeones, barras de progreso, audio y video.</p><span class="temas">&lt;article&gt; &lt;details&gt; &lt;video&gt;</span></a></li>
+                <li><a class="tarjeta" href="07-html-incrustados.html"><span class="numero">07</span><h3>Imágenes e incrustados</h3><p>Imágenes adaptables, SVG, mapas, videos de YouTube y PDF.</p><span class="temas">&lt;picture&gt; &lt;svg&gt; &lt;iframe&gt;</span></a></li>
+            </ul>
+        </section>
+
+        <section id="css" class="parte parte-css">
+            <div class="parte-titulo">
+                <img src="assets/imgs/logos/css3.svg" alt="" width="40" height="40">
+                <h2>Parte 2: CSS</h2>
+                <span>la presentación</span>
+            </div>
+            <p>Cada lección enlaza su propia hoja de estilos desde la carpeta <code>css/</code>.</p>
+            <ul class="tarjetas">
+                <li><a class="tarjeta" href="08-css-selectores.html"><span class="numero">08</span><h3>Selectores</h3><p>Clases, combinadores, pseudo-clases, pseudo-elementos y especificidad.</p><span class="temas">.clase :hover ::before</span></a></li>
+                <li><a class="tarjeta" href="09-css-colores-texto.html"><span class="numero">09</span><h3>Colores y texto</h3><p>Formatos de color, degradados, Google Fonts, sombras y contraste.</p><span class="temas">hsl() gradient font</span></a></li>
+                <li><a class="tarjeta" href="10-css-modelo-caja.html"><span class="numero">10</span><h3>Modelo de caja</h3><p>Margin, padding, border, sombras, bordes redondeados y overflow.</p><span class="temas">margin padding border</span></a></li>
+                <li><a class="tarjeta" href="11-css-display-posicion.html"><span class="numero">11</span><h3>Display y posición</h3><p>Insignias, tooltips, menús desplegables, modales y elementos fijos.</p><span class="temas">position z-index sticky</span></a></li>
+                <li><a class="tarjeta" href="12-css-flexbox.html"><span class="numero">12</span><h3>Flexbox</h3><p>Laboratorio interactivo, barras de navegación, tarjetas, carritos y centrado perfecto.</p><span class="temas">display: flex</span></a></li>
+                <li><a class="tarjeta" href="13-css-grid.html"><span class="numero">13</span><h3>Grid</h3><p>Laboratorio interactivo, galerías, dashboards, calendarios y páginas completas.</p><span class="temas">display: grid</span></a></li>
+                <li><a class="tarjeta" href="14-css-responsive.html"><span class="numero">14</span><h3>Responsive</h3><p>Media queries, container queries, menú hamburguesa, modo oscuro e impresión.</p><span class="temas">@media @container clamp()</span></a></li>
+                <li><a class="tarjeta" href="15-css-transiciones-animaciones.html"><span class="numero">15</span><h3>Transiciones y animaciones</h3><p>Botones animados, tarjetas que voltean, loaders, notificaciones y carruseles.</p><span class="temas">transition @keyframes</span></a></li>
+                <li><a class="tarjeta" href="16-css-variables-temas.html"><span class="numero">16</span><h3>Variables y temas</h3><p>Paletas de marca, modo oscuro, temas y sistemas de diseño.</p><span class="temas">--variables var()</span></a></li>
+                <li><a class="tarjeta" href="17-css-formularios-estilizados.html"><span class="numero">17</span><h3>Formularios con estilo</h3><p>Etiquetas flotantes, interruptores, estrellas, pagos y códigos de verificación.</p><span class="temas">appearance accent-color</span></a></li>
+            </ul>
+        </section>
+
+        <section id="js" class="parte parte-js">
+            <div class="parte-titulo">
+                <img src="assets/imgs/logos/javascript.svg" alt="" width="40" height="40">
+                <h2>Parte 3: JavaScript</h2>
+                <span>el comportamiento</span>
+            </div>
+            <p>Cada lección enlaza su propio script desde la carpeta <code>js/</code>.</p>
+            <ul class="tarjetas">
+                <li><div class="tarjeta pendiente"><span class="numero">18</span><h3>Variables y tipos</h3><p>Calculadoras y conversores.</p><span class="temas">let const typeof</span></div></li>
+                <li><div class="tarjeta pendiente"><span class="numero">19</span><h3>Condicionales y bucles</h3><p>Calificaciones, tablas de multiplicar y adivinanzas.</p><span class="temas">if for while</span></div></li>
+                <li><div class="tarjeta pendiente"><span class="numero">20</span><h3>Funciones</h3><p>Generadores, calculadoras y formateadores.</p><span class="temas">function =&gt;</span></div></li>
+                <li><div class="tarjeta pendiente"><span class="numero">21</span><h3>Arrays y objetos</h3><p>Listas de productos, rankings y carritos.</p><span class="temas">map filter reduce</span></div></li>
+                <li><div class="tarjeta pendiente"><span class="numero">22</span><h3>DOM</h3><p>Cambiar la página desde JavaScript.</p><span class="temas">querySelector</span></div></li>
+                <li><div class="tarjeta pendiente"><span class="numero">23</span><h3>Eventos</h3><p>Contadores, pestañas, modales y menús.</p><span class="temas">addEventListener</span></div></li>
+                <li><div class="tarjeta pendiente"><span class="numero">24</span><h3>Formularios con JavaScript</h3><p>Validación en vivo y fuerza de contraseña.</p><span class="temas">input submit</span></div></li>
+                <li><div class="tarjeta pendiente"><span class="numero">25</span><h3>localStorage</h3><p>Tareas, notas y preferencias que se guardan.</p><span class="temas">setItem getItem</span></div></li>
+                <li><div class="tarjeta pendiente"><span class="numero">26</span><h3>Fetch y APIs</h3><p>Datos reales desde internet.</p><span class="temas">fetch async await</span></div></li>
+                <li><div class="tarjeta pendiente"><span class="numero">27</span><h3>Mini aplicaciones</h3><p>Reloj, carrusel, quiz y juego de memoria.</p><span class="temas">todo junto</span></div></li>
+            </ul>
+        </section>
+
+        <section class="como-practicar">
+            <h2>Cómo practicar</h2>
+            <ul>
+                <li>Abre cada lección en el navegador y compara cada resultado con el código que aparece debajo.</li>
+                <li>Usa el botón <strong>Copiar</strong> de cada bloque de código para pegarlo en tu propio archivo.</li>
+                <li>Pulsa <kbd>Ctrl</kbd> + <kbd>U</kbd> para ver el código fuente completo, o <kbd>F12</kbd> para inspeccionar un elemento.</li>
+                <li>Cambia valores en los archivos de <code>css/</code> y <code>js/</code>, guarda y recarga para ver el efecto.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="pie-indice">
+        <p>Curso de programación web · HTML, CSS y JavaScript</p>
+    </footer>
+</body>
+</html>

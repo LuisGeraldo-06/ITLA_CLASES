@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01. Estructura y encabezados</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>01. Estructura y encabezados</h1>
+        <p>Un documento HTML comienza con una estructura que indica al navegador <strong>cómo interpretar su contenido</strong>. Aquí veremos el esqueleto de una página, los metadatos, los encabezados, los párrafos y las reglas básicas para escribir HTML correcto.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-esqueleto">Esqueleto</a></li>
+            <li><a href="#ej-head">Head completo</a></li>
+            <li><a href="#ej-compartir">Open Graph</a></li>
+            <li><a href="#ej-encabezados">Encabezados</a></li>
+            <li><a href="#ej-parrafos">Párrafos</a></li>
+            <li><a href="#ej-direccion">br en direcciones</a></li>
+            <li><a href="#ej-poema">br en poemas</a></li>
+            <li><a href="#ej-cuento">hr</a></li>
+            <li><a href="#ej-espacios">Espacios y pre</a></li>
+            <li><a href="#ej-legal">Entidades</a></li>
+            <li><a href="#ej-precio">Entidades en precios</a></li>
+            <li><a href="#ej-atributos">id, class, title</a></li>
+            <li><a href="#ej-idiomas">lang, dir, translate</a></li>
+            <li><a href="#ej-hidden">hidden</a></li>
+            <li><a href="#ej-vacios">Elementos vacíos</a></li>
+            <li><a href="#ej-anidamiento">Anidamiento</a></li>
+            <li><a href="#ej-div-span">div y span</a></li>
+            <li><a href="#ej-fuente">Código fuente y validación</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Anatomía de un elemento</h2>
+<pre>&lt;etiqueta atributo="valor"&gt;contenido&lt;/etiqueta&gt;
+ \_____/ \______________/ \_______/ \_________/
+ apertura    atributo     contenido   cierre</pre>
+            <p><code>&lt;!DOCTYPE html&gt;</code> declara que el documento usa HTML moderno. El elemento <code>&lt;html&gt;</code> contiene la página y su atributo <code>lang</code> indica el idioma. <code>&lt;head&gt;</code> guarda metadatos y el título de la pestaña; <code>&lt;body&gt;</code> contiene lo que se muestra. <code>&lt;meta charset="UTF-8"&gt;</code> permite usar correctamente caracteres como ñ y tildes.</p>
+            <table>
+                <thead>
+                    <tr><th>Elemento</th><th>Dónde va</th><th>Para qué sirve</th><th>¿Tiene cierre?</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>&lt;!DOCTYPE html&gt;</code></td><td>primera línea</td><td>activa el modo estándar del navegador</td><td>no (no es un elemento)</td></tr>
+                    <tr><td><code>&lt;html&gt;</code></td><td>raíz</td><td>envuelve todo el documento</td><td>sí</td></tr>
+                    <tr><td><code>&lt;head&gt;</code></td><td>dentro de html</td><td>metadatos: título, codificación, estilos</td><td>sí</td></tr>
+                    <tr><td><code>&lt;meta&gt;</code></td><td>dentro de head</td><td>información sobre la página</td><td>no (vacío)</td></tr>
+                    <tr><td><code>&lt;title&gt;</code></td><td>dentro de head</td><td>texto de la pestaña y de los buscadores</td><td>sí</td></tr>
+                    <tr><td><code>&lt;body&gt;</code></td><td>dentro de html</td><td>todo el contenido visible</td><td>sí</td></tr>
+                    <tr><td><code>&lt;h1&gt;</code> … <code>&lt;h6&gt;</code></td><td>body</td><td>encabezados por niveles</td><td>sí</td></tr>
+                    <tr><td><code>&lt;p&gt;</code></td><td>body</td><td>párrafo</td><td>sí</td></tr>
+                    <tr><td><code>&lt;br&gt;</code></td><td>dentro de texto</td><td>salto de línea</td><td>no (vacío)</td></tr>
+                    <tr><td><code>&lt;hr&gt;</code></td><td>entre bloques</td><td>cambio de tema o de escena</td><td>no (vacío)</td></tr>
+                    <tr><td><code>&lt;pre&gt;</code></td><td>body</td><td>texto que conserva espacios y saltos</td><td>sí</td></tr>
+                    <tr><td><code>&lt;div&gt;</code> / <code>&lt;span&gt;</code></td><td>body</td><td>contenedores genéricos de bloque / de línea</td><td>sí</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="ej-esqueleto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>El esqueleto mínimo: la web de una panadería</h2>
+            <p>Toda página empieza igual. Lo único que se ve en pantalla es lo que está dentro de <code>&lt;body&gt;</code>; el <code>&lt;title&gt;</code> aparece en la pestaña del navegador.</p>
+            <div class="resultado">
+                <h1>Panadería La Espiga</h1>
+                <p>Pan artesanal recién horneado todos los días desde las 7:00.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Panadería La Espiga&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Panadería La Espiga&lt;/h1&gt;
+    &lt;p&gt;Pan artesanal recién horneado todos los días desde las 7:00.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Línea por línea</figcaption>
+<pre>&lt;!DOCTYPE html&gt;   modo estándar (HTML5)
+&lt;html lang="es"&gt;   raíz; idioma español
+&lt;head&gt;             lo que NO se ve
+  charset UTF-8    ñ, tildes, ¿, €...
+  viewport         adapta la página al móvil
+  title            texto de la pestaña
+&lt;body&gt;             lo que SÍ se ve</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-head" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Un &lt;head&gt; completo: blog de recetas</h2>
+            <p>Los metadatos no se ven en la página, pero los usan los buscadores, el navegador y las redes sociales. Así se vería esta página en una lista de resultados de un buscador:</p>
+            <div class="resultado">
+                <p><small>www.cocinaconmarta.example › recetas › tortilla</small></p>
+                <h3><a href="#ej-head">Tortilla de patatas jugosa en 30 minutos | Cocina con Marta</a></h3>
+                <p>Receta paso a paso de la tortilla de patatas tradicional, con o sin cebolla, y trucos para que quede jugosa por dentro.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Tortilla de patatas jugosa en 30 minutos | Cocina con Marta&lt;/title&gt;
+    &lt;meta name="description" content="Receta paso a paso de la tortilla de patatas tradicional, con o sin cebolla, y trucos para que quede jugosa por dentro."&gt;
+    &lt;meta name="author" content="Marta Ruiz"&gt;
+    &lt;meta name="keywords" content="tortilla, patatas, receta, huevo"&gt;
+    &lt;meta name="theme-color" content="#f59e0b"&gt;
+    &lt;link rel="icon" href="favicon.ico"&gt;
+    &lt;link rel="stylesheet" href="css/estilos.css"&gt;
+&lt;/head&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Para qué sirve cada uno</figcaption>
+<pre>title          pestaña, marcadores y título
+               azul en los buscadores
+description    resumen gris bajo el título
+author         autor del documento
+keywords       palabras clave (casi ignorada hoy)
+theme-color    color de la barra del navegador
+               en el móvil
+link rel=icon  favicon: el icono de la pestaña
+link stylesheet hoja de estilos CSS</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-compartir" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Open Graph: la vista previa al compartir un enlace</h2>
+            <p>Cuando pegas un enlace en una red social o en una aplicación de mensajería, la tarjeta que aparece sale de las etiquetas <code>og:</code> del <code>&lt;head&gt;</code>. Debajo, una imitación de esa tarjeta hecha solo con HTML.</p>
+            <div class="resultado">
+                <p><strong>Lucía:</strong> ¡Mirad este sitio para el viaje!</p>
+                <p><img src="https://picsum.photos/id/1040/500/260" alt="Castillo sobre una colina al atardecer" width="500" height="260"></p>
+                <p><small>VIAJESLENTOS.EXAMPLE</small></p>
+                <p><strong>Ruta de los castillos: 5 días por el interior</strong></p>
+                <p>Itinerario completo con alojamientos, mapas y presupuesto para recorrer los castillos más bonitos sin prisas.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;meta property="og:type" content="article"&gt;
+&lt;meta property="og:title" content="Ruta de los castillos: 5 días por el interior"&gt;
+&lt;meta property="og:description" content="Itinerario completo con alojamientos, mapas y presupuesto..."&gt;
+&lt;meta property="og:image" content="https://viajeslentos.example/img/castillo.jpg"&gt;
+&lt;meta property="og:url" content="https://viajeslentos.example/ruta-castillos"&gt;
+&lt;meta property="og:site_name" content="Viajes Lentos"&gt;
+&lt;meta property="og:locale" content="es_ES"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>De la etiqueta a la tarjeta</figcaption>
+<pre>og:image        la foto grande
+og:site_name    el nombre del sitio
+og:url          el dominio en mayúsculas
+og:title        el título en negrita
+og:description  el texto de abajo
+
+Usan property="..." en lugar de name="...".</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-encabezados" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Jerarquía de encabezados: el manual de una lavadora</h2>
+            <p>Los seis niveles funcionan como el índice de un libro. Usa los niveles en orden jerárquico para organizar el contenido, <strong>no para cambiar el tamaño del texto</strong>. Solo debería haber un <code>&lt;h1&gt;</code> por página.</p>
+            <div class="resultado">
+                <h1>Manual de usuario: Lavadora AquaPlus 8 kg</h1>
+                <h2>1. Instalación</h2>
+                <h3>1.1 Desembalaje</h3>
+                <h3>1.2 Conexión del agua</h3>
+                <h4>1.2.1 Manguera de entrada</h4>
+                <h5>Nota sobre la presión del agua</h5>
+                <h6>Referencia técnica: válvula V-220</h6>
+                <h4>1.2.2 Manguera de desagüe</h4>
+                <h2>2. Programas de lavado</h2>
+                <h3>2.1 Algodón</h3>
+                <h3>2.2 Delicado</h3>
+                <h2>3. Solución de problemas</h2>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h1&gt;Manual de usuario: Lavadora AquaPlus 8 kg&lt;/h1&gt;
+&lt;h2&gt;1. Instalación&lt;/h2&gt;
+&lt;h3&gt;1.1 Desembalaje&lt;/h3&gt;
+&lt;h3&gt;1.2 Conexión del agua&lt;/h3&gt;
+&lt;h4&gt;1.2.1 Manguera de entrada&lt;/h4&gt;
+&lt;h5&gt;Nota sobre la presión del agua&lt;/h5&gt;
+&lt;h6&gt;Referencia técnica: válvula V-220&lt;/h6&gt;
+&lt;h4&gt;1.2.2 Manguera de desagüe&lt;/h4&gt;
+&lt;h2&gt;2. Programas de lavado&lt;/h2&gt;
+...
+&lt;h2&gt;3. Solución de problemas&lt;/h2&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Esquema resultante</figcaption>
+<pre>h1 Manual de usuario
+├── h2 1. Instalación
+│   ├── h3 1.1 Desembalaje
+│   └── h3 1.2 Conexión del agua
+│       ├── h4 1.2.1 Manguera de entrada
+│       │   └── h5 Nota...
+│       │       └── h6 Referencia...
+│       └── h4 1.2.2 Manguera de desagüe
+├── h2 2. Programas de lavado
+└── h2 3. Solución de problemas
+
+Mal: saltar de h2 a h5 porque
+"se ve más pequeño".</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-parrafos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Párrafos: una noticia local</h2>
+            <p>Un párrafo se escribe con <code>&lt;p&gt;</code>. El navegador agrega separación arriba y abajo de cada párrafo; no hace falta dejar líneas vacías.</p>
+            <div class="resultado">
+                <h3>El mercado de abastos reabre tras ocho meses de obras</h3>
+                <p>El mercado municipal de la plaza Mayor volvió a abrir sus puertas este sábado con 42 puestos renovados, nueva climatización y un espacio de restauración en la planta alta.</p>
+                <p>Cientos de vecinos hicieron cola desde primera hora. «Echábamos de menos comprar aquí», comentaba una clienta mientras esperaba en la frutería.</p>
+                <p>El horario será de lunes a sábado de 8:00 a 14:30, y los viernes también por la tarde, de 17:00 a 20:30.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;El mercado de abastos reabre tras ocho meses de obras&lt;/h3&gt;
+&lt;p&gt;El mercado municipal de la plaza Mayor volvió a abrir...&lt;/p&gt;
+&lt;p&gt;Cientos de vecinos hicieron cola desde primera hora...&lt;/p&gt;
+&lt;p&gt;El horario será de lunes a sábado de 8:00 a 14:30...&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Recuerda</figcaption>
+<pre>Un &lt;p&gt; = una idea.
+No uses &lt;p&gt;&lt;/p&gt; vacíos para separar:
+la separación es cosa de CSS.
+Un &lt;p&gt; no puede contener otro &lt;p&gt;
+ni un encabezado.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-direccion" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>&lt;br&gt; en una dirección postal</h2>
+            <p>En una dirección, los saltos de línea forman parte del contenido. <code>&lt;br&gt;</code> inicia otra línea dentro del mismo párrafo.</p>
+            <div class="resultado">
+                <p><strong>Destinatario:</strong></p>
+                <p>Sr. Andrés Molina Pérez<br>
+                Calle de los Almendros, 14, 3.º B<br>
+                28045 Madrid<br>
+                España</p>
+                <p><strong>Remitente:</strong></p>
+                <p>Librería El Desván<br>Avenida del Puerto, 7<br>46011 Valencia</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;Sr. Andrés Molina Pérez&lt;br&gt;
+Calle de los Almendros, 14, 3.º B&lt;br&gt;
+28045 Madrid&lt;br&gt;
+España&lt;/p&gt;
+
+&lt;p&gt;Librería El Desván&lt;br&gt;Avenida del Puerto, 7&lt;br&gt;46011 Valencia&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cuándo usar &lt;br&gt;</figcaption>
+<pre>Sí: direcciones, poemas, letras de
+canciones, firmas.
+
+No: para separar párrafos o dejar
+espacio (&lt;br&gt;&lt;br&gt;&lt;br&gt;).
+Para eso usa &lt;p&gt; y CSS.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-poema" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>&lt;br&gt; en un poema</h2>
+            <p>Cada estrofa es un párrafo y cada verso termina con un <code>&lt;br&gt;</code>. Sin ellos, el navegador juntaría todos los versos en una sola línea.</p>
+            <div class="resultado">
+                <h3>Canción del faro</h3>
+                <p>Sobre la roca, solo y sin sueño,<br>
+                el viejo faro cuenta las olas;<br>
+                gira su luz como un pequeño<br>
+                reloj que nunca da las horas.</p>
+                <p>Pasan los barcos, pasa la bruma,<br>
+                pasa el invierno con su tambor;<br>
+                y él, encendido entre la espuma,<br>
+                sigue esperando al pescador.</p>
+                <p><em>Poema inventado para esta lección.</em></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Canción del faro&lt;/h3&gt;
+&lt;p&gt;Sobre la roca, solo y sin sueño,&lt;br&gt;
+el viejo faro cuenta las olas;&lt;br&gt;
+gira su luz como un pequeño&lt;br&gt;
+reloj que nunca da las horas.&lt;/p&gt;
+&lt;p&gt;Pasan los barcos, pasa la bruma,&lt;br&gt;
+...&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Sin &lt;br&gt; se vería así</figcaption>
+<pre>Sobre la roca, solo y sin sueño, el viejo
+faro cuenta las olas; gira su luz como un
+pequeño reloj que nunca da las horas.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-cuento" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>&lt;hr&gt;: cambio de escena en un cuento</h2>
+            <p><code>&lt;hr&gt;</code> representa una separación temática entre contenidos: un cambio de escena, de tema o de lugar. El navegador lo dibuja como una línea horizontal.</p>
+            <div class="resultado">
+                <h3>La llave del desván</h3>
+                <p>Clara encontró la llave dentro de un calcetín viejo, en el fondo del armario de la abuela. Era pequeña, oxidada y tenía grabado un número: 17.</p>
+                <p>Esa noche no pudo dormir pensando en qué puerta abriría.</p>
+                <hr>
+                <p>Tres días después, el cerrajero del barrio la miró con la lupa y sonrió. «Esto no es de una puerta», dijo. «Es de un buzón de correos. Y ya no quedan muchos así».</p>
+                <hr>
+                <p>El buzón 17 estaba en la antigua estación. Dentro había una carta con fecha de 1962 y su nombre escrito en el sobre.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;La llave del desván&lt;/h3&gt;
+&lt;p&gt;Clara encontró la llave...&lt;/p&gt;
+&lt;p&gt;Esa noche no pudo dormir...&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Tres días después, el cerrajero...&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;El buzón 17 estaba en la antigua estación...&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Otros usos reales</figcaption>
+<pre>- Entre la pregunta y la respuesta
+  de un examen.
+- Entre el cuerpo de un correo y la
+  firma.
+- Entre los platos y los postres de
+  una carta de restaurante.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-espacios" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Espacios en blanco colapsados y &lt;pre&gt;: horario de autobús</h2>
+            <p>El navegador convierte cualquier cantidad de espacios, tabulaciones y saltos de línea en <strong>un solo espacio</strong>. <code>&lt;pre&gt;</code> conserva espacios y saltos de línea y usa letra de ancho fijo, así que las columnas quedan alineadas. Mira el mismo horario escrito de las dos formas.</p>
+            <div class="resultado">
+                <h3>Línea 12: Centro → Hospital</h3>
+                <p><strong>Dentro de &lt;p&gt;:</strong></p>
+                <p>PARADA              LAB.    SÁB.    DOM.
+                Plaza Mayor         07:15   08:00   09:30
+                Calle Real          07:22   08:07   09:37
+                Estación de tren    07:30   08:15   09:45
+                Hospital General    07:41   08:26   09:56</p>
+                <p><strong>Dentro de &lt;pre&gt;:</strong></p>
+<pre>PARADA              LAB.    SÁB.    DOM.
+Plaza Mayor         07:15   08:00   09:30
+Calle Real          07:22   08:07   09:37
+Estación de tren    07:30   08:15   09:45
+Hospital General    07:41   08:26   09:56</pre>
+                <p><strong>Arte ASCII en la firma de correo de una cafetería:</strong></p>
+<pre>      ( (
+       ) )
+    ........
+    |      |]   Café El Molino
+    \      /    Abierto de 7 a 21 h
+     `----'</pre>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;PARADA              LAB.    SÁB.    DOM.
+Plaza Mayor         07:15   08:00   09:30
+...&lt;/p&gt;
+
+&lt;pre&gt;PARADA              LAB.    SÁB.    DOM.
+Plaza Mayor         07:15   08:00   09:30
+Calle Real          07:22   08:07   09:37
+...&lt;/pre&gt;
+
+&lt;pre&gt;      ( (
+       ) )
+    ........
+    |      |]   Café El Molino
+    \      /    Abierto de 7 a 21 h
+     `----'&lt;/pre&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Regla</figcaption>
+<pre>En HTML normal:
+  5 espacios      →  1 espacio
+  salto de línea  →  1 espacio
+  tabulación      →  1 espacio
+
+&lt;pre&gt; conserva todo tal cual.
+Cuidado: también cuenta la sangría
+de tu editor. Si escribes
+
+    &lt;pre&gt;
+        hola
+    &lt;/pre&gt;
+
+los espacios antes de "hola" se ven.
+Por eso el contenido suele empezar
+pegado al margen izquierdo.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-legal" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Entidades HTML: el pie legal de una tienda</h2>
+            <p>Algunos caracteres tienen significado especial en HTML (<code>&lt;</code>, <code>&gt;</code>, <code>&amp;</code>) o no están en el teclado (©, ™). Se escriben con <strong>entidades</strong>: empiezan por <code>&amp;</code> y terminan en <code>;</code>.</p>
+            <div class="resultado">
+                <p>&copy; 2026 Muebles Roble &amp; Pino S.L. &middot; Todos los derechos reservados.</p>
+                <p>SofáNube&trade; y CamaFlex&reg; son marcas de sus respectivos fabricantes.</p>
+                <p>Envío gratis en pedidos &gt; 50&nbsp;&euro;. Devoluciones en un plazo &lt; 30&nbsp;días.</p>
+                <p>Atención al cliente: lunes&ndash;viernes, 9:00&ndash;18:00 &mdash; también por chat.</p>
+                <p>&laquo;Calidad que se nota&raquo; &hearts;</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;&amp;copy; 2026 Muebles Roble &amp;amp; Pino S.L. &amp;middot; Todos...&lt;/p&gt;
+&lt;p&gt;SofáNube&amp;trade; y CamaFlex&amp;reg; son marcas...&lt;/p&gt;
+&lt;p&gt;Envío gratis en pedidos &amp;gt; 50&amp;nbsp;&amp;euro;.
+   Devoluciones en un plazo &amp;lt; 30&amp;nbsp;días.&lt;/p&gt;
+&lt;p&gt;Atención al cliente: lunes&amp;ndash;viernes, 9:00&amp;ndash;18:00
+   &amp;mdash; también por chat.&lt;/p&gt;
+&lt;p&gt;&amp;laquo;Calidad que se nota&amp;raquo; &amp;hearts;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Entidades más usadas</figcaption>
+<pre>&amp;lt;      &lt;     menor que
+&amp;gt;      &gt;     mayor que
+&amp;amp;     &amp;     ampersand
+&amp;quot;    "     comillas
+&amp;nbsp;    ( )   espacio que no se parte
+&amp;copy;    ©     copyright
+&amp;reg;     ®     marca registrada
+&amp;trade;   ™     marca comercial
+&amp;euro;    €     euro
+&amp;ndash;   –     guion medio
+&amp;mdash;   —     raya
+&amp;laquo;   «     comilla angular
+&amp;raquo;   »     comilla angular
+&amp;middot;  ·     punto medio
+&amp;hearts;  ♥     corazón
+&amp;#9733;   ★     por número</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-precio" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Entidades en una ficha de precio</h2>
+            <p><code>&amp;nbsp;</code> evita que el número y su unidad queden en líneas distintas. Las entidades numéricas (<code>&amp;#9733;</code>) permiten escribir cualquier símbolo Unicode.</p>
+            <div class="resultado">
+                <h3>Auriculares inalámbricos SonaMax&trade; Pro</h3>
+                <p>&#9733;&#9733;&#9733;&#9733;&#9734; 4,2 de 5 (318&nbsp;opiniones)</p>
+                <p>Precio: <strong>89,99&nbsp;&euro;</strong> &times; 1 unidad</p>
+                <p>Batería: 30&nbsp;h &middot; Peso: 250&nbsp;g &middot; Garantía: 2&nbsp;años</p>
+                <p>Temperatura de uso: 0&nbsp;&deg;C a 40&nbsp;&deg;C &plusmn; 2&nbsp;&deg;C</p>
+                <p>Compatible con dispositivos &ge; Bluetooth 5.0 &rarr; <a href="#ej-precio">Ver detalles</a></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Auriculares inalámbricos SonaMax&amp;trade; Pro&lt;/h3&gt;
+&lt;p&gt;&amp;#9733;&amp;#9733;&amp;#9733;&amp;#9733;&amp;#9734; 4,2 de 5 (318&amp;nbsp;opiniones)&lt;/p&gt;
+&lt;p&gt;Precio: &lt;strong&gt;89,99&amp;nbsp;&amp;euro;&lt;/strong&gt; &amp;times; 1 unidad&lt;/p&gt;
+&lt;p&gt;Batería: 30&amp;nbsp;h &amp;middot; Peso: 250&amp;nbsp;g &amp;middot; ...&lt;/p&gt;
+&lt;p&gt;Temperatura de uso: 0&amp;nbsp;&amp;deg;C a 40&amp;nbsp;&amp;deg;C &amp;plusmn; 2&amp;nbsp;&amp;deg;C&lt;/p&gt;
+&lt;p&gt;Compatible con dispositivos &amp;ge; Bluetooth 5.0 &amp;rarr; ...&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Más símbolos</figcaption>
+<pre>&amp;#9733;   ★   estrella llena
+&amp;#9734;   ☆   estrella vacía
+&amp;times;   ×   por
+&amp;deg;     °   grados
+&amp;plusmn;  ±   más/menos
+&amp;ge;      ≥   mayor o igual
+&amp;le;      ≤   menor o igual
+&amp;rarr;    →   flecha</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-atributos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Atributos globales: id, class y title</h2>
+            <p>Los atributos globales sirven en cualquier elemento. <code>id</code> es un nombre único, <code>class</code> agrupa elementos (para CSS) y <code>title</code> muestra un texto al dejar el ratón encima. Pasa el ratón sobre las palabras subrayadas.</p>
+            <div class="resultado">
+                <h3 id="ficha-bici">Bicicleta urbana Paseo 28"</h3>
+                <p class="dato-tecnico">Cuadro: <span title="Aleación ligera de aluminio serie 6061">aluminio 6061</span></p>
+                <p class="dato-tecnico">Cambio: <span title="7 velocidades con cambio integrado en el buje trasero">Nexus 7V</span></p>
+                <p class="dato-tecnico">Frenos: <span title="Frenos de rodillo, sin mantenimiento">roller brake</span></p>
+                <p title="Entrega en 48 h laborables en península">Disponible para envío inmediato.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3 id="ficha-bici"&gt;Bicicleta urbana Paseo 28"&lt;/h3&gt;
+&lt;p class="dato-tecnico"&gt;Cuadro:
+  &lt;span title="Aleación ligera de aluminio serie 6061"&gt;aluminio 6061&lt;/span&gt;&lt;/p&gt;
+&lt;p class="dato-tecnico"&gt;Cambio:
+  &lt;span title="7 velocidades con cambio..."&gt;Nexus 7V&lt;/span&gt;&lt;/p&gt;
+...
+&lt;p title="Entrega en 48 h laborables en península"&gt;
+  Disponible para envío inmediato.&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Reglas</figcaption>
+<pre>id      único en toda la página
+        id="ficha-bici"
+        sirve para enlaces (#ficha-bici),
+        CSS y JavaScript
+
+class   se puede repetir;
+        un elemento puede tener varias:
+        class="dato-tecnico destacado"
+
+title   texto de ayuda (tooltip).
+        No lo veas en el móvil:
+        no pongas ahí información vital.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-idiomas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>lang, dir y translate: la carta de un restaurante internacional</h2>
+            <p><code>lang</code> marca el idioma de un fragmento (los lectores de pantalla cambian la pronunciación), <code>dir="rtl"</code> escribe de derecha a izquierda (árabe, hebreo) y <code>translate="no"</code> pide a los traductores automáticos que no toquen ese texto.</p>
+            <div class="resultado">
+                <h3>Restaurante <span translate="no">Casa Olivo</span></h3>
+                <p>Bienvenidos a nuestro restaurante.</p>
+                <p lang="en">Welcome to our restaurant.</p>
+                <p lang="fr">Bienvenue dans notre restaurant.</p>
+                <p lang="ar" dir="rtl">مرحبا بكم في مطعمنا</p>
+                <p>Plato del día: <span translate="no">Pulpo a feira</span>, con patatas y pimentón.</p>
+                <p>Nuestro lema, en palabras de un cliente: <span lang="en">“Best octopus in town”</span>.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Restaurante &lt;span translate="no"&gt;Casa Olivo&lt;/span&gt;&lt;/h3&gt;
+&lt;p&gt;Bienvenidos a nuestro restaurante.&lt;/p&gt;
+&lt;p lang="en"&gt;Welcome to our restaurant.&lt;/p&gt;
+&lt;p lang="fr"&gt;Bienvenue dans notre restaurant.&lt;/p&gt;
+&lt;p lang="ar" dir="rtl"&gt;مرحبا بكم في مطعمنا&lt;/p&gt;
+&lt;p&gt;Plato del día: &lt;span translate="no"&gt;Pulpo a feira&lt;/span&gt;, ...&lt;/p&gt;
+&lt;p&gt;... &lt;span lang="en"&gt;“Best octopus in town”&lt;/span&gt;.&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Valores</figcaption>
+<pre>lang="es"   español
+lang="en"   inglés
+lang="fr"   francés
+lang="ar"   árabe
+lang="es-MX" español de México
+
+dir="ltr"   izquierda → derecha
+dir="rtl"   derecha → izquierda
+dir="auto"  lo decide el navegador
+
+translate="no"   nombres propios,
+                 marcas, código</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-hidden" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>hidden: contenido que todavía no debe verse</h2>
+            <p>El atributo <code>hidden</code> oculta un elemento por completo. El contenido sigue en el código (Ctrl+U), pero el navegador no lo muestra. En la vida real, JavaScript lo quita cuando llega el momento.</p>
+            <div class="resultado">
+                <h3>Tienda Deportes Cumbre</h3>
+                <p>Nueva colección de botas de montaña ya disponible.</p>
+                <p hidden>OFERTA BLACK FRIDAY: 40 % de descuento en toda la tienda.</p>
+                <p>Envío gratuito a partir de 60&nbsp;&euro;.</p>
+                <p hidden>Código secreto para empleados: CUMBRE-2026.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Tienda Deportes Cumbre&lt;/h3&gt;
+&lt;p&gt;Nueva colección de botas de montaña ya disponible.&lt;/p&gt;
+&lt;p hidden&gt;OFERTA BLACK FRIDAY: 40 % de descuento...&lt;/p&gt;
+&lt;p&gt;Envío gratuito a partir de 60&amp;nbsp;&amp;euro;.&lt;/p&gt;
+&lt;p hidden&gt;Código secreto para empleados: CUMBRE-2026.&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Ojo</figcaption>
+<pre>hidden es un atributo booleano:
+basta con escribirlo, sin valor.
+
+hidden NO es seguridad:
+cualquiera puede ver el código
+fuente. Nunca escondas ahí
+contraseñas ni datos privados.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-vacios" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Elementos vacíos y elementos con cierre: tarjeta de un empleado</h2>
+            <p>La mayoría de elementos envuelven contenido y necesitan etiqueta de cierre. Los <strong>elementos vacíos</strong> no tienen contenido, así que no se cierran: <code>&lt;br&gt;</code>, <code>&lt;hr&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;meta&gt;</code>, <code>&lt;link&gt;</code>, <code>&lt;input&gt;</code>…</p>
+            <div class="resultado">
+                <p><img src="assets/imgs/pic_trulli.jpg" alt="Casas tradicionales de piedra con tejados cónicos" width="250" height="167"></p>
+                <h3>Paula Serrano Vidal</h3>
+                <p>Guía turística<br>Oficina de Turismo de Alberobello</p>
+                <hr>
+                <p>Idiomas: español, italiano e inglés.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;&lt;img src="assets/imgs/pic_trulli.jpg" alt="Casas tradicionales..."
+        width="250" height="167"&gt;&lt;/p&gt;
+&lt;h3&gt;Paula Serrano Vidal&lt;/h3&gt;
+&lt;p&gt;Guía turística&lt;br&gt;Oficina de Turismo de Alberobello&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Idiomas: español, italiano e inglés.&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Comparación</figcaption>
+<pre>CON CIERRE (envuelven algo)
+&lt;h3&gt;...&lt;/h3&gt;   &lt;p&gt;...&lt;/p&gt;   &lt;span&gt;...&lt;/span&gt;
+
+VACÍOS (no envuelven nada)
+&lt;br&gt;  &lt;hr&gt;  &lt;img&gt;  &lt;meta&gt;  &lt;link&gt;  &lt;input&gt;
+
+&lt;br /&gt; con barra también es válido
+(estilo XHTML), pero no es necesario.
+&lt;/br&gt; o &lt;/img&gt; son ERRORES.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-anidamiento" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Anidamiento correcto e incorrecto: un aviso de la comunidad de vecinos</h2>
+            <p>Los elementos se cierran en orden inverso al que se abrieron, como cajas dentro de cajas: <strong>la última que abres es la primera que cierras</strong>. Abajo se ve la versión correcta; la incorrecta solo se muestra como código.</p>
+            <div class="resultado">
+                <h3>Aviso a los vecinos</h3>
+                <p>El <strong>martes 24</strong> se cortará el agua de <strong>9:00 a <em>14:00</em></strong> por la revisión de las tuberías.</p>
+                <p>Disculpen las molestias. <span>La administración.</span></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML correcto</figcaption>
+<pre>&lt;p&gt;El &lt;strong&gt;martes 24&lt;/strong&gt; se cortará el agua de
+   &lt;strong&gt;9:00 a &lt;em&gt;14:00&lt;/em&gt;&lt;/strong&gt; por...&lt;/p&gt;
+
+  &lt;p&gt;
+  └── &lt;strong&gt;
+      └── &lt;em&gt; 14:00 &lt;/em&gt;
+      &lt;/strong&gt;
+  &lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>HTML incorrecto (no hacer)</figcaption>
+<pre>&lt;p&gt;... &lt;strong&gt;9:00 a &lt;em&gt;14:00&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
+                          ✗ se cruzan
+
+&lt;p&gt;Aviso &lt;h3&gt;Título&lt;/h3&gt;&lt;/p&gt;
+           ✗ un p no puede contener un h3
+
+&lt;h3&gt;Aviso a los vecinos
+&lt;p&gt;El martes...&lt;/p&gt;
+           ✗ falta &lt;/h3&gt;
+
+El navegador intenta "arreglarlo",
+pero cada uno lo hace a su manera.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-div-span" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>&lt;div&gt; y &lt;span&gt;: la previsión del tiempo</h2>
+            <p><code>&lt;div&gt;</code> y <code>&lt;span&gt;</code> no significan nada: son cajas genéricas para agrupar y luego dar estilo con CSS. <code>div</code> es de <strong>bloque</strong> (ocupa toda la línea) y <code>span</code> es <strong>en línea</strong> (fluye dentro del texto).</p>
+            <div class="resultado">
+                <div class="tiempo-dia">
+                    <h3>Lunes</h3>
+                    <p>Soleado. Máxima <span class="temp-max">24&nbsp;&deg;C</span>, mínima <span class="temp-min">12&nbsp;&deg;C</span>.</p>
+                </div>
+                <div class="tiempo-dia">
+                    <h3>Martes</h3>
+                    <p>Nubes y claros. Máxima <span class="temp-max">21&nbsp;&deg;C</span>, mínima <span class="temp-min">11&nbsp;&deg;C</span>.</p>
+                </div>
+                <div class="tiempo-dia">
+                    <h3>Miércoles</h3>
+                    <p>Lluvia por la tarde. Máxima <span class="temp-max">17&nbsp;&deg;C</span>, mínima <span class="temp-min">10&nbsp;&deg;C</span>.</p>
+                </div>
+                <div>Esto es un div.</div><div>Y esto otro div: empieza en otra línea.</div>
+                <p><span>Esto es un span.</span> <span>Y esto otro span: sigue en la misma línea.</span></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="tiempo-dia"&gt;
+    &lt;h3&gt;Lunes&lt;/h3&gt;
+    &lt;p&gt;Soleado. Máxima &lt;span class="temp-max"&gt;24&amp;nbsp;&amp;deg;C&lt;/span&gt;,
+       mínima &lt;span class="temp-min"&gt;12&amp;nbsp;&amp;deg;C&lt;/span&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="tiempo-dia"&gt;
+    &lt;h3&gt;Martes&lt;/h3&gt;
+    ...
+&lt;/div&gt;
+
+&lt;div&gt;Esto es un div.&lt;/div&gt;&lt;div&gt;Y esto otro div...&lt;/div&gt;
+&lt;p&gt;&lt;span&gt;Esto es un span.&lt;/span&gt; &lt;span&gt;Y esto otro span...&lt;/span&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cuándo usarlos</figcaption>
+<pre>Primero busca un elemento con
+significado: &lt;p&gt;, &lt;h2&gt;, &lt;strong&gt;,
+&lt;article&gt;, &lt;nav&gt;...
+
+Si ninguno encaja:
+  agrupar bloques   → &lt;div&gt;
+  marcar un trozo
+  de texto          → &lt;span&gt;
+
+Sin CSS, no cambian nada visible.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-fuente" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Ver el código fuente y validar una página</h2>
+            <p>Cualquier página web se puede inspeccionar. Es la mejor forma de aprender cómo están hechas otras webs y de encontrar errores en la tuya.</p>
+            <div class="resultado">
+                <h3>Guía rápida para revisar tu página</h3>
+                <h4>Paso 1: ver el código fuente</h4>
+                <p>Pulsa <strong>Ctrl + U</strong> (Windows y Linux) o <strong>Cmd + Opción + U</strong> (Mac). También: clic derecho &rarr; «Ver código fuente de la página».</p>
+                <h4>Paso 2: inspeccionar un elemento</h4>
+                <p>Pulsa <strong>F12</strong> o clic derecho sobre cualquier parte &rarr; «Inspeccionar». Verás el árbol de elementos y podrás probar cambios en vivo.</p>
+                <h4>Paso 3: validar</h4>
+                <p>Entra en <a href="https://validator.w3.org/">validator.w3.org</a>, elige «Validate by File Upload» o «Validate by Direct Input» y pega tu código. El validador te dirá la línea exacta de cada error.</p>
+                <h4>Ejemplo de mensaje del validador</h4>
+<pre>Error: End tag h3 seen, but there were open elements.
+From line 12, column 5; to line 12, column 9
+Error: Unclosed element strong.
+From line 10, column 12; to line 10, column 19</pre>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Guía rápida para revisar tu página&lt;/h3&gt;
+&lt;h4&gt;Paso 1: ver el código fuente&lt;/h4&gt;
+&lt;p&gt;Pulsa &lt;strong&gt;Ctrl + U&lt;/strong&gt; ...&lt;/p&gt;
+&lt;h4&gt;Paso 2: inspeccionar un elemento&lt;/h4&gt;
+&lt;p&gt;Pulsa &lt;strong&gt;F12&lt;/strong&gt; ...&lt;/p&gt;
+&lt;h4&gt;Paso 3: validar&lt;/h4&gt;
+&lt;p&gt;Entra en &lt;a href="https://validator.w3.org/"&gt;validator.w3.org&lt;/a&gt;...&lt;/p&gt;
+&lt;h4&gt;Ejemplo de mensaje del validador&lt;/h4&gt;
+&lt;pre&gt;Error: End tag h3 seen, but there were open elements.
+...&lt;/pre&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Atajos útiles</figcaption>
+<pre>Ctrl + U         ver código fuente
+F12              herramientas de desarrollo
+Ctrl + Mayús + C seleccionar un elemento
+Ctrl + F5        recargar sin caché
+
+Prueba ahora: pulsa Ctrl + U en
+esta misma lección.</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="index.html">Índice</a> |
+            <a href="02-texto.html">Siguiente: texto y citas</a>
+        </nav>
+    </footer>
+</body>
+</html>

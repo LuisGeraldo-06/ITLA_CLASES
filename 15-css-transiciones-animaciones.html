@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15. CSS: transiciones y animaciones</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <link rel="stylesheet" href="css/15-css-transiciones-animaciones.css">
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>15. CSS: transiciones y animaciones</h1>
+        <p>El movimiento le da vida a una página: un botón que se eleva, un menú que entra deslizando, un corazón que late al darle "me gusta". Con CSS hay dos herramientas: las <strong>transiciones</strong>, que suavizan el paso de un estado a otro, y las <strong>animaciones</strong> con <code>@keyframes</code>, que reproducen una secuencia completa por sí solas. Todo en esta lección funciona sin JavaScript.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-boton">Botón con hover</a></li>
+            <li><a href="#ej-timing">Timing functions</a></li>
+            <li><a href="#ej-producto">Tarjeta de producto</a></li>
+            <li><a href="#ej-menu">Subrayado animado</a></li>
+            <li><a href="#ej-like">Me gusta</a></li>
+            <li><a href="#ej-switch">Interruptor</a></li>
+            <li><a href="#ej-faq">Acordeón FAQ</a></li>
+            <li><a href="#ej-offcanvas">Menú lateral</a></li>
+            <li><a href="#ej-flip">Tarjeta que voltea</a></li>
+            <li><a href="#ej-loaders">Loaders</a></li>
+            <li><a href="#ej-toast">Notificaciones</a></li>
+            <li><a href="#ej-maquina">Máquina de escribir</a></li>
+            <li><a href="#ej-banner">Degradado animado</a></li>
+            <li><a href="#ej-campana">Campana y en vivo</a></li>
+            <li><a href="#ej-transform">transform</a></li>
+            <li><a href="#ej-escalonada">Entrada escalonada</a></li>
+            <li><a href="#ej-marquee">Carrusel de logos</a></li>
+            <li><a href="#ej-movimiento">Movimiento reducido</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Transición o animación</h2>
+            <p>Una <strong>transición</strong> necesita un cambio de estado (<code>:hover</code>, <code>:focus</code>, <code>:checked</code>, una clase nueva) y solo anima del estado A al estado B. Una <strong>animación</strong> define sus propios pasos con <code>@keyframes</code>, puede arrancar sola al cargar la página y repetirse para siempre.</p>
+            <table>
+                <thead>
+                    <tr><th>Propiedad de transición</th><th>Qué hace</th><th>Ejemplo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>transition-property</code></td><td>qué propiedad se anima</td><td><code>background-color</code>, <code>transform</code>, <code>all</code></td></tr>
+                    <tr><td><code>transition-duration</code></td><td>cuánto dura</td><td><code>0.3s</code>, <code>300ms</code></td></tr>
+                    <tr><td><code>transition-timing-function</code></td><td>la curva de velocidad</td><td><code>ease</code>, <code>linear</code>, <code>steps(4)</code></td></tr>
+                    <tr><td><code>transition-delay</code></td><td>cuánto espera antes de empezar</td><td><code>0.5s</code></td></tr>
+                    <tr><td><code>transition</code></td><td>las cuatro juntas</td><td><code>transform 0.3s ease 0s</code></td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Propiedad de animación</th><th>Qué hace</th><th>Valores típicos</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>animation-name</code></td><td>qué <code>@keyframes</code> usar</td><td><code>latido</code></td></tr>
+                    <tr><td><code>animation-duration</code></td><td>cuánto dura una vuelta</td><td><code>1s</code></td></tr>
+                    <tr><td><code>animation-timing-function</code></td><td>curva de velocidad</td><td><code>ease-in-out</code>, <code>linear</code></td></tr>
+                    <tr><td><code>animation-delay</code></td><td>espera antes de empezar</td><td><code>0.2s</code></td></tr>
+                    <tr><td><code>animation-iteration-count</code></td><td>cuántas veces se repite</td><td><code>1</code>, <code>3</code>, <code>infinite</code></td></tr>
+                    <tr><td><code>animation-direction</code></td><td>sentido de cada vuelta</td><td><code>normal</code>, <code>reverse</code>, <code>alternate</code></td></tr>
+                    <tr><td><code>animation-fill-mode</code></td><td>qué estilo tiene antes y después</td><td><code>none</code>, <code>forwards</code>, <code>backwards</code>, <code>both</code></td></tr>
+                    <tr><td><code>animation-play-state</code></td><td>pausar o reanudar</td><td><code>running</code>, <code>paused</code></td></tr>
+                    <tr><td><code>animation</code></td><td>todas juntas</td><td><code>latido 1s ease infinite</code></td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Función de <code>transform</code></th><th>Qué hace</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>translate(x, y)</code>, <code>translateX()</code>, <code>translateY()</code></td><td>mueve sin afectar a los vecinos</td></tr>
+                    <tr><td><code>scale(n)</code></td><td>agranda (<code>1.2</code>) o achica (<code>0.8</code>)</td></tr>
+                    <tr><td><code>rotate(45deg)</code>, <code>rotateY()</code></td><td>gira en 2D o en 3D</td></tr>
+                    <tr><td><code>skewX()</code>, <code>skewY()</code></td><td>inclina como una sombra</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <div class="comparacion">
+                    <figure>
+                        <figcaption>Atajo transition</figcaption>
+<pre>transition: propiedad duración curva retraso;
+
+.boton {
+    background: #db2777;
+    transition: background-color 0.3s ease;
+}
+
+.boton:hover {
+    background: #9d174d;
+}
+
+Varias propiedades, separadas por comas:
+transition: color 0.3s, transform 0.5s ease-out;
+
+La transition va en el estado normal,
+no en :hover: así anima al entrar Y al salir.</pre>
+                    </figure>
+                    <figure>
+                        <figcaption>@keyframes y atajo animation</figcaption>
+<pre>@keyframes latido {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+animation: nombre duración curva retraso
+           repeticiones dirección relleno estado;
+
+.corazon {
+    animation: latido 1s ease-in-out 0s
+               infinite alternate both running;
+}
+
+from = 0%   y   to = 100%</pre>
+                    </figure>
+                </div>
+                <figure>
+                    <figcaption>Rendimiento: qué conviene animar</figcaption>
+<pre>BARATO (lo hace la tarjeta gráfica, va fluido a 60 fps)
+    transform   → translate, scale, rotate
+    opacity
+
+CARO (el navegador recalcula el diseño en cada cuadro)
+    width, height, top, left, margin, padding
+
+En vez de...                    usa...
+left: 0 → left: 200px           transform: translateX(200px)
+width: 0 → width: 100%          transform: scaleX(0) → scaleX(1)
+display: none → block           opacity + visibility
+
+Y evita transition: all; nombra solo lo que cambia.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-boton" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Botón con hover: color, sombra y elevación</h2>
+            <p>Pasa el mouse (o usa Tab) por cada botón. Todos cambian igual en <code>:hover</code>; lo único distinto es su <code>transition</code>.</p>
+            <div class="resultado">
+                <div class="botones">
+                    <div><button class="btn btn-sin" type="button">Comprar</button><span class="nota">sin transición</span></div>
+                    <div><button class="btn" type="button">Comprar</button><span class="nota">0.3s ease</span></div>
+                    <div><button class="btn btn-lento" type="button">Comprar</button><span class="nota">solo color, 1.5s linear</span></div>
+                    <div><button class="btn btn-retraso" type="button">Comprar</button><span class="nota">retraso de 0.8s</span></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.btn {
+    background: #db2777;
+    box-shadow: 0 2px 4px rgba(157, 23, 77, 0.2);
+    transition: background-color 0.3s ease,
+                box-shadow 0.3s ease,
+                transform 0.3s ease;
+}
+
+.btn:hover,
+.btn:focus-visible {
+    background: #9d174d;
+    box-shadow: 0 10px 20px rgba(157, 23, 77, 0.35);
+    transform: translateY(-4px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-sin     { transition: none; }
+.btn-lento   { transition: background-color 1.5s linear; }
+.btn-retraso { transition: background-color 0.3s ease 0.8s, ...; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Las cuatro partes</figcaption>
+<pre>transition: background-color  0.3s   ease   0.8s
+            └─ propiedad ─┘   └dur┘  └curva┘ └retraso┘
+
+Si no pones transition, el cambio es instantáneo.
+Fíjate en el botón lento: solo el color es lento,
+la sombra y el salto ocurren de golpe.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-timing" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Carrera de timing functions</h2>
+            <p>Todas las barras tardan exactamente 2 segundos, pero cada una acelera distinto. Pasa el mouse sobre el recuadro (o haz clic en él) para largar la carrera; al salir, vuelven.</p>
+            <div class="resultado">
+                <div class="carreras" tabindex="0">
+                    <p class="aviso">🏁 Pasa el mouse aquí</p>
+                    <div class="carril"><code>linear</code><div class="pista"><div class="relleno linear"></div></div></div>
+                    <div class="carril"><code>ease</code><div class="pista"><div class="relleno ease"></div></div></div>
+                    <div class="carril"><code>ease-in</code><div class="pista"><div class="relleno ease-in"></div></div></div>
+                    <div class="carril"><code>ease-out</code><div class="pista"><div class="relleno ease-out"></div></div></div>
+                    <div class="carril"><code>ease-in-out</code><div class="pista"><div class="relleno ease-in-out"></div></div></div>
+                    <div class="carril"><code>cubic-bezier</code><div class="pista"><div class="relleno rebote"></div></div></div>
+                    <div class="carril"><code>steps(5)</code><div class="pista"><div class="relleno pasos"></div></div></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.relleno {
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 2s;
+}
+
+.carreras:hover .relleno {
+    transform: scaleX(1);
+}
+
+.linear      { transition-timing-function: linear; }
+.ease        { transition-timing-function: ease; }
+.ease-in     { transition-timing-function: ease-in; }
+.ease-out    { transition-timing-function: ease-out; }
+.ease-in-out { transition-timing-function: ease-in-out; }
+.rebote      { transition-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+.pasos       { transition-timing-function: steps(5); }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cuándo usar cada una</figcaption>
+<pre>linear       velocidad constante      → spinners, carruseles
+ease         (por defecto) suave      → casi todo
+ease-in      arranca lento            → elementos que SALEN
+ease-out     frena al final           → elementos que ENTRAN
+ease-in-out  lento-rápido-lento       → movimientos de ida y vuelta
+cubic-bezier curva a medida; valores  → efecto "rebote"
+             fuera de 0..1 se pasan
+steps(n)     saltos sin suavizar      → relojes, sprites, máquina
+                                        de escribir
+
+Prueba curvas en: DevTools → clic en el ícono de la curva
+junto a cualquier transition.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-producto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Tarjeta de producto de una tienda</h2>
+            <p>Tres efectos a la vez al pasar el mouse: la tarjeta se eleva, la foto hace zoom dentro de su marco y el botón "Agregar" sube desde abajo. El marco usa <code>overflow: hidden</code> para que la foto no se salga.</p>
+            <div class="resultado">
+                <div class="tienda">
+                    <article class="tarjeta">
+                        <div class="foto">
+                            <img src="https://picsum.photos/id/30/400/300" alt="Taza de cerámica">
+                            <button class="agregar" type="button">Agregar al carrito</button>
+                        </div>
+                        <div class="info">
+                            <h3>Taza Bruma 350 ml</h3>
+                            <p class="precio">$ 12,90</p>
+                        </div>
+                    </article>
+                    <article class="tarjeta">
+                        <div class="foto">
+                            <img src="https://picsum.photos/id/96/400/300" alt="Lentes de sol">
+                            <button class="agregar" type="button">Agregar al carrito</button>
+                        </div>
+                        <div class="info">
+                            <h3>Lentes Solsticio</h3>
+                            <p class="precio">$ 48,00</p>
+                        </div>
+                    </article>
+                    <article class="tarjeta">
+                        <div class="foto">
+                            <img src="https://picsum.photos/id/175/400/300" alt="Reloj de pared">
+                            <button class="agregar" type="button">Agregar al carrito</button>
+                        </div>
+                        <div class="info">
+                            <h3>Reloj Minuto Vintage</h3>
+                            <p class="precio">$ 35,50</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;article class="tarjeta"&gt;
+    &lt;div class="foto"&gt;
+        &lt;img src="taza.jpg" alt="Taza de cerámica"&gt;
+        &lt;button class="agregar"&gt;Agregar al carrito&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="info"&gt;...&lt;/div&gt;
+&lt;/article&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tarjeta {
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tarjeta:hover {
+    box-shadow: 0 16px 32px rgba(157, 23, 77, 0.2);
+    transform: translateY(-8px);
+}
+
+.foto {
+    position: relative;
+    overflow: hidden;
+}
+
+.foto img {
+    transition: transform 0.5s ease;
+}
+
+.tarjeta:hover img {
+    transform: scale(1.12);
+}
+
+.agregar {
+    position: absolute;
+    bottom: 0;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+.tarjeta:hover .agregar {
+    transform: translateY(0);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-menu" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Subrayado animado en un menú</h2>
+            <p>La línea es un <code>::after</code> que mide el 100% del enlace pero empieza con <code>scaleX(0)</code>. Con <code>transform-origin</code> decides desde dónde crece.</p>
+            <div class="resultado">
+                <nav class="barra" aria-label="Menú con subrayado desde la izquierda">
+                    <span class="logo">Estudio Lumen</span>
+                    <a href="#ej-menu">Inicio</a>
+                    <a href="#ej-menu">Proyectos</a>
+                    <a href="#ej-menu">Equipo</a>
+                    <a href="#ej-menu">Contacto</a>
+                </nav>
+                <nav class="barra centro" aria-label="Menú con subrayado desde el centro">
+                    <span class="logo">Panadería Trigal</span>
+                    <a href="#ej-menu">Productos</a>
+                    <a href="#ej-menu">Pedidos</a>
+                    <a href="#ej-menu">Locales</a>
+                </nav>
+                <nav class="barra pastilla" aria-label="Menú con fondo de pastilla">
+                    <span class="logo">Ritmo FM</span>
+                    <a href="#ej-menu">En vivo</a>
+                    <a href="#ej-menu">Podcasts</a>
+                    <a href="#ej-menu">Agenda</a>
+                </nav>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.barra a {
+    position: relative;
+}
+
+.barra a::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #f472b6;
+    content: "";
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.barra a:hover::after {
+    transform: scaleX(1);
+}
+
+.centro a::after {
+    transform-origin: center;
+}
+
+.pastilla a {
+    border-radius: 999px;
+    transition: background-color 0.3s ease;
+}
+
+.pastilla a:hover {
+    background: #db2777;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>¿Por qué no animar width?</figcaption>
+<pre>width: 0 → 100%       el navegador recalcula el diseño
+                      en cada cuadro de la animación
+
+scaleX(0) → scaleX(1) solo "estira" lo ya dibujado:
+                      más fluido, mismo resultado visual
+
+transform-origin: left    crece de izquierda a derecha
+transform-origin: center  crece hacia ambos lados
+transform-origin: right   crece de derecha a izquierda</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-like" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Botón de "me gusta" que late</h2>
+            <p>Un checkbox oculto guarda el estado. Al marcarlo, <code>:checked</code> le pone color y una animación de <code>@keyframes</code> con varios pasos. Como la animación solo existe en el estado marcado, se reproduce cada vez que das "me gusta".</p>
+            <div class="resultado">
+                <article class="publicacion">
+                    <img src="https://picsum.photos/id/1015/760/420" alt="Río entre montañas">
+                    <div class="acciones">
+                        <label>
+                            <input type="checkbox">
+                            <span class="corazon" aria-hidden="true">♥</span>
+                            <span class="cuenta-sin">128 me gusta</span>
+                            <span class="cuenta-con">129 me gusta</span>
+                        </label>
+                        <span>💬 14</span>
+                    </div>
+                    <p class="texto"><strong>@viajera.sol</strong> Amanecer en el valle 🏔️</p>
+                </article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label&gt;
+    &lt;input type="checkbox"&gt;
+    &lt;span class="corazon"&gt;♥&lt;/span&gt;
+    &lt;span class="cuenta-sin"&gt;128 me gusta&lt;/span&gt;
+    &lt;span class="cuenta-con"&gt;129 me gusta&lt;/span&gt;
+&lt;/label&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>input {
+    position: absolute;
+    opacity: 0;
+}
+
+.corazon {
+    color: #9ca3af;
+    transition: color 0.2s ease;
+}
+
+input:checked + .corazon {
+    color: #e11d48;
+    animation: ej-latido 0.6s ease;
+}
+
+@keyframes ej-latido {
+    0%   { transform: scale(1); }
+    25%  { transform: scale(1.4); }
+    50%  { transform: scale(0.9); }
+    75%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.cuenta-con { display: none; }
+.acciones:has(input:checked) .cuenta-sin { display: none; }
+.acciones:has(input:checked) .cuenta-con { display: inline; }</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-switch" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Interruptores de configuración</h2>
+            <p>El típico switch de los celulares es un checkbox disfrazado. La bolita es un <code>::before</code> que se desplaza con <code>translateX</code> y una curva con rebote. El último interruptor, además, oscurece todo el panel con <code>:has()</code>.</p>
+            <div class="resultado">
+                <div class="ajustes">
+                    <label>📶 Wi-Fi <input type="checkbox" checked><span class="interruptor"></span></label>
+                    <label>🔵 Bluetooth <input type="checkbox"><span class="interruptor"></span></label>
+                    <label>🔔 Notificaciones <input type="checkbox" checked><span class="interruptor"></span></label>
+                    <label>🌙 Modo oscuro <input type="checkbox" class="oscuro"><span class="interruptor"></span></label>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label&gt;
+    📶 Wi-Fi
+    &lt;input type="checkbox" checked&gt;
+    &lt;span class="interruptor"&gt;&lt;/span&gt;
+&lt;/label&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.interruptor {
+    position: relative;
+    width: 48px;
+    height: 28px;
+    border-radius: 999px;
+    background: #cbd5e1;
+    transition: background-color 0.3s ease;
+}
+
+.interruptor::before {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffffff;
+    content: "";
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+input:checked + .interruptor {
+    background: #db2777;
+}
+
+input:checked + .interruptor::before {
+    transform: translateX(20px);
+}
+
+.ajustes {
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+.ajustes:has(.oscuro:checked) {
+    background: #1f2430;
+    color: #f6f7fb;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-faq" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Acordeón de preguntas frecuentes</h2>
+            <p><code>&lt;details&gt;</code> abre y cierra solo. CSS agrega la flecha que gira 180° con una transición y hace que la respuesta aparezca con una animación corta cada vez que se abre.</p>
+            <div class="resultado">
+                <div class="preguntas">
+                    <details>
+                        <summary>¿Cuánto tarda el envío?</summary>
+                        <p>Entre 2 y 4 días hábiles en la ciudad, y hasta 7 días al interior. Te enviamos el número de seguimiento por correo.</p>
+                    </details>
+                    <details>
+                        <summary>¿Puedo devolver un producto?</summary>
+                        <p>Sí, tienes 30 días desde la entrega. El producto debe estar sin uso y en su caja original.</p>
+                    </details>
+                    <details>
+                        <summary>¿Qué medios de pago aceptan?</summary>
+                        <p>Tarjetas de crédito y débito, transferencia bancaria y pago en efectivo al retirar en tienda.</p>
+                    </details>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;details&gt;
+    &lt;summary&gt;¿Cuánto tarda el envío?&lt;/summary&gt;
+    &lt;p&gt;Entre 2 y 4 días hábiles...&lt;/p&gt;
+&lt;/details&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>summary {
+    list-style: none;
+}
+
+summary::after {
+    content: "▾";
+    transition: transform 0.3s ease;
+}
+
+details[open] summary::after {
+    transform: rotate(180deg);
+}
+
+details[open] p {
+    animation: ej-faq-aparece 0.4s ease-out;
+}
+
+@keyframes ej-faq-aparece {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-offcanvas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Menú lateral que entra deslizando</h2>
+            <p>El menú "hamburguesa" de casi todas las apps. El panel vive fuera de la pantalla con <code>translateX(-100%)</code>; al marcar el checkbox vuelve a <code>translateX(0)</code>. El fondo oscuro aparece con <code>opacity</code> y al tocarlo se cierra el menú.</p>
+            <div class="resultado">
+                <div class="telefono">
+                    <input type="checkbox" id="menu-lateral">
+                    <div class="app-barra">
+                        <label for="menu-lateral" class="abrir" aria-label="Abrir menú">☰</label>
+                        <span>Mis Finanzas</span>
+                    </div>
+                    <div class="app-cuerpo">
+                        <div class="bloque"></div>
+                        <div class="bloque"></div>
+                        <div class="bloque"></div>
+                        <div class="bloque"></div>
+                    </div>
+                    <label for="menu-lateral" class="fondo-oscuro" aria-label="Cerrar menú"></label>
+                    <nav class="panel" aria-label="Menú de la app">
+                        <div class="usuario">
+                            <img class="avatar" src="https://picsum.photos/id/64/80/80" alt="">
+                            <span>Camila Ortiz</span>
+                        </div>
+                        <ul>
+                            <li>🏠 Resumen</li>
+                            <li>💳 Tarjetas</li>
+                            <li>📈 Inversiones</li>
+                            <li>⚙️ Ajustes</li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;input type="checkbox" id="menu-lateral"&gt;
+&lt;div class="app-barra"&gt;
+    &lt;label for="menu-lateral" class="abrir"&gt;☰&lt;/label&gt;
+    ...
+&lt;/div&gt;
+&lt;label for="menu-lateral" class="fondo-oscuro"&gt;&lt;/label&gt;
+&lt;nav class="panel"&gt;...&lt;/nav&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.panel {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 75%;
+    transform: translateX(-100%);
+    transition: transform 0.35s ease;
+}
+
+.fondo-oscuro {
+    position: absolute;
+    inset: 0;
+    background: rgba(31, 36, 48, 0.55);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s;
+}
+
+input:checked ~ .panel {
+    transform: translateX(0);
+}
+
+input:checked ~ .fondo-oscuro {
+    opacity: 1;
+    visibility: visible;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-flip" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Tarjeta que se voltea en 3D</h2>
+            <p>Pasa el mouse (o usa Tab) sobre la tarjeta del entrenador. Las dos caras están una encima de la otra; el reverso ya viene girado 180° y <code>backface-visibility: hidden</code> esconde la cara que queda de espaldas.</p>
+            <div class="resultado">
+                <div class="tarjetas">
+                    <div class="flip" tabindex="0">
+                        <div class="interior">
+                            <div class="cara frente">
+                                <img src="https://picsum.photos/id/1005/520/480" alt="Retrato de Martín Salas">
+                                <h3>Martín Salas</h3>
+                                <p>Entrenador de fuerza</p>
+                            </div>
+                            <div class="cara reverso">
+                                <h3>Gimnasio Impulso</h3>
+                                <dl>
+                                    <dt>Experiencia</dt><dd>8 años</dd>
+                                    <dt>Clases</dt><dd>Funcional, pesas</dd>
+                                    <dt>Horario</dt><dd>Lun a vie, 7 a 13 h</dd>
+                                    <dt>Alumnos</dt><dd>142 activos</dd>
+                                    <dt>Valoración</dt><dd>★★★★★ 4,9</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip" tabindex="0">
+                        <div class="interior">
+                            <div class="cara frente">
+                                <img src="https://picsum.photos/id/1027/520/480" alt="Retrato de Lucía Paredes">
+                                <h3>Lucía Paredes</h3>
+                                <p>Instructora de yoga</p>
+                            </div>
+                            <div class="cara reverso">
+                                <h3>Gimnasio Impulso</h3>
+                                <dl>
+                                    <dt>Experiencia</dt><dd>5 años</dd>
+                                    <dt>Clases</dt><dd>Yoga, pilates</dd>
+                                    <dt>Horario</dt><dd>Mar a sáb, 17 a 21 h</dd>
+                                    <dt>Alumnos</dt><dd>96 activos</dd>
+                                    <dt>Valoración</dt><dd>★★★★★ 4,8</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="flip" tabindex="0"&gt;
+    &lt;div class="interior"&gt;
+        &lt;div class="cara frente"&gt;...&lt;/div&gt;
+        &lt;div class="cara reverso"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.flip {
+    perspective: 1000px;
+}
+
+.interior {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.7s ease;
+}
+
+.flip:hover .interior,
+.flip:focus .interior {
+    transform: rotateY(180deg);
+}
+
+.cara {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+}
+
+.reverso {
+    transform: rotateY(180deg);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Las tres piezas del 3D</figcaption>
+<pre>perspective          en el PADRE: qué tan lejos está el "ojo".
+                     Menor valor = efecto 3D más exagerado.
+transform-style:     en el que gira: sus hijos viven en 3D
+  preserve-3d        en vez de aplastarse en un plano.
+backface-visibility: en cada cara: oculta la cara cuando
+  hidden             queda de espaldas.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-loaders" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Indicadores de carga</h2>
+            <p>Cuatro loaders que vemos todos los días. Todos usan <code>animation</code> con <code>infinite</code>: arrancan solos, sin hover.</p>
+            <div class="resultado">
+                <div class="rejilla">
+                    <div class="caja">
+                        <div class="spinner" role="status" aria-label="Cargando"></div>
+                        <p>Spinner</p>
+                    </div>
+                    <div class="caja">
+                        <div class="puntos" role="status" aria-label="Escribiendo"><span></span><span></span><span></span></div>
+                        <p>"Escribiendo..."</p>
+                    </div>
+                    <div class="caja">
+                        <div class="barra" role="status" aria-label="Subiendo archivo"><span></span></div>
+                        <p>Barra indeterminada</p>
+                    </div>
+                    <div class="caja">
+                        <div class="esqueleto" aria-hidden="true">
+                            <div class="hueso circulo"></div>
+                            <div class="hueso"></div>
+                            <div class="hueso"></div>
+                            <div class="hueso corto"></div>
+                        </div>
+                        <p>Esqueleto (skeleton)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Spinner y tres puntos</figcaption>
+<pre>.spinner {
+    width: 44px;
+    height: 44px;
+    border: 5px solid #fbcfe8;
+    border-top-color: #db2777;
+    border-radius: 50%;
+    animation: ej-girar 0.9s linear infinite;
+}
+
+@keyframes ej-girar {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.puntos span {
+    animation: ej-rebotar 0.6s ease-in-out infinite alternate;
+}
+
+.puntos span:nth-child(2) { animation-delay: 0.2s; }
+.puntos span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes ej-rebotar {
+    from {
+        transform: translateY(8px);
+        opacity: 0.4;
+    }
+    to {
+        transform: translateY(-8px);
+        opacity: 1;
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Barra indeterminada y esqueleto</figcaption>
+<pre>.barra {
+    overflow: hidden;
+}
+
+.barra span {
+    width: 35%;
+    animation: ej-indeterminada 1.4s ease-in-out infinite;
+}
+
+@keyframes ej-indeterminada {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(300%); }
+}
+
+.hueso {
+    background: linear-gradient(90deg, #eceef3 25%, #f8f9fc 50%, #eceef3 75%);
+    background-size: 200% 100%;
+    animation: ej-brillo 1.5s linear infinite;
+}
+
+@keyframes ej-brillo {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>iteration-count y direction</figcaption>
+<pre>infinite      se repite para siempre (spinner)
+alternate     una vuelta de ida, otra de vuelta
+              → los puntos suben y bajan sin "saltar"
+normal        siempre de 0% a 100% (la barra)
+
+Solo con animation-delay distinto en cada punto
+se consigue el efecto de "ola".</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-toast" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Notificaciones (toast) que entran y salen</h2>
+            <p>Una sola animación hace todo el recorrido: entra desde la derecha, se queda quieta un rato y se va. La segunda tiene <code>animation-delay</code> y <code>fill-mode: both</code> para que no se vea antes de su turno.</p>
+            <div class="resultado">
+                <div class="escena">
+                    <div class="pila">
+                        <div class="toast" role="status">✅ <div><strong>Pago recibido</strong>Tu pedido #4821 está confirmado.</div></div>
+                        <div class="toast aviso" role="status">📦 <div><strong>En camino</strong>Llega mañana entre 9 y 13 h.</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.toast {
+    animation: ej-toast 6s ease both infinite;
+}
+
+.toast.aviso {
+    animation-delay: 1s;
+}
+
+@keyframes ej-toast {
+    0% {
+        opacity: 0;
+        transform: translateX(120%);
+    }
+    10%,
+    75% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    90%,
+    100% {
+        opacity: 0;
+        transform: translateX(120%);
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>animation-fill-mode</figcaption>
+<pre>none       antes y después: el estilo normal del elemento
+forwards   al TERMINAR se queda con el último fotograma
+backwards  durante el DELAY ya aplica el primer fotograma
+both       las dos cosas
+
+Sin both, el segundo toast se vería quieto durante
+su segundo de espera y luego "saltaría" afuera.
+
+Varios porcentajes con el mismo estilo
+(10%, 75%) = "quédate quieto entre esos dos puntos".</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-maquina" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Texto de máquina de escribir</h2>
+            <p>El texto está completo en el HTML; lo que se anima es el ancho de su caja, que crece letra por letra gracias a <code>steps()</code> y a la unidad <code>ch</code> (el ancho de un carácter en fuente monoespaciada). El cursor es el borde derecho, que parpadea con una segunda animación.</p>
+            <div class="resultado">
+                <div class="terminal">
+                    <p class="escribir">Hola, soy Valeria Ríos</p>
+                    <p class="lema">Desarrolladora web · Portafolio 2026</p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.escribir {
+    width: 22ch;
+    overflow: hidden;
+    border-right: 3px solid #f472b6;
+    font-family: "Courier New", monospace;
+    white-space: nowrap;
+    animation: ej-escribir 3s steps(22) infinite alternate,
+               ej-cursor 0.7s step-end infinite;
+}
+
+@keyframes ej-escribir {
+    from {
+        width: 0;
+    }
+}
+
+@keyframes ej-cursor {
+    50% {
+        border-color: transparent;
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Detalles</figcaption>
+<pre>"Hola, soy Valeria Ríos" = 22 caracteres
+    → width: 22ch  y  steps(22)
+
+Keyframes con solo "from": el "to" es el estilo
+normal del elemento (width: 22ch).
+
+Dos animaciones a la vez, separadas por coma.
+
+alternate: escribe, luego "borra", y vuelve a escribir.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-banner" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Banner con degradado animado</h2>
+            <p>El degradado se dibuja tres veces más grande que el banner (<code>background-size: 300%</code>) y la animación mueve <code>background-position</code> de un lado al otro, como una ventana que recorre una tela de colores.</p>
+            <div class="resultado">
+                <div class="banner">
+                    <h3>Black Friday en Tienda Nébula</h3>
+                    <p>Hasta 50% de descuento en toda la tienda. Solo este fin de semana.</p>
+                    <a href="#ej-banner">Ver ofertas</a>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.banner {
+    background: linear-gradient(120deg, #db2777, #7c3aed, #f59e0b, #db2777);
+    background-size: 300% 300%;
+    animation: ej-degradado 8s ease infinite;
+}
+
+@keyframes ej-degradado {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.banner a {
+    transition: transform 0.2s ease;
+}
+
+.banner a:hover {
+    transform: scale(1.08);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-campana" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Campana de notificaciones y badge "en vivo"</h2>
+            <p>Tres animaciones pequeñas de una barra de plataforma de streaming: el punto rojo emite un pulso, el contador de la campana palpita y la campana se agita al pasarle el mouse. La campana gira desde arriba gracias a <code>transform-origin: top center</code>.</p>
+            <div class="resultado">
+                <div class="cabecera-app">
+                    <span class="marca">▶ Ondas TV</span>
+                    <span class="en-vivo"><span class="punto"></span>EN VIVO</span>
+                    <button class="campana" type="button" aria-label="Notificaciones, 3 nuevas">
+                        <span class="icono" aria-hidden="true">🔔</span>
+                        <span class="contador">3</span>
+                    </button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Pulso "en vivo"</figcaption>
+<pre>.punto {
+    position: relative;
+    border-radius: 50%;
+    background: #dc2626;
+}
+
+.punto::after {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #dc2626;
+    content: "";
+    animation: ej-pulso 1.5s ease-out infinite;
+}
+
+@keyframes ej-pulso {
+    from {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(3);
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Campana que se agita</figcaption>
+<pre>.icono {
+    display: inline-block;
+    transform-origin: top center;
+}
+
+.campana:hover .icono {
+    animation: ej-agitar 0.8s ease-in-out;
+}
+
+@keyframes ej-agitar {
+    0%,
+    100% { transform: rotate(0); }
+    15%  { transform: rotate(18deg); }
+    30%  { transform: rotate(-16deg); }
+    45%  { transform: rotate(12deg); }
+    60%  { transform: rotate(-8deg); }
+    75%  { transform: rotate(4deg); }
+}
+
+.contador {
+    animation: ej-badge 2s ease-in-out infinite;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-transform" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Galería: las funciones de <code>transform</code></h2>
+            <p>Cada foto aplica una función distinta al pasar el mouse. <code>transform</code> no mueve a los vecinos: la foto se dibuja en otro lugar, pero su espacio en el diseño sigue siendo el mismo.</p>
+            <div class="resultado">
+                <div class="galeria">
+                    <figure class="rotar"><img src="https://picsum.photos/id/1043/300/300" alt="Paisaje 1"><figcaption>rotate(8deg)</figcaption></figure>
+                    <figure class="escalar"><img src="https://picsum.photos/id/1039/300/300" alt="Paisaje 2"><figcaption>scale(1.15)</figcaption></figure>
+                    <figure class="mover"><img src="https://picsum.photos/id/1036/300/300" alt="Paisaje 3"><figcaption>translate(10px, -14px)</figcaption></figure>
+                    <figure class="sesgar"><img src="https://picsum.photos/id/1018/300/300" alt="Paisaje 4"><figcaption>skewX(-10deg)</figcaption></figure>
+                    <figure class="combinar"><img src="assets/imgs/pic_trulli.jpg" alt="Casas trulli"><figcaption>combinadas</figcaption></figure>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>img {
+    transition: transform 0.4s ease;
+}
+
+.rotar:hover img    { transform: rotate(8deg); }
+.escalar:hover img  { transform: scale(1.15); }
+.mover:hover img    { transform: translate(10px, -14px); }
+.sesgar:hover img   { transform: skewX(-10deg); }
+.combinar:hover img { transform: translateY(-10px) rotate(-6deg) scale(1.1); }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Combinar funciones</figcaption>
+<pre>Se escriben en UNA sola propiedad, separadas por espacios:
+    transform: translateY(-10px) rotate(-6deg) scale(1.1);
+
+Si escribes dos veces transform, la segunda reemplaza
+a la primera (no se suman).
+
+El orden importa: se aplican de derecha a izquierda.
+    rotate(45deg) translateX(100px)  ≠  translateX(100px) rotate(45deg)
+
+Unidades:  deg (grados), turn (1turn = 360deg),
+           px o % (del propio elemento) para translate.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-escalonada" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Entrada escalonada de una lista</h2>
+            <p>Al mostrar los resultados de búsqueda, cada elemento entra un poquito después que el anterior. Es la misma animación para todos; solo cambia el <code>animation-delay</code> con <code>:nth-child()</code>. Oculta y vuelve a mostrar para repetirla.</p>
+            <div class="resultado">
+                <input type="checkbox" id="ver-resultados">
+                <label for="ver-resultados" class="disparador"><span class="mostrar">🔍 Buscar "auriculares"</span><span class="ocultar">✕ Ocultar resultados</span></label>
+                <ul class="resultados">
+                    <li><img src="https://picsum.photos/id/1080/88/88" alt="">Auriculares Eco Pro<span>$ 89</span></li>
+                    <li><img src="https://picsum.photos/id/1060/88/88" alt="">Auriculares Pulso Mini<span>$ 45</span></li>
+                    <li><img src="https://picsum.photos/id/1062/88/88" alt="">Diadema Studio Nube<span>$ 120</span></li>
+                    <li><img src="https://picsum.photos/id/1069/88/88" alt="">Auriculares Deporte Ola<span>$ 59</span></li>
+                    <li><img src="https://picsum.photos/id/1074/88/88" alt="">Estuche de carga Vía<span>$ 19</span></li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.resultados {
+    display: none;
+}
+
+body:has(input:checked) .resultados {
+    display: grid;
+}
+
+.resultados li {
+    animation: ej-entrar 0.5s ease-out both;
+}
+
+.resultados li:nth-child(2) { animation-delay: 0.1s; }
+.resultados li:nth-child(3) { animation-delay: 0.2s; }
+.resultados li:nth-child(4) { animation-delay: 0.3s; }
+.resultados li:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes ej-entrar {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué se repite</figcaption>
+<pre>Una animación arranca cuando el elemento empieza
+a mostrarse (pasa de display: none a visible).
+
+Al ocultar y volver a mostrar la lista, cada &lt;li&gt;
+"nace" de nuevo y la animación vuelve a empezar.
+
+fill-mode: both → durante su delay, cada &lt;li&gt; ya está
+invisible (opacity: 0) y no aparece antes de tiempo.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-marquee" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Carrusel infinito de logos</h2>
+            <p>La típica franja de "confían en nosotros". La lista de logos está <strong>duplicada</strong>: al moverse exactamente la mitad (<code>-50%</code>), la segunda copia queda donde estaba la primera y el salto no se nota. Pasa el mouse para pausarlo con <code>animation-play-state</code>.</p>
+            <div class="resultado">
+                <div class="carrusel">
+                    <div class="cinta">
+                        <span class="logo"><img src="assets/imgs/logos/html5.svg" alt="">HTML5</span>
+                        <span class="logo"><img src="assets/imgs/logos/css3.svg" alt="">CSS3</span>
+                        <span class="logo"><img src="assets/imgs/logos/javascript.svg" alt="">JavaScript</span>
+                        <span class="logo">◆ Nubia Cloud</span>
+                        <span class="logo">▲ Kodex</span>
+                        <span class="logo">● Pixelia</span>
+                        <span class="logo">✦ Rumbo Pagos</span>
+                        <span class="logo" aria-hidden="true"><img src="assets/imgs/logos/html5.svg" alt="">HTML5</span>
+                        <span class="logo" aria-hidden="true"><img src="assets/imgs/logos/css3.svg" alt="">CSS3</span>
+                        <span class="logo" aria-hidden="true"><img src="assets/imgs/logos/javascript.svg" alt="">JavaScript</span>
+                        <span class="logo" aria-hidden="true">◆ Nubia Cloud</span>
+                        <span class="logo" aria-hidden="true">▲ Kodex</span>
+                        <span class="logo" aria-hidden="true">● Pixelia</span>
+                        <span class="logo" aria-hidden="true">✦ Rumbo Pagos</span>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="carrusel"&gt;
+    &lt;div class="cinta"&gt;
+        &lt;span class="logo"&gt;...&lt;/span&gt;   (logos 1 a 7)
+        &lt;span class="logo" aria-hidden="true"&gt;...&lt;/span&gt;   (copia de los 7)
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.carrusel {
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000000 12%, #000000 88%, transparent);
+}
+
+.cinta {
+    display: flex;
+    width: max-content;
+    animation: ej-desplazar 18s linear infinite;
+}
+
+.carrusel:hover .cinta {
+    animation-play-state: paused;
+}
+
+@keyframes ej-desplazar {
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.logo {
+    margin-right: 48px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Claves</figcaption>
+<pre>width: max-content   la cinta mide lo que miden todos los logos
+linear               velocidad constante, sin frenar en la unión
+-50%                 de la propia cinta = exactamente una copia
+margin-right         igual en TODOS los logos, para que las dos
+                     mitades midan lo mismo
+mask-image           difumina los bordes izquierdo y derecho
+play-state: paused   congela la animación donde va, sin reiniciar</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-movimiento" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Movimiento reducido: animar con respeto</h2>
+            <p>Algunas personas sienten mareo o náuseas con el movimiento en pantalla. Por eso los sistemas operativos tienen la opción "reducir movimiento", que CSS detecta con <code>prefers-reduced-motion</code> (lo vimos en la lección 14). Esta lección incluye una regla global que <strong>apaga todas sus animaciones y transiciones</strong> si esa opción está activa. Como en clase es incómodo cambiar el sistema, el checkbox simula el efecto solo en esta caja.</p>
+            <div class="resultado">
+                <div class="escena">
+                    <p class="estado"></p>
+                    <div class="carril"><div class="pelota"></div></div>
+                    <label class="simulador"><input type="checkbox" class="simular"> Simular "reducir movimiento"</label>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS: regla global de esta lección</figcaption>
+<pre>@media (prefers-reduced-motion: reduce) {
+    .leccion-contenido *,
+    .leccion-contenido *::before,
+    .leccion-contenido *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .toast,
+    .pelota {
+        animation: none;
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo funciona y cómo probarlo</figcaption>
+<pre>0.01ms en vez de none: las animaciones "terminan" al
+instante y el elemento queda en su estado final
+(la lista escalonada aparece, los hover cambian igual
+pero sin movimiento).
+
+Algunas animaciones necesitan un caso especial: el toast
+terminaría oculto, así que a ese se le pone animation: none.
+
+!important gana a todas las reglas de los ejemplos.
+
+Activarlo para probar:
+    Windows  Configuración → Accesibilidad → Efectos visuales
+             → Efectos de animación: desactivado
+    macOS    Ajustes → Accesibilidad → Pantalla → Reducir movimiento
+    Android  Accesibilidad → Quitar animaciones
+    iPhone   Accesibilidad → Movimiento → Reducir movimiento
+    DevTools Ctrl + Shift + P → "Emulate CSS prefers-reduced-motion"</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="14-css-responsive.html">Anterior: responsive</a> |
+            <a href="index.html">Índice</a> |
+            <a href="16-css-variables-temas.html">Siguiente: variables y temas</a>
+        </nav>
+    </footer>
+</body>
+</html>

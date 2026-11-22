@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>05. Formularios</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>05. Formularios</h1>
+        <p>Los formularios permiten recoger información de quien visita una página: iniciar sesión, comprar, reservar, opinar o buscar. Todos los ejemplos usan el aspecto <strong>por defecto del navegador</strong>, sin CSS propio, para ver cómo se comporta cada control de forma nativa.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-login">Inicio de sesión</a></li>
+            <li><a href="#ej-registro">Registro y validación</a></li>
+            <li><a href="#ej-galeria">Tipos de input</a></li>
+            <li><a href="#ej-encuesta">Encuesta</a></li>
+            <li><a href="#ej-pizza">Pedido de pizza</a></li>
+            <li><a href="#ej-hotel">Reserva de hotel</a></li>
+            <li><a href="#ej-buscador">Buscador con datalist</a></li>
+            <li><a href="#ej-contacto">Contacto</a></li>
+            <li><a href="#ej-cv">Subir CV</a></li>
+            <li><a href="#ej-perfil">Configuración de perfil</a></li>
+            <li><a href="#ej-multiple">Selección múltiple</a></li>
+            <li><a href="#ej-estados">disabled y readonly</a></li>
+            <li><a href="#ej-placeholder">placeholder vs label</a></li>
+            <li><a href="#ej-botones">Botones</a></li>
+            <li><a href="#ej-envio">GET, POST y name</a></li>
+            <li><a href="#ej-pasos">Formulario por pasos</a></li>
+            <li><a href="#ej-accesibilidad">Accesibilidad</a></li>
+            <li><a href="#ej-novalidate">novalidate</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Anatomía de un formulario</h2>
+            <p>Un formulario es un contenedor <code>&lt;form&gt;</code> con controles dentro. Cada control lleva un <code>name</code> (el nombre del dato) y una <code>&lt;label&gt;</code> que explica qué se pide. Al pulsar el botón de envío, el navegador junta todos los pares <code>name=valor</code> y los manda a la dirección indicada en <code>action</code>.</p>
+            <table>
+                <thead>
+                    <tr><th>Elemento / atributo</th><th>Para qué sirve</th><th>Ejemplo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>&lt;form&gt;</code></td><td>agrupa los controles que se envían juntos</td><td><code>&lt;form action="#" method="get"&gt;</code></td></tr>
+                    <tr><td><code>action</code></td><td>dirección a la que se envían los datos</td><td><code>action="/buscar"</code></td></tr>
+                    <tr><td><code>method</code></td><td><code>get</code> (datos en la URL) o <code>post</code> (datos ocultos en la petición)</td><td><code>method="post"</code></td></tr>
+                    <tr><td><code>&lt;label&gt;</code></td><td>texto asociado a un control mediante <code>for</code> e <code>id</code></td><td><code>&lt;label for="correo"&gt;</code></td></tr>
+                    <tr><td><code>&lt;input&gt;</code></td><td>control de una línea; su <code>type</code> cambia el comportamiento</td><td><code>&lt;input type="email"&gt;</code></td></tr>
+                    <tr><td><code>&lt;textarea&gt;</code></td><td>texto de varias líneas</td><td><code>&lt;textarea rows="4"&gt;</code></td></tr>
+                    <tr><td><code>&lt;select&gt;</code> y <code>&lt;option&gt;</code></td><td>lista desplegable de opciones</td><td><code>&lt;option value="cr"&gt;</code></td></tr>
+                    <tr><td><code>&lt;fieldset&gt;</code> y <code>&lt;legend&gt;</code></td><td>agrupan controles relacionados con un título</td><td><code>&lt;legend&gt;Envío&lt;/legend&gt;</code></td></tr>
+                    <tr><td><code>&lt;button&gt;</code></td><td>envía (<code>submit</code>), limpia (<code>reset</code>) o no hace nada (<code>button</code>)</td><td><code>&lt;button type="submit"&gt;</code></td></tr>
+                    <tr><td><code>name</code> y <code>value</code></td><td>nombre del dato y valor que se envía</td><td><code>name="talla" value="m"</code></td></tr>
+                    <tr><td><code>required</code>, <code>min</code>, <code>max</code>, <code>pattern</code></td><td>validación nativa del navegador, sin JavaScript</td><td><code>minlength="8"</code></td></tr>
+                    <tr><td><code>autocomplete</code></td><td>ayuda al navegador a rellenar datos guardados</td><td><code>autocomplete="email"</code></td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Estructura mínima</figcaption>
+<pre>&lt;form action="/destino" method="get"&gt;
+    &lt;label for="nombre"&gt;Nombre&lt;/label&gt;
+    &lt;input type="text" id="nombre" name="nombre"&gt;
+
+    &lt;button type="submit"&gt;Enviar&lt;/button&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Qué se envía</figcaption>
+<pre>Si escribes "Ana" y pulsas Enviar,
+el navegador visita:
+
+/destino?nombre=Ana
+
+Sin name, el dato NO se envía.
+Sin label, el control no tiene
+nombre para un lector de pantalla.
+
+Esta página no tiene servidor:
+action="#" vuelve a la misma página
+y solo verás los datos en la URL.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-login" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Inicio de sesión</h2>
+            <p>El formulario más común de la web. El tipo <code>password</code> oculta lo escrito y <code>autocomplete</code> le indica al navegador qué datos guardados puede ofrecer.</p>
+            <div class="resultado">
+                <form action="#" method="post">
+                    <h3>Banco Horizonte · Banca en línea</h3>
+                    <p>
+                        <label for="login-correo">Correo electrónico</label><br>
+                        <input type="email" id="login-correo" name="correo" autocomplete="username" required>
+                    </p>
+                    <p>
+                        <label for="login-clave">Contraseña</label><br>
+                        <input type="password" id="login-clave" name="clave" autocomplete="current-password" required>
+                    </p>
+                    <p>
+                        <input type="checkbox" id="login-recordar" name="recordar" value="si">
+                        <label for="login-recordar">Recordarme en este equipo</label>
+                    </p>
+                    <p><button type="submit">Ingresar</button></p>
+                    <p><a href="#ej-login">¿Olvidaste tu contraseña?</a></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form action="#" method="post"&gt;
+    &lt;label for="login-correo"&gt;Correo electrónico&lt;/label&gt;
+    &lt;input type="email" id="login-correo" name="correo"
+           autocomplete="username" required&gt;
+
+    &lt;label for="login-clave"&gt;Contraseña&lt;/label&gt;
+    &lt;input type="password" id="login-clave" name="clave"
+           autocomplete="current-password" required&gt;
+
+    &lt;input type="checkbox" id="login-recordar" name="recordar" value="si"&gt;
+    &lt;label for="login-recordar"&gt;Recordarme en este equipo&lt;/label&gt;
+
+    &lt;button type="submit"&gt;Ingresar&lt;/button&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué post</figcaption>
+<pre>Una contraseña NUNCA debe ir en la URL:
+quedaría en el historial del navegador.
+Por eso este formulario usa method="post".
+
+autocomplete útiles:
+username          usuario o correo
+current-password  contraseña actual
+new-password      contraseña nueva
+name, email, tel  datos personales</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-registro" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Registro con validación nativa</h2>
+            <p>Sin una línea de JavaScript, el navegador revisa que los campos obligatorios estén llenos, que el correo tenga formato válido, que la contraseña sea larga y que el teléfono siga un patrón. Pulsa <em>Crear cuenta</em> con datos incompletos para ver los mensajes.</p>
+            <div class="resultado">
+                <form action="#" method="get">
+                    <h3>Crea tu cuenta en TiendaVerde</h3>
+                    <p>
+                        <label for="reg-nombre">Nombre completo</label><br>
+                        <input type="text" id="reg-nombre" name="nombre" autocomplete="name" required minlength="3" maxlength="60">
+                    </p>
+                    <p>
+                        <label for="reg-correo">Correo electrónico</label><br>
+                        <input type="email" id="reg-correo" name="correo" autocomplete="email" required>
+                    </p>
+                    <p>
+                        <label for="reg-telefono">Teléfono (8 dígitos)</label><br>
+                        <input type="tel" id="reg-telefono" name="telefono" autocomplete="tel" pattern="[0-9]{4}-?[0-9]{4}" title="Escribe 8 dígitos, por ejemplo 8888-1234" placeholder="8888-1234">
+                    </p>
+                    <p>
+                        <label for="reg-clave">Contraseña (mínimo 8 caracteres)</label><br>
+                        <input type="password" id="reg-clave" name="clave" autocomplete="new-password" required minlength="8">
+                    </p>
+                    <p>
+                        <label for="reg-nacimiento">Fecha de nacimiento</label><br>
+                        <input type="date" id="reg-nacimiento" name="nacimiento" min="1920-01-01" max="2010-12-31" required>
+                    </p>
+                    <p>
+                        <input type="checkbox" id="reg-terminos" name="terminos" value="acepto" required>
+                        <label for="reg-terminos">Acepto los términos y condiciones</label>
+                    </p>
+                    <p><button type="submit">Crear cuenta</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;input type="text" id="reg-nombre" name="nombre"
+       required minlength="3" maxlength="60"&gt;
+
+&lt;input type="email" id="reg-correo" name="correo" required&gt;
+
+&lt;input type="tel" id="reg-telefono" name="telefono"
+       pattern="[0-9]{4}-?[0-9]{4}"
+       title="Escribe 8 dígitos, por ejemplo 8888-1234"&gt;
+
+&lt;input type="password" id="reg-clave" name="clave"
+       required minlength="8"&gt;
+
+&lt;input type="date" id="reg-nacimiento" name="nacimiento"
+       min="1920-01-01" max="2010-12-31" required&gt;
+
+&lt;input type="checkbox" id="reg-terminos" name="terminos"
+       value="acepto" required&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Atributos de validación</figcaption>
+<pre>required    el campo no puede quedar vacío
+minlength   mínimo de caracteres
+maxlength   máximo (no deja escribir más)
+min / max   límites en números y fechas
+pattern     expresión regular que debe cumplir
+title       texto que se añade al mensaje
+            de error de pattern
+type=email  exige algo@algo
+type=url    exige https://...
+
+Patrón del teléfono:
+[0-9]{4}  cuatro dígitos
+-?        un guion opcional
+[0-9]{4}  otros cuatro dígitos</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-galeria" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Galería de tipos de input</h2>
+            <p>El atributo <code>type</code> transforma el mismo elemento <code>&lt;input&gt;</code> en controles muy distintos. En el celular, además, cambia el teclado que aparece (numérico, de correo, de teléfono...). Prueba cada uno.</p>
+            <div class="resultado">
+                <form action="#" method="get">
+                    <fieldset>
+                        <legend>Texto</legend>
+                        <p><label for="gal-text">text:</label> <input type="text" id="gal-text" name="text" value="Texto libre"></p>
+                        <p><label for="gal-email">email:</label> <input type="email" id="gal-email" name="email" value="ana@correo.com"></p>
+                        <p><label for="gal-password">password:</label> <input type="password" id="gal-password" name="password" value="secreto123"></p>
+                        <p><label for="gal-search">search:</label> <input type="search" id="gal-search" name="search" value="zapatos"></p>
+                        <p><label for="gal-tel">tel:</label> <input type="tel" id="gal-tel" name="tel" value="2222-3333"></p>
+                        <p><label for="gal-url">url:</label> <input type="url" id="gal-url" name="url" value="https://ejemplo.com"></p>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Números</legend>
+                        <p><label for="gal-number">number:</label> <input type="number" id="gal-number" name="number" min="0" max="10" step="1" value="3"></p>
+                        <p><label for="gal-range">range:</label> <input type="range" id="gal-range" name="range" min="0" max="100" value="40"></p>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Fechas y horas</legend>
+                        <p><label for="gal-date">date:</label> <input type="date" id="gal-date" name="date" value="2026-12-24"></p>
+                        <p><label for="gal-time">time:</label> <input type="time" id="gal-time" name="time" value="14:30"></p>
+                        <p><label for="gal-datetime">datetime-local:</label> <input type="datetime-local" id="gal-datetime" name="datetime" value="2026-12-24T20:00"></p>
+                        <p><label for="gal-month">month:</label> <input type="month" id="gal-month" name="month" value="2026-12"></p>
+                        <p><label for="gal-week">week:</label> <input type="week" id="gal-week" name="week" value="2026-W52"></p>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Otros</legend>
+                        <p><label for="gal-color">color:</label> <input type="color" id="gal-color" name="color" value="#16a34a"></p>
+                        <p><label for="gal-file">file:</label> <input type="file" id="gal-file" name="archivo" accept="image/*" multiple></p>
+                        <p><input type="checkbox" id="gal-checkbox" name="checkbox" value="si" checked> <label for="gal-checkbox">checkbox</label></p>
+                        <p>
+                            <input type="radio" id="gal-radio-a" name="radio" value="a" checked> <label for="gal-radio-a">radio A</label>
+                            <input type="radio" id="gal-radio-b" name="radio" value="b"> <label for="gal-radio-b">radio B</label>
+                        </p>
+                        <input type="hidden" name="origen" value="galeria">
+                        <p>hidden: no se ve, pero se envía (<code>origen=galeria</code>).</p>
+                    </fieldset>
+                    <p><button type="submit">Enviar y ver la URL</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;input type="text"&gt;
+&lt;input type="email"&gt;
+&lt;input type="password"&gt;
+&lt;input type="search"&gt;
+&lt;input type="tel"&gt;
+&lt;input type="url"&gt;
+&lt;input type="number" min="0" max="10" step="1"&gt;
+&lt;input type="range" min="0" max="100"&gt;
+&lt;input type="date"&gt;
+&lt;input type="time"&gt;
+&lt;input type="datetime-local"&gt;
+&lt;input type="month"&gt;
+&lt;input type="week"&gt;
+&lt;input type="color" value="#16a34a"&gt;
+&lt;input type="file" accept="image/*" multiple&gt;
+&lt;input type="checkbox"&gt;
+&lt;input type="radio"&gt;
+&lt;input type="hidden" name="origen" value="galeria"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Formato del valor enviado</figcaption>
+<pre>date            2026-12-24
+time            14:30
+datetime-local  2026-12-24T20:00
+month           2026-12
+week            2026-W52
+color           #16a34a
+range / number  40
+checkbox        si   (solo si está marcado)
+radio           a    (el marcado del grupo)
+file            nombre del archivo
+
+Los formatos son siempre los mismos,
+aunque el navegador muestre la fecha
+como 24/12/2026 según el idioma.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-encuesta" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Encuesta de satisfacción</h2>
+            <p>Los botones de radio con el <strong>mismo</strong> <code>name</code> forman un grupo: solo se puede elegir uno. Cada pregunta va en su propio <code>&lt;fieldset&gt;</code> y la <code>&lt;legend&gt;</code> hace de enunciado.</p>
+            <div class="resultado">
+                <form action="#" method="get">
+                    <h3>¿Cómo fue tu visita a Café Montaña?</h3>
+                    <fieldset>
+                        <legend>Calidad de la comida (1 = mala, 5 = excelente)</legend>
+                        <input type="radio" id="enc-comida-1" name="comida" value="1"> <label for="enc-comida-1">1</label>
+                        <input type="radio" id="enc-comida-2" name="comida" value="2"> <label for="enc-comida-2">2</label>
+                        <input type="radio" id="enc-comida-3" name="comida" value="3"> <label for="enc-comida-3">3</label>
+                        <input type="radio" id="enc-comida-4" name="comida" value="4"> <label for="enc-comida-4">4</label>
+                        <input type="radio" id="enc-comida-5" name="comida" value="5" required> <label for="enc-comida-5">5</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Atención del personal</legend>
+                        <input type="radio" id="enc-atencion-1" name="atencion" value="1"> <label for="enc-atencion-1">1</label>
+                        <input type="radio" id="enc-atencion-2" name="atencion" value="2"> <label for="enc-atencion-2">2</label>
+                        <input type="radio" id="enc-atencion-3" name="atencion" value="3"> <label for="enc-atencion-3">3</label>
+                        <input type="radio" id="enc-atencion-4" name="atencion" value="4"> <label for="enc-atencion-4">4</label>
+                        <input type="radio" id="enc-atencion-5" name="atencion" value="5"> <label for="enc-atencion-5">5</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>¿Nos recomendarías?</legend>
+                        <p><input type="radio" id="enc-rec-si" name="recomienda" value="si"> <label for="enc-rec-si">Sí, sin duda</label></p>
+                        <p><input type="radio" id="enc-rec-quiza" name="recomienda" value="quiza"> <label for="enc-rec-quiza">Tal vez</label></p>
+                        <p><input type="radio" id="enc-rec-no" name="recomienda" value="no"> <label for="enc-rec-no">No</label></p>
+                    </fieldset>
+                    <fieldset>
+                        <legend>¿Qué pediste? (puedes marcar varias)</legend>
+                        <input type="checkbox" id="enc-pidio-cafe" name="pidio" value="cafe"> <label for="enc-pidio-cafe">Café</label>
+                        <input type="checkbox" id="enc-pidio-postre" name="pidio" value="postre"> <label for="enc-pidio-postre">Postre</label>
+                        <input type="checkbox" id="enc-pidio-desayuno" name="pidio" value="desayuno"> <label for="enc-pidio-desayuno">Desayuno</label>
+                    </fieldset>
+                    <p><button type="submit">Enviar opinión</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;fieldset&gt;
+    &lt;legend&gt;Calidad de la comida (1 = mala, 5 = excelente)&lt;/legend&gt;
+    &lt;input type="radio" id="enc-comida-1" name="comida" value="1"&gt;
+    &lt;label for="enc-comida-1"&gt;1&lt;/label&gt;
+    ...
+    &lt;input type="radio" id="enc-comida-5" name="comida" value="5" required&gt;
+    &lt;label for="enc-comida-5"&gt;5&lt;/label&gt;
+&lt;/fieldset&gt;
+
+&lt;fieldset&gt;
+    &lt;legend&gt;¿Qué pediste? (puedes marcar varias)&lt;/legend&gt;
+    &lt;input type="checkbox" id="enc-pidio-cafe" name="pidio" value="cafe"&gt;
+    &lt;label for="enc-pidio-cafe"&gt;Café&lt;/label&gt;
+    ...
+&lt;/fieldset&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>radio vs checkbox</figcaption>
+<pre>radio     una sola opción por grupo
+          (mismo name = mismo grupo)
+checkbox  cero, una o varias opciones
+
+Con required en UN radio del grupo,
+el grupo entero pasa a ser obligatorio.
+
+Si marcas Café y Postre se envía:
+?pidio=cafe&amp;pidio=postre</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-pizza" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Pedido de pizza</h2>
+            <p>Un formulario de compra combina varios controles: radio para el tamaño (uno solo), checkbox para los ingredientes (varios), <code>select</code> para la bebida y <code>number</code> para la cantidad. El atributo <code>checked</code> marca una opción por defecto y <code>selected</code> preselecciona en la lista.</p>
+            <div class="resultado">
+                <form action="#" method="get">
+                    <h3>Pizzería Don Vesubio</h3>
+                    <fieldset>
+                        <legend>Tamaño</legend>
+                        <p><input type="radio" id="piz-pequena" name="tamano" value="pequena"> <label for="piz-pequena">Pequeña (4 porciones) · ₡5 500</label></p>
+                        <p><input type="radio" id="piz-mediana" name="tamano" value="mediana" checked> <label for="piz-mediana">Mediana (6 porciones) · ₡7 900</label></p>
+                        <p><input type="radio" id="piz-grande" name="tamano" value="grande"> <label for="piz-grande">Grande (8 porciones) · ₡9 900</label></p>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Ingredientes extra (₡800 c/u)</legend>
+                        <p><input type="checkbox" id="piz-queso" name="extra" value="queso" checked> <label for="piz-queso">Doble queso</label></p>
+                        <p><input type="checkbox" id="piz-jamon" name="extra" value="jamon"> <label for="piz-jamon">Jamón</label></p>
+                        <p><input type="checkbox" id="piz-hongos" name="extra" value="hongos"> <label for="piz-hongos">Hongos</label></p>
+                        <p><input type="checkbox" id="piz-pina" name="extra" value="pina"> <label for="piz-pina">Piña</label></p>
+                        <p><input type="checkbox" id="piz-chile" name="extra" value="chile"> <label for="piz-chile">Chile dulce</label></p>
+                    </fieldset>
+                    <p>
+                        <label for="piz-bebida">Bebida</label>
+                        <select id="piz-bebida" name="bebida">
+                            <option value="ninguna">Sin bebida</option>
+                            <option value="cola" selected>Refresco de cola 1,5 L</option>
+                            <option value="naranja">Jugo de naranja 1 L</option>
+                            <option value="agua">Agua 600 ml</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="piz-cantidad">Cantidad de pizzas</label>
+                        <input type="number" id="piz-cantidad" name="cantidad" min="1" max="10" value="1">
+                    </p>
+                    <p>
+                        <label for="piz-notas">Indicaciones para el repartidor</label><br>
+                        <textarea id="piz-notas" name="notas" rows="2" cols="40" placeholder="Casa verde con portón negro"></textarea>
+                    </p>
+                    <p><button type="submit">Pedir ahora</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;fieldset&gt;
+    &lt;legend&gt;Tamaño&lt;/legend&gt;
+    &lt;input type="radio" id="piz-pequena" name="tamano" value="pequena"&gt;
+    &lt;label for="piz-pequena"&gt;Pequeña ...&lt;/label&gt;
+    &lt;input type="radio" id="piz-mediana" name="tamano" value="mediana" checked&gt;
+    ...
+&lt;/fieldset&gt;
+
+&lt;fieldset&gt;
+    &lt;legend&gt;Ingredientes extra (₡800 c/u)&lt;/legend&gt;
+    &lt;input type="checkbox" id="piz-queso" name="extra" value="queso" checked&gt;
+    &lt;label for="piz-queso"&gt;Doble queso&lt;/label&gt;
+    ...
+&lt;/fieldset&gt;
+
+&lt;label for="piz-bebida"&gt;Bebida&lt;/label&gt;
+&lt;select id="piz-bebida" name="bebida"&gt;
+    &lt;option value="ninguna"&gt;Sin bebida&lt;/option&gt;
+    &lt;option value="cola" selected&gt;Refresco de cola 1,5 L&lt;/option&gt;
+    ...
+&lt;/select&gt;
+
+&lt;label for="piz-cantidad"&gt;Cantidad de pizzas&lt;/label&gt;
+&lt;input type="number" id="piz-cantidad" name="cantidad"
+       min="1" max="10" value="1"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>value vs texto visible</figcaption>
+<pre>Lo que la persona ve:
+  Refresco de cola 1,5 L
+Lo que se envía al servidor:
+  bebida=cola
+
+El value es un código corto y estable;
+el texto visible puede cambiar sin
+romper el programa que recibe el pedido.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-hotel" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Reserva de hotel</h2>
+            <p>Las fechas usan <code>min</code> y <code>max</code> para impedir reservas en el pasado o demasiado lejanas. El <code>select</code> agrupa las habitaciones por tipo con <code>&lt;optgroup&gt;</code>, y la primera opción vacía obliga a elegir gracias a <code>required</code>.</p>
+            <div class="resultado">
+                <form action="#" method="get">
+                    <h3>Hotel Playa Serena</h3>
+                    <p>
+                        <label for="hot-entrada">Fecha de entrada</label><br>
+                        <input type="date" id="hot-entrada" name="entrada" min="2026-11-20" max="2027-11-20" required>
+                    </p>
+                    <p>
+                        <label for="hot-salida">Fecha de salida</label><br>
+                        <input type="date" id="hot-salida" name="salida" min="2026-11-21" max="2027-11-30" required>
+                    </p>
+                    <p>
+                        <label for="hot-adultos">Adultos</label>
+                        <input type="number" id="hot-adultos" name="adultos" min="1" max="4" value="2">
+                        <label for="hot-ninos">Niños</label>
+                        <input type="number" id="hot-ninos" name="ninos" min="0" max="3" value="0">
+                    </p>
+                    <p>
+                        <label for="hot-habitacion">Habitación</label><br>
+                        <select id="hot-habitacion" name="habitacion" required>
+                            <option value="">Elige una habitación</option>
+                            <optgroup label="Estándar">
+                                <option value="std-jardin">Vista al jardín · $85 por noche</option>
+                                <option value="std-piscina">Vista a la piscina · $95 por noche</option>
+                            </optgroup>
+                            <optgroup label="Superior">
+                                <option value="sup-mar">Vista al mar · $140 por noche</option>
+                                <option value="sup-familiar">Familiar con dos camas · $160 por noche</option>
+                            </optgroup>
+                            <optgroup label="Suite">
+                                <option value="suite-luna">Suite Luna de miel · $260 por noche</option>
+                                <option value="suite-presi" disabled>Suite presidencial (agotada)</option>
+                            </optgroup>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="hot-llegada">Hora estimada de llegada</label>
+                        <input type="time" id="hot-llegada" name="llegada" min="14:00" max="23:00" value="15:00">
+                    </p>
+                    <p>
+                        <input type="checkbox" id="hot-desayuno" name="desayuno" value="si">
+                        <label for="hot-desayuno">Incluir desayuno buffet ($15 por persona)</label>
+                    </p>
+                    <p><button type="submit">Buscar disponibilidad</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;input type="date" id="hot-entrada" name="entrada"
+       min="2026-11-20" max="2027-11-20" required&gt;
+
+&lt;input type="number" id="hot-adultos" name="adultos"
+       min="1" max="4" value="2"&gt;
+
+&lt;select id="hot-habitacion" name="habitacion" required&gt;
+    &lt;option value=""&gt;Elige una habitación&lt;/option&gt;
+    &lt;optgroup label="Estándar"&gt;
+        &lt;option value="std-jardin"&gt;Vista al jardín · $85 por noche&lt;/option&gt;
+        ...
+    &lt;/optgroup&gt;
+    &lt;optgroup label="Suite"&gt;
+        &lt;option value="suite-luna"&gt;Suite Luna de miel ...&lt;/option&gt;
+        &lt;option value="suite-presi" disabled&gt;Suite presidencial (agotada)&lt;/option&gt;
+    &lt;/optgroup&gt;
+&lt;/select&gt;
+
+&lt;input type="time" id="hot-llegada" name="llegada"
+       min="14:00" max="23:00" value="15:00"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Trucos del select</figcaption>
+<pre>optgroup label   título de grupo, no se
+                 puede seleccionar
+option disabled  se ve pero no se elige
+option value=""  con required, obliga a
+                 elegir una opción real
+
+Las fechas min y max se escriben
+siempre como AAAA-MM-DD.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-buscador" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Buscador de vuelos con datalist</h2>
+            <p>Un <code>&lt;datalist&gt;</code> ofrece sugerencias mientras se escribe, pero a diferencia de <code>select</code> permite escribir cualquier otro valor. Se conecta al input con el atributo <code>list</code>.</p>
+            <div class="resultado">
+                <form action="#" method="get" role="search">
+                    <h3>VuelaYa · Busca tu próximo destino</h3>
+                    <p>
+                        <label for="bus-origen">Origen</label><br>
+                        <input type="search" id="bus-origen" name="origen" list="bus-paises" placeholder="Escribe un país" required>
+                    </p>
+                    <p>
+                        <label for="bus-destino">Destino</label><br>
+                        <input type="search" id="bus-destino" name="destino" list="bus-paises" placeholder="Escribe un país" required>
+                    </p>
+                    <datalist id="bus-paises">
+                        <option value="Argentina"></option>
+                        <option value="Chile"></option>
+                        <option value="Colombia"></option>
+                        <option value="Costa Rica"></option>
+                        <option value="España"></option>
+                        <option value="Guatemala"></option>
+                        <option value="México"></option>
+                        <option value="Panamá"></option>
+                        <option value="Perú"></option>
+                        <option value="Uruguay"></option>
+                    </datalist>
+                    <p>
+                        <label for="bus-fecha">Fecha de ida</label>
+                        <input type="date" id="bus-fecha" name="fecha" min="2026-11-20">
+                    </p>
+                    <p>
+                        <label for="bus-clase">Clase</label>
+                        <input type="text" id="bus-clase" name="clase" list="bus-clases" value="Económica">
+                        <datalist id="bus-clases">
+                            <option value="Económica"></option>
+                            <option value="Premium"></option>
+                            <option value="Ejecutiva"></option>
+                        </datalist>
+                    </p>
+                    <p><button type="submit">Buscar vuelos</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form action="#" method="get" role="search"&gt;
+    &lt;label for="bus-origen"&gt;Origen&lt;/label&gt;
+    &lt;input type="search" id="bus-origen" name="origen"
+           list="bus-paises" placeholder="Escribe un país" required&gt;
+
+    &lt;label for="bus-destino"&gt;Destino&lt;/label&gt;
+    &lt;input type="search" id="bus-destino" name="destino"
+           list="bus-paises" placeholder="Escribe un país" required&gt;
+
+    &lt;datalist id="bus-paises"&gt;
+        &lt;option value="Argentina"&gt;&lt;/option&gt;
+        &lt;option value="Chile"&gt;&lt;/option&gt;
+        ...
+        &lt;option value="Uruguay"&gt;&lt;/option&gt;
+    &lt;/datalist&gt;
+
+    &lt;button type="submit"&gt;Buscar vuelos&lt;/button&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>datalist vs select</figcaption>
+<pre>select    solo permite las opciones
+          de la lista
+datalist  sugiere, pero acepta
+          cualquier texto
+
+Un mismo datalist puede servir a
+varios inputs (origen y destino
+usan list="bus-paises").
+
+type="search" añade una X para
+borrar en algunos navegadores.
+role="search" anuncia el formulario
+como buscador a lectores de pantalla.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-contacto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Formulario de contacto</h2>
+            <p>El clásico "Contáctanos" de cualquier empresa. El <code>&lt;textarea&gt;</code> recoge mensajes largos; <code>maxlength</code> limita los caracteres y <code>rows</code>/<code>cols</code> definen su tamaño inicial. Las preferencias se agrupan en otro <code>fieldset</code>.</p>
+            <div class="resultado">
+                <form action="#" method="get">
+                    <h3>Soporte de Nube Digital S.A.</h3>
+                    <fieldset>
+                        <legend>Datos de contacto</legend>
+                        <p>
+                            <label for="con-nombre">Nombre:</label>
+                            <input type="text" id="con-nombre" name="nombre" autocomplete="name" required>
+                        </p>
+                        <p>
+                            <label for="con-correo">Correo electrónico:</label>
+                            <input type="email" id="con-correo" name="correo" autocomplete="email" required>
+                        </p>
+                        <p>
+                            <label for="con-edad">Edad:</label>
+                            <input type="number" id="con-edad" name="edad" min="1" max="120">
+                        </p>
+                        <p>
+                            <label for="con-fecha">Fecha preferida para llamarte:</label>
+                            <input type="date" id="con-fecha" name="fecha">
+                        </p>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Consulta</legend>
+                        <p>
+                            <label for="con-tema">Tema:</label>
+                            <select id="con-tema" name="tema">
+                                <option value="">Selecciona un tema</option>
+                                <optgroup label="Cuenta">
+                                    <option value="acceso">No puedo ingresar</option>
+                                    <option value="datos">Cambiar mis datos</option>
+                                </optgroup>
+                                <optgroup label="Facturación">
+                                    <option value="cobro">Cobro incorrecto</option>
+                                    <option value="factura">Solicitar factura</option>
+                                </optgroup>
+                            </select>
+                        </p>
+                        <p>
+                            <label for="con-mensaje">Mensaje (máximo 300 caracteres):</label><br>
+                            <textarea id="con-mensaje" name="mensaje" rows="5" cols="45" maxlength="300" required placeholder="Cuéntanos qué pasó"></textarea>
+                        </p>
+                        <p>
+                            <input type="checkbox" id="con-novedades" name="novedades" value="si">
+                            <label for="con-novedades">Quiero recibir novedades por correo</label>
+                        </p>
+                    </fieldset>
+                    <p><button type="submit">Enviar mensaje</button> <button type="reset">Limpiar</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;fieldset&gt;
+    &lt;legend&gt;Datos de contacto&lt;/legend&gt;
+    &lt;label for="con-nombre"&gt;Nombre:&lt;/label&gt;
+    &lt;input type="text" id="con-nombre" name="nombre"
+           autocomplete="name" required&gt;
+    ...
+&lt;/fieldset&gt;
+
+&lt;fieldset&gt;
+    &lt;legend&gt;Consulta&lt;/legend&gt;
+    &lt;select id="con-tema" name="tema"&gt;
+        &lt;option value=""&gt;Selecciona un tema&lt;/option&gt;
+        &lt;optgroup label="Cuenta"&gt;...&lt;/optgroup&gt;
+        &lt;optgroup label="Facturación"&gt;...&lt;/optgroup&gt;
+    &lt;/select&gt;
+
+    &lt;label for="con-mensaje"&gt;Mensaje (máximo 300 caracteres):&lt;/label&gt;
+    &lt;textarea id="con-mensaje" name="mensaje" rows="5" cols="45"
+              maxlength="300" required
+              placeholder="Cuéntanos qué pasó"&gt;&lt;/textarea&gt;
+&lt;/fieldset&gt;
+
+&lt;button type="submit"&gt;Enviar mensaje&lt;/button&gt;
+&lt;button type="reset"&gt;Limpiar&lt;/button&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>textarea</figcaption>
+<pre>Se escribe con etiqueta de cierre:
+&lt;textarea&gt;&lt;/textarea&gt;
+
+El texto por defecto va ENTRE las
+etiquetas, no en un atributo value.
+
+rows       líneas visibles
+cols       ancho en caracteres
+maxlength  límite de caracteres
+
+La persona puede agrandarlo
+arrastrando la esquina inferior.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-cv" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Postulación de empleo: subir CV</h2>
+            <p>Para enviar archivos el formulario necesita <code>method="post"</code> y <code>enctype="multipart/form-data"</code>. El atributo <code>accept</code> filtra los archivos que muestra el explorador y <code>multiple</code> permite elegir varios a la vez.</p>
+            <div class="resultado">
+                <form action="#" method="post" enctype="multipart/form-data">
+                    <h3>Trabaja con nosotros · Desarrollador web junior</h3>
+                    <p>
+                        <label for="cv-nombre">Nombre completo</label><br>
+                        <input type="text" id="cv-nombre" name="nombre" autocomplete="name" required>
+                    </p>
+                    <p>
+                        <label for="cv-linkedin">Perfil profesional o portafolio</label><br>
+                        <input type="url" id="cv-linkedin" name="portafolio" placeholder="https://miportafolio.dev">
+                    </p>
+                    <p>
+                        <label for="cv-archivo">Currículum (solo PDF)</label><br>
+                        <input type="file" id="cv-archivo" name="cv" accept=".pdf,application/pdf" required>
+                    </p>
+                    <p>
+                        <label for="cv-certificados">Certificados (PDF o imagen, puedes elegir varios)</label><br>
+                        <input type="file" id="cv-certificados" name="certificados" accept=".pdf,image/*" multiple>
+                    </p>
+                    <p>
+                        <label for="cv-foto">Foto desde la cámara del celular</label><br>
+                        <input type="file" id="cv-foto" name="foto" accept="image/*" capture="user">
+                    </p>
+                    <p>
+                        <label for="cv-salario">Aspiración salarial mensual (USD)</label><br>
+                        <input type="number" id="cv-salario" name="salario" min="0" step="50" placeholder="1200">
+                    </p>
+                    <p><button type="submit">Enviar postulación</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form action="#" method="post" enctype="multipart/form-data"&gt;
+    &lt;label for="cv-archivo"&gt;Currículum (solo PDF)&lt;/label&gt;
+    &lt;input type="file" id="cv-archivo" name="cv"
+           accept=".pdf,application/pdf" required&gt;
+
+    &lt;label for="cv-certificados"&gt;Certificados ...&lt;/label&gt;
+    &lt;input type="file" id="cv-certificados" name="certificados"
+           accept=".pdf,image/*" multiple&gt;
+
+    &lt;label for="cv-foto"&gt;Foto desde la cámara del celular&lt;/label&gt;
+    &lt;input type="file" id="cv-foto" name="foto"
+           accept="image/*" capture="user"&gt;
+    ...
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Valores de accept</figcaption>
+<pre>.pdf             por extensión
+application/pdf  por tipo MIME
+image/*          cualquier imagen
+video/*          cualquier video
+.doc,.docx       varias, separadas por coma
+
+accept solo es una ayuda: el servidor
+siempre debe revisar el archivo.
+
+capture="user"         cámara frontal
+capture="environment"  cámara trasera</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-perfil" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Configuración de perfil</h2>
+            <p>Una pantalla de ajustes de una aplicación de música. El selector de color abre la paleta del sistema y los deslizadores <code>range</code> sirven para valores aproximados. El elemento <code>&lt;output&gt;</code> muestra un resultado; aquí es estático, porque actualizarlo en vivo requiere JavaScript.</p>
+            <div class="resultado">
+                <form action="#" method="get">
+                    <h3>SonaMusic · Ajustes</h3>
+                    <fieldset>
+                        <legend>Apariencia</legend>
+                        <p>
+                            <label for="per-alias">Nombre visible</label>
+                            <input type="text" id="per-alias" name="alias" value="mariela_beats" maxlength="20">
+                        </p>
+                        <p>
+                            <label for="per-color">Color de acento</label>
+                            <input type="color" id="per-color" name="color" value="#7c3aed">
+                        </p>
+                        <p>
+                            <label for="per-tema">Tema</label>
+                            <select id="per-tema" name="tema">
+                                <option value="auto" selected>Igual que el sistema</option>
+                                <option value="claro">Claro</option>
+                                <option value="oscuro">Oscuro</option>
+                            </select>
+                        </p>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Sonido</legend>
+                        <p>
+                            <label for="per-volumen">Volumen</label>
+                            <input type="range" id="per-volumen" name="volumen" min="0" max="100" step="5" value="70">
+                            <output for="per-volumen">70 %</output>
+                        </p>
+                        <p>
+                            <label for="per-graves">Graves</label>
+                            <input type="range" id="per-graves" name="graves" min="-10" max="10" value="3">
+                            <output for="per-graves">+3</output>
+                        </p>
+                        <p>
+                            <input type="checkbox" id="per-autoplay" name="autoplay" value="si" checked>
+                            <label for="per-autoplay">Reproducir automáticamente canciones similares</label>
+                        </p>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Notificaciones</legend>
+                        <p>
+                            <label for="per-silencio">No molestar desde</label>
+                            <input type="time" id="per-silencio" name="silencio" value="22:00">
+                        </p>
+                        <p>
+                            <input type="checkbox" id="per-correo" name="avisos" value="correo" checked>
+                            <label for="per-correo">Por correo</label>
+                            <input type="checkbox" id="per-push" name="avisos" value="push">
+                            <label for="per-push">En el celular</label>
+                        </p>
+                    </fieldset>
+                    <p><button type="submit">Guardar cambios</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label for="per-color"&gt;Color de acento&lt;/label&gt;
+&lt;input type="color" id="per-color" name="color" value="#7c3aed"&gt;
+
+&lt;label for="per-volumen"&gt;Volumen&lt;/label&gt;
+&lt;input type="range" id="per-volumen" name="volumen"
+       min="0" max="100" step="5" value="70"&gt;
+&lt;output for="per-volumen"&gt;70 %&lt;/output&gt;
+
+&lt;label for="per-graves"&gt;Graves&lt;/label&gt;
+&lt;input type="range" id="per-graves" name="graves"
+       min="-10" max="10" value="3"&gt;
+&lt;output for="per-graves"&gt;+3&lt;/output&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>range</figcaption>
+<pre>min    valor del extremo izquierdo
+max    valor del extremo derecho
+step   salto entre valores
+value  posición inicial
+
+range no muestra el número elegido.
+Por eso se acompaña de un &lt;output&gt;
+(o de texto). El for de output indica
+de qué control depende.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-multiple" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Selección múltiple de intereses</h2>
+            <p>Con <code>multiple</code>, un <code>select</code> se convierte en una lista donde se pueden elegir varias opciones con <kbd>Ctrl</kbd> (o <kbd>Cmd</kbd> en Mac). <code>size</code> indica cuántas filas se ven. Junto a él, la misma idea resuelta con checkboxes, que suele ser más fácil de usar.</p>
+            <div class="resultado">
+                <form action="#" method="get">
+                    <h3>Noticias a tu medida</h3>
+                    <p>
+                        <label for="mul-secciones">Secciones que te interesan</label><br>
+                        <select id="mul-secciones" name="seccion" multiple size="6">
+                            <option value="nacionales" selected>Nacionales</option>
+                            <option value="mundo">Mundo</option>
+                            <option value="economia" selected>Economía</option>
+                            <option value="deportes">Deportes</option>
+                            <option value="tecnologia">Tecnología</option>
+                            <option value="cultura">Cultura</option>
+                            <option value="salud">Salud</option>
+                            <option value="ciencia">Ciencia</option>
+                        </select>
+                    </p>
+                    <fieldset>
+                        <legend>Frecuencia del boletín</legend>
+                        <input type="checkbox" id="mul-diario" name="boletin" value="diario"> <label for="mul-diario">Diario</label>
+                        <input type="checkbox" id="mul-semanal" name="boletin" value="semanal" checked> <label for="mul-semanal">Resumen semanal</label>
+                        <input type="checkbox" id="mul-alertas" name="boletin" value="alertas"> <label for="mul-alertas">Alertas de última hora</label>
+                    </fieldset>
+                    <p><button type="submit">Guardar preferencias</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label for="mul-secciones"&gt;Secciones que te interesan&lt;/label&gt;
+&lt;select id="mul-secciones" name="seccion" multiple size="6"&gt;
+    &lt;option value="nacionales" selected&gt;Nacionales&lt;/option&gt;
+    &lt;option value="mundo"&gt;Mundo&lt;/option&gt;
+    &lt;option value="economia" selected&gt;Economía&lt;/option&gt;
+    ...
+    &lt;option value="ciencia"&gt;Ciencia&lt;/option&gt;
+&lt;/select&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Qué se envía</figcaption>
+<pre>Con Nacionales y Economía elegidas:
+
+?seccion=nacionales&amp;seccion=economia
+
+El mismo name se repite una vez por
+cada opción elegida, igual que con
+varios checkbox del mismo grupo.
+
+En el celular, multiple muestra una
+lista con casillas para marcar.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-estados" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Campos disabled y readonly</h2>
+            <p>En una factura electrónica algunos datos no se pueden cambiar. Parecen iguales, pero se comportan distinto: <code>readonly</code> se puede seleccionar y <strong>sí se envía</strong>; <code>disabled</code> no recibe el foco y <strong>no se envía</strong>. Un <code>fieldset disabled</code> desactiva todo su contenido de una vez.</p>
+            <div class="resultado">
+                <form action="#" method="get">
+                    <h3>Factura electrónica N.º 00100001010000004521</h3>
+                    <p>
+                        <label for="est-cliente">Cliente (readonly)</label><br>
+                        <input type="text" id="est-cliente" name="cliente" value="Ferretería El Tornillo Feliz" readonly>
+                    </p>
+                    <p>
+                        <label for="est-cedula">Cédula jurídica (readonly)</label><br>
+                        <input type="text" id="est-cedula" name="cedula" value="3-101-123456" readonly>
+                    </p>
+                    <p>
+                        <label for="est-moneda">Moneda (disabled)</label><br>
+                        <select id="est-moneda" name="moneda" disabled>
+                            <option value="crc" selected>Colones</option>
+                            <option value="usd">Dólares</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="est-correo">Correo para enviar la factura (editable)</label><br>
+                        <input type="email" id="est-correo" name="correo" value="compras@tornillofeliz.example">
+                    </p>
+                    <fieldset disabled>
+                        <legend>Datos de pago (bloqueados: factura ya pagada)</legend>
+                        <p>
+                            <label for="est-metodo">Método</label>
+                            <input type="text" id="est-metodo" name="metodo" value="Transferencia">
+                        </p>
+                        <p>
+                            <label for="est-monto">Monto</label>
+                            <input type="text" id="est-monto" name="monto" value="₡125 000">
+                        </p>
+                    </fieldset>
+                    <p><button type="submit">Reenviar factura</button> <button type="button" disabled>Anular factura</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;input type="text" id="est-cliente" name="cliente"
+       value="Ferretería El Tornillo Feliz" readonly&gt;
+
+&lt;select id="est-moneda" name="moneda" disabled&gt;
+    &lt;option value="crc" selected&gt;Colones&lt;/option&gt;
+    ...
+&lt;/select&gt;
+
+&lt;fieldset disabled&gt;
+    &lt;legend&gt;Datos de pago (bloqueados: factura ya pagada)&lt;/legend&gt;
+    &lt;input type="text" id="est-metodo" name="metodo" value="Transferencia"&gt;
+    &lt;input type="text" id="est-monto" name="monto" value="₡125 000"&gt;
+&lt;/fieldset&gt;
+
+&lt;button type="button" disabled&gt;Anular factura&lt;/button&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Comparación</figcaption>
+<pre>                readonly   disabled
+Se puede editar    no         no
+Recibe el foco     sí         no
+Se puede copiar    sí         no
+Se envía           sí         NO
+Aspecto            normal     gris
+
+Pulsa "Reenviar factura" y mira la URL:
+aparecen cliente, cedula y correo, pero
+no moneda, metodo ni monto.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-placeholder" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>placeholder no reemplaza a label</h2>
+            <p>Dos versiones del mismo formulario de dirección de envío. En la primera solo hay <code>placeholder</code>: al empezar a escribir, la pista desaparece y ya no se sabe qué campo era cuál. En la segunda, la <code>label</code> siempre está visible y el <code>placeholder</code> solo da un ejemplo del formato.</p>
+            <div class="resultado">
+                <h3>Mal: solo placeholder</h3>
+                <form action="#" method="get">
+                    <p><input type="text" id="ph-mal-provincia" name="provincia" placeholder="Provincia" aria-label="Provincia"></p>
+                    <p><input type="text" id="ph-mal-canton" name="canton" placeholder="Cantón" aria-label="Cantón"></p>
+                    <p><input type="text" id="ph-mal-senas" name="senas" placeholder="Otras señas" aria-label="Otras señas"></p>
+                    <p><input type="text" id="ph-mal-postal" name="postal" placeholder="Código postal" aria-label="Código postal"></p>
+                </form>
+                <h3>Bien: label + placeholder de ejemplo</h3>
+                <form action="#" method="get">
+                    <p>
+                        <label for="ph-provincia">Provincia</label><br>
+                        <input type="text" id="ph-provincia" name="provincia" placeholder="Ej. Heredia">
+                    </p>
+                    <p>
+                        <label for="ph-canton">Cantón</label><br>
+                        <input type="text" id="ph-canton" name="canton" placeholder="Ej. Barva">
+                    </p>
+                    <p>
+                        <label for="ph-senas">Otras señas</label><br>
+                        <input type="text" id="ph-senas" name="senas" placeholder="Ej. 200 m norte de la iglesia" size="35">
+                    </p>
+                    <p>
+                        <label for="ph-postal">Código postal</label><br>
+                        <input type="text" id="ph-postal" name="postal" placeholder="Ej. 40201" inputmode="numeric" maxlength="5">
+                    </p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;input type="text" name="provincia" placeholder="Provincia"
+       aria-label="Provincia"&gt;
+
+&lt;label for="ph-provincia"&gt;Provincia&lt;/label&gt;
+&lt;input type="text" id="ph-provincia" name="provincia"
+       placeholder="Ej. Heredia"&gt;
+
+&lt;label for="ph-postal"&gt;Código postal&lt;/label&gt;
+&lt;input type="text" id="ph-postal" name="postal"
+       placeholder="Ej. 40201" inputmode="numeric" maxlength="5"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Reglas prácticas</figcaption>
+<pre>label        dice QUÉ dato se pide
+placeholder  muestra un EJEMPLO del formato
+
+Problemas de usar solo placeholder:
+- desaparece al escribir
+- suele tener poco contraste
+- se confunde con un valor ya escrito
+
+aria-label da nombre accesible cuando
+no hay label visible, pero es mejor
+tener la label.
+
+inputmode="numeric" muestra el teclado
+numérico sin convertir el campo en
+type="number" (útil para códigos).</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-botones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Botones: submit, reset, button y formaction</h2>
+            <p>Un editor de publicaciones de un blog. Cada botón tiene un <code>type</code> distinto, y un mismo formulario puede enviar a destinos diferentes: <code>formaction</code> cambia el destino solo para ese botón y <code>formnovalidate</code> permite guardar un borrador aunque falten campos obligatorios.</p>
+            <div class="resultado">
+                <form action="#publicar" method="get">
+                    <h3>Nueva entrada del blog</h3>
+                    <p>
+                        <label for="bot-titulo">Título</label><br>
+                        <input type="text" id="bot-titulo" name="titulo" required size="40">
+                    </p>
+                    <p>
+                        <label for="bot-categoria">Categoría</label>
+                        <select id="bot-categoria" name="categoria" required>
+                            <option value="">Elige una</option>
+                            <option value="recetas">Recetas</option>
+                            <option value="viajes">Viajes</option>
+                            <option value="tecnologia">Tecnología</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="bot-contenido">Contenido</label><br>
+                        <textarea id="bot-contenido" name="contenido" rows="4" cols="45" required></textarea>
+                    </p>
+                    <p>
+                        <button type="submit">Publicar</button>
+                        <button type="submit" formaction="#borrador" formnovalidate name="accion" value="borrador">Guardar borrador</button>
+                        <button type="reset">Descartar cambios</button>
+                        <button type="button">Vista previa</button>
+                    </p>
+                    <p>
+                        <input type="submit" value="Publicar (con input)">
+                        <input type="reset" value="Limpiar (con input)">
+                    </p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form action="#publicar" method="get"&gt;
+    ...
+    &lt;button type="submit"&gt;Publicar&lt;/button&gt;
+
+    &lt;button type="submit" formaction="#borrador" formnovalidate
+            name="accion" value="borrador"&gt;Guardar borrador&lt;/button&gt;
+
+    &lt;button type="reset"&gt;Descartar cambios&lt;/button&gt;
+    &lt;button type="button"&gt;Vista previa&lt;/button&gt;
+
+    &lt;input type="submit" value="Publicar (con input)"&gt;
+    &lt;input type="reset" value="Limpiar (con input)"&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Tipos de botón</figcaption>
+<pre>submit  envía el formulario (es el tipo
+        por defecto de &lt;button&gt; dentro
+        de un form: escríbelo siempre)
+reset   devuelve los valores iniciales
+button  no hace nada sin JavaScript
+
+Atributos que solo afectan a ese botón:
+formaction      otro destino
+formmethod      otro método
+formnovalidate  salta la validación
+name / value    se envía qué botón se usó
+
+Fíjate en el final de la URL:
+#publicar o #borrador según el botón.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-envio" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Cómo viajan los datos: GET, POST y name</h2>
+            <p>El mismo filtro de una tienda en línea enviado de dos maneras. Con <code>get</code>, mira la barra de direcciones después de enviar: verás <code>?categoria=...&amp;precio_max=...</code>. Con <code>post</code>, la URL no cambia porque los datos viajan dentro de la petición. El campo sin <code>name</code> nunca se envía.</p>
+            <div class="resultado">
+                <h3>Con method="get"</h3>
+                <form action="#ej-envio" method="get">
+                    <input type="hidden" name="tienda" value="electro-sur">
+                    <p>
+                        <label for="env-categoria">Categoría</label>
+                        <select id="env-categoria" name="categoria">
+                            <option value="celulares">Celulares</option>
+                            <option value="laptops">Laptops</option>
+                            <option value="audifonos">Audífonos</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="env-precio">Precio máximo ($)</label>
+                        <input type="number" id="env-precio" name="precio_max" min="0" step="10" value="500">
+                    </p>
+                    <p>
+                        <input type="checkbox" id="env-oferta" name="oferta" value="si">
+                        <label for="env-oferta">Solo ofertas</label>
+                    </p>
+                    <p>
+                        <label for="env-sin-name">Campo sin name (no se envía)</label>
+                        <input type="text" id="env-sin-name" value="me quedo aquí">
+                    </p>
+                    <p><button type="submit">Filtrar con GET</button></p>
+                </form>
+                <h3>Con method="post"</h3>
+                <form action="#ej-envio" method="post">
+                    <p>
+                        <label for="env-post-categoria">Categoría</label>
+                        <select id="env-post-categoria" name="categoria">
+                            <option value="celulares">Celulares</option>
+                            <option value="laptops">Laptops</option>
+                            <option value="audifonos">Audífonos</option>
+                        </select>
+                    </p>
+                    <p><button type="submit">Filtrar con POST</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form action="#ej-envio" method="get"&gt;
+    &lt;input type="hidden" name="tienda" value="electro-sur"&gt;
+
+    &lt;select id="env-categoria" name="categoria"&gt;
+        &lt;option value="celulares"&gt;Celulares&lt;/option&gt;
+        ...
+    &lt;/select&gt;
+
+    &lt;input type="number" id="env-precio" name="precio_max" value="500"&gt;
+
+    &lt;input type="checkbox" id="env-oferta" name="oferta" value="si"&gt;
+
+    &lt;input type="text" id="env-sin-name" value="me quedo aquí"&gt;
+
+    &lt;button type="submit"&gt;Filtrar con GET&lt;/button&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>URL resultante con GET</figcaption>
+<pre>05-formularios.html
+  ?tienda=electro-sur
+  &amp;categoria=celulares
+  &amp;precio_max=500
+  #ej-envio
+
+?   empieza la lista de datos
+&amp;   separa cada par name=valor
++   representa un espacio
+%C3%B3 es una letra con tilde codificada
+
+GET   búsquedas y filtros: la URL se
+      puede guardar y compartir
+POST  login, pagos, archivos y datos
+      que cambian algo en el servidor</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-pasos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Formulario por pasos con progress</h2>
+            <p>En un proceso de compra largo se indica en qué paso va la persona. La barra <code>&lt;progress&gt;</code> es solo visual (no se envía), y <code>&lt;meter&gt;</code> muestra una medida dentro de un rango, como el espacio ocupado del carrito de regalo. Aquí se ve el paso 2 de 4.</p>
+            <div class="resultado">
+                <form action="#" method="get">
+                    <h3>Finalizar compra · Librería Las Hojas</h3>
+                    <p>
+                        <label for="pas-progreso">Paso 2 de 4: datos de envío</label><br>
+                        <progress id="pas-progreso" max="4" value="2">Paso 2 de 4</progress>
+                    </p>
+                    <ol>
+                        <li><del>Carrito</del> ✓</li>
+                        <li><strong>Envío</strong></li>
+                        <li>Pago</li>
+                        <li>Confirmación</li>
+                    </ol>
+                    <fieldset>
+                        <legend>¿Cómo quieres recibir tu pedido?</legend>
+                        <p><input type="radio" id="pas-domicilio" name="entrega" value="domicilio" checked> <label for="pas-domicilio">Envío a domicilio (2 a 3 días) · $4</label></p>
+                        <p><input type="radio" id="pas-tienda" name="entrega" value="tienda"> <label for="pas-tienda">Recoger en tienda (gratis)</label></p>
+                        <p><input type="radio" id="pas-express" name="entrega" value="express"> <label for="pas-express">Express (24 horas) · $9</label></p>
+                    </fieldset>
+                    <p>
+                        <label for="pas-direccion">Dirección</label><br>
+                        <input type="text" id="pas-direccion" name="direccion" autocomplete="street-address" size="40" required>
+                    </p>
+                    <p>
+                        <label for="pas-caja">Espacio usado en la caja de regalo</label><br>
+                        <meter id="pas-caja" min="0" max="10" low="3" high="8" optimum="5" value="6">6 de 10 libros</meter> 6 de 10 libros
+                    </p>
+                    <p>
+                        <button type="submit" formaction="#paso-1" formnovalidate>Volver al carrito</button>
+                        <button type="submit" formaction="#paso-3">Continuar al pago</button>
+                    </p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label for="pas-progreso"&gt;Paso 2 de 4: datos de envío&lt;/label&gt;
+&lt;progress id="pas-progreso" max="4" value="2"&gt;Paso 2 de 4&lt;/progress&gt;
+
+&lt;meter id="pas-caja" min="0" max="10" low="3" high="8"
+       optimum="5" value="6"&gt;6 de 10 libros&lt;/meter&gt;
+
+&lt;button type="submit" formaction="#paso-1" formnovalidate&gt;
+    Volver al carrito
+&lt;/button&gt;
+&lt;button type="submit" formaction="#paso-3"&gt;Continuar al pago&lt;/button&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>progress vs meter</figcaption>
+<pre>progress  avance de una tarea
+          (subida, pasos, descarga)
+          sin value = barra animada de
+          "cargando..."
+meter     medida en un rango conocido
+          (batería, espacio, nota)
+          low / high / optimum cambian
+          el color: verde, amarillo, rojo
+
+El texto entre las etiquetas se
+muestra en navegadores antiguos.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-accesibilidad" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Accesibilidad: formas de asociar label y ayuda</h2>
+            <p>Formulario de pago con tarjeta. Hay dos maneras de unir una etiqueta con su control: con <code>for</code> + <code>id</code>, o <strong>envolviendo</strong> el control dentro de la <code>label</code>. En ambos casos, hacer clic en el texto activa el campo. <code>aria-describedby</code> conecta un texto de ayuda para que el lector de pantalla también lo lea.</p>
+            <div class="resultado">
+                <form action="#" method="post">
+                    <h3>Pago seguro</h3>
+                    <p>
+                        <label for="acc-titular">Nombre del titular</label><br>
+                        <input type="text" id="acc-titular" name="titular" autocomplete="cc-name" required>
+                    </p>
+                    <p>
+                        <label for="acc-tarjeta">Número de tarjeta</label><br>
+                        <input type="text" id="acc-tarjeta" name="tarjeta" autocomplete="cc-number" inputmode="numeric" pattern="[0-9 ]{13,19}" maxlength="19" aria-describedby="acc-tarjeta-ayuda" required><br>
+                        <small id="acc-tarjeta-ayuda">Los 16 dígitos del frente, con o sin espacios. Usa la tarjeta de prueba 4111 1111 1111 1111.</small>
+                    </p>
+                    <p>
+                        <label>Vencimiento
+                            <input type="month" name="vencimiento" autocomplete="cc-exp" min="2026-11" required>
+                        </label>
+                    </p>
+                    <p>
+                        <label>Código de seguridad
+                            <input type="password" name="cvv" autocomplete="cc-csc" inputmode="numeric" pattern="[0-9]{3,4}" maxlength="4" size="4" aria-describedby="acc-cvv-ayuda" required>
+                        </label><br>
+                        <small id="acc-cvv-ayuda">Los 3 números del reverso de la tarjeta.</small>
+                    </p>
+                    <p>
+                        <label><input type="checkbox" name="guardar" value="si"> Guardar tarjeta para próximas compras</label>
+                    </p>
+                    <p><button type="submit">Pagar $37,50</button></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label for="acc-tarjeta"&gt;Número de tarjeta&lt;/label&gt;
+&lt;input type="text" id="acc-tarjeta" name="tarjeta"
+       autocomplete="cc-number" inputmode="numeric"
+       aria-describedby="acc-tarjeta-ayuda" required&gt;
+&lt;small id="acc-tarjeta-ayuda"&gt;Los 16 dígitos del frente...&lt;/small&gt;
+
+&lt;label&gt;Vencimiento
+    &lt;input type="month" name="vencimiento" autocomplete="cc-exp"&gt;
+&lt;/label&gt;
+
+&lt;label&gt;&lt;input type="checkbox" name="guardar" value="si"&gt;
+    Guardar tarjeta para próximas compras&lt;/label&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Lista de revisión</figcaption>
+<pre>for + id          label y control pueden
+                  estar en cualquier lugar
+label envolvente  no necesita id; útil
+                  en checkbox y radio
+aria-describedby  añade ayuda o error al
+                  nombre del campo
+
+Además:
+- agrupa radios con fieldset y legend
+- autocomplete correcto ahorra tiempo
+- no indiques algo solo con color
+- todo debe funcionar con Tab y Enter</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-novalidate" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Desactivar la validación con novalidate</h2>
+            <p>Dos copias del mismo formulario de suscripción. La primera valida normalmente. La segunda tiene <code>novalidate</code> en el <code>&lt;form&gt;</code>: se envía aunque el correo esté vacío o mal escrito. Se usa cuando JavaScript se encargará de validar con mensajes propios; el servidor siempre debe volver a validar.</p>
+            <div class="resultado">
+                <h3>Con validación (por defecto)</h3>
+                <form action="#ej-novalidate" method="get">
+                    <p>
+                        <label for="nov-correo">Correo para el boletín</label>
+                        <input type="email" id="nov-correo" name="correo" value="esto-no-es-un-correo" required>
+                        <button type="submit">Suscribirme</button>
+                    </p>
+                </form>
+                <h3>Con novalidate</h3>
+                <form action="#ej-novalidate" method="get" novalidate>
+                    <p>
+                        <label for="nov-correo-2">Correo para el boletín</label>
+                        <input type="email" id="nov-correo-2" name="correo" value="esto-no-es-un-correo" required>
+                        <button type="submit">Suscribirme</button>
+                    </p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form action="#ej-novalidate" method="get"&gt;
+    &lt;label for="nov-correo"&gt;Correo para el boletín&lt;/label&gt;
+    &lt;input type="email" id="nov-correo" name="correo"
+           value="esto-no-es-un-correo" required&gt;
+    &lt;button type="submit"&gt;Suscribirme&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;form action="#ej-novalidate" method="get" novalidate&gt;
+    ...
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Dónde se desactiva</figcaption>
+<pre>novalidate      en &lt;form&gt;: para todo
+                el formulario
+formnovalidate  en un botón: solo al
+                enviar con ese botón
+
+La validación del navegador ayuda a
+quien llena el formulario, pero se puede
+saltar fácilmente. Nunca es seguridad:
+el servidor decide qué datos acepta.</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="04-tablas.html">Anterior: tablas</a> |
+            <a href="index.html">Índice</a> |
+            <a href="06-semantica-multimedia.html">Siguiente: semántica y multimedia</a>
+        </nav>
+    </footer>
+</body>
+</html>

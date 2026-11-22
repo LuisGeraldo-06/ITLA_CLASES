@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>14. CSS: diseño responsive</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <link rel="stylesheet" href="css/14-css-responsive.css">
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>14. CSS: diseño responsive</h1>
+        <p>Una misma página debe verse bien en un celular de 360px y en un monitor de 1920px. El diseño <strong>responsive</strong> adapta la página al tamaño de la pantalla, al tipo de dispositivo y a las preferencias de quien la visita.</p>
+        <p class="pista">Para probar esta lección: cambia el ancho de la ventana, o abre las herramientas del navegador (F12) y activa el modo de dispositivo (Ctrl + Shift + M). En las cajas punteadas naranjas, arrastra la esquina inferior derecha ↘.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-viewport">Viewport</a></li>
+            <li><a href="#ej-indicador">Tu pantalla</a></li>
+            <li><a href="#ej-mobile-first">Mobile first</a></li>
+            <li><a href="#ej-menu">Menú hamburguesa</a></li>
+            <li><a href="#ej-container">Container queries</a></li>
+            <li><a href="#ej-fluida">Texto fluido</a></li>
+            <li><a href="#ej-imagenes">Imágenes</a></li>
+            <li><a href="#ej-tabla">Tablas</a></li>
+            <li><a href="#ej-prioridad">Columnas</a></li>
+            <li><a href="#ej-layout">Página</a></li>
+            <li><a href="#ej-unidades">Unidades</a></li>
+            <li><a href="#ej-tema">Modo oscuro</a></li>
+            <li><a href="#ej-movimiento">Movimiento</a></li>
+            <li><a href="#ej-puntero">Mouse o táctil</a></li>
+            <li><a href="#ej-intrinseco">Sin media queries</a></li>
+            <li><a href="#ej-form">Formulario</a></li>
+            <li><a href="#ej-video">Video</a></li>
+            <li><a href="#ej-imprimir">Imprimir</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Media queries: CSS con condiciones</h2>
+            <p>Una <em>media query</em> aplica reglas solo cuando se cumple una condición sobre el dispositivo.</p>
+            <table>
+                <thead>
+                    <tr><th>Punto de quiebre</th><th>Condición</th><th>Dispositivos típicos</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Base</td><td>sin media query</td><td>celulares (360–599px)</td></tr>
+                    <tr><td>Tablet</td><td><code>(min-width: 600px)</code></td><td>tablets verticales, celulares horizontales</td></tr>
+                    <tr><td>Escritorio</td><td><code>(min-width: 900px)</code></td><td>tablets horizontales, laptops</td></tr>
+                    <tr><td>Grande</td><td><code>(min-width: 1200px)</code></td><td>monitores</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Sintaxis</figcaption>
+<pre>.tarjetas {
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 600px) {
+    .tarjetas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+"Si la ventana mide 600px o más,
+ usa dos columnas."</pre>
+                </figure>
+                <figure>
+                    <figcaption>Otras condiciones</figcaption>
+<pre>(max-width: 599px)              hasta 599px
+(min-width: 600px) and (max-width: 899px)
+(width &gt;= 600px)                sintaxis nueva
+(orientation: landscape)        horizontal
+(hover: hover)                  tiene mouse
+(prefers-color-scheme: dark)    modo oscuro
+(prefers-reduced-motion: reduce)
+print                           al imprimir</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-viewport" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>La etiqueta <code>meta viewport</code></h2>
+            <p>Sin ella, el celular finge tener una pantalla de 980px y encoge toda la página. Con ella, la página usa el ancho real del dispositivo.</p>
+            <div class="resultado">
+                <div class="telefonos">
+                    <figure>
+                        <div class="telefono sin-viewport">
+                            <div class="pagina-mini"><h4>Panadería Sol</h4><p>Pan recién horneado todos los días desde las 6:00.</p><button type="button">Hacer pedido</button></div>
+                        </div>
+                        <figcaption>Sin meta viewport</figcaption>
+                    </figure>
+                    <figure>
+                        <div class="telefono con-viewport">
+                            <div class="pagina-mini"><h4>Panadería Sol</h4><p>Pan recién horneado todos los días desde las 6:00.</p><button type="button">Hacer pedido</button></div>
+                        </div>
+                        <figcaption>Con meta viewport</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML: siempre en el &lt;head&gt;</figcaption>
+<pre>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Qué significa</figcaption>
+<pre>width=device-width
+    el ancho de la página es el ancho
+    real de la pantalla
+
+initial-scale=1.0
+    sin zoom al abrir la página
+
+Sin esta línea ninguna media query
+funciona bien en un celular.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-indicador" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>¿Qué tamaño de pantalla tienes ahora?</h2>
+            <p>Esta franja cambia de color y de texto según el ancho de tu ventana. Achica y agranda la ventana para ver los cuatro estados.</p>
+            <div class="resultado">
+                <div class="indicador" role="status"></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.indicador {
+    background: #dc2626;
+}
+
+.indicador::after {
+    content: "📱 Móvil: menos de 600px";
+}
+
+@media (min-width: 600px) {
+    .indicador { background: #f59e0b; }
+    .indicador::after { content: "📟 Tablet: de 600px a 899px"; }
+}
+
+@media (min-width: 900px) {
+    .indicador { background: #16a34a; }
+    .indicador::after { content: "💻 Escritorio: de 900px a 1199px"; }
+}
+
+@media (min-width: 1200px) {
+    .indicador { background: #4f46e5; }
+    .indicador::after { content: "🖥️ Pantalla grande: 1200px o más"; }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué funciona el orden</figcaption>
+<pre>En una pantalla de 1000px se cumplen
+las condiciones de 600px y de 900px.
+
+Las dos aplican, pero la de 900px está
+después en el archivo y tiene la misma
+especificidad: gana la última.
+
+Por eso, con min-width, los puntos de
+quiebre se escriben de menor a mayor.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-mobile-first" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Mobile first: 1, 2 y 3 columnas</h2>
+            <p>Primero se escribe el diseño para celular, sin media queries. Después se agregan columnas a medida que hay más espacio.</p>
+            <div class="resultado">
+                <div class="tarjetas">
+                    <div class="tarjeta"><h3>Envío gratis</h3><p>En compras mayores a $50.</p></div>
+                    <div class="tarjeta"><h3>Pago seguro</h3><p>Tarjeta, transferencia o efectivo.</p></div>
+                    <div class="tarjeta"><h3>Devoluciones</h3><p>30 días para cambiar de opinión.</p></div>
+                    <div class="tarjeta"><h3>Soporte</h3><p>Chat disponible todos los días.</p></div>
+                    <div class="tarjeta"><h3>Garantía</h3><p>Un año en todos los productos.</p></div>
+                    <div class="tarjeta"><h3>Puntos</h3><p>Acumula en cada compra.</p></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Mobile first (recomendado)</figcaption>
+<pre>.tarjetas {
+    display: grid;
+    gap: 12px;
+}
+
+@media (min-width: 600px) {
+    .tarjetas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 900px) {
+    .tarjetas {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Desktop first (al revés)</figcaption>
+<pre>.tarjetas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 899px) {
+    .tarjetas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 599px) {
+    .tarjetas {
+        grid-template-columns: 1fr;
+    }
+}
+
+Funciona igual, pero el celular descarga
+y procesa reglas que luego deshace.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-menu" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Menú hamburguesa que se vuelve horizontal</h2>
+            <p>Con ventana angosta aparece el botón ☰; tócalo para abrir el menú. Desde 768px el botón desaparece y los enlaces se muestran en fila.</p>
+            <div class="resultado">
+                <nav class="barra" aria-label="Menú adaptable">
+                    <span class="logo">🍕 Pizzería Roma</span>
+                    <input type="checkbox" id="menu-toggle">
+                    <label for="menu-toggle" class="hamburguesa" aria-label="Abrir menú">☰</label>
+                    <ul class="enlaces">
+                        <li><a href="#ej-menu">Menú</a></li>
+                        <li><a href="#ej-menu">Promociones</a></li>
+                        <li><a href="#ej-menu">Sucursales</a></li>
+                        <li><a href="#ej-menu">Pedir en línea</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;nav class="barra"&gt;
+    &lt;span class="logo"&gt;🍕 Pizzería Roma&lt;/span&gt;
+    &lt;input type="checkbox" id="menu-toggle"&gt;
+    &lt;label for="menu-toggle" class="hamburguesa"&gt;☰&lt;/label&gt;
+    &lt;ul class="enlaces"&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Menú&lt;/a&gt;&lt;/li&gt;
+        ...
+    &lt;/ul&gt;
+&lt;/nav&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.enlaces {
+    display: none;
+    flex-basis: 100%;
+}
+
+#menu-toggle:checked ~ .enlaces {
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .hamburguesa {
+        display: none;
+    }
+
+    #menu-toggle ~ .enlaces {
+        display: flex;
+        flex-basis: auto;
+        gap: 20px;
+    }
+}</pre>
+                </figure>
+            </div>
+            <p>Abrir el menú con una casilla oculta es un truco de CSS. En la lección 23 lo haremos con JavaScript, que es la forma habitual.</p>
+        </section>
+
+        <section id="ej-container" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Container queries: la tarjeta mira su caja, no la pantalla</h2>
+            <p>Las media queries preguntan por la ventana. Las <em>container queries</em> preguntan por el contenedor. Arrastra la esquina de la caja: la tarjeta pasa de vertical a horizontal.</p>
+            <div class="resultado">
+                <div class="redimensionable">
+                    <p class="pista">↘ Arrastra la esquina inferior derecha</p>
+                    <article class="producto">
+                        <img src="assets/imgs/pic_trulli.jpg" alt="Casas trulli">
+                        <div class="info">
+                            <h3>Tour por Alberobello</h3>
+                            <p>Recorrido guiado de 4 horas con almuerzo típico.</p>
+                            <span class="precio">$120</span>
+                        </div>
+                        <button type="button">Reservar</button>
+                    </article>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.redimensionable {
+    container-type: inline-size;
+}
+
+.producto {
+    display: grid;
+    gap: 12px;
+}
+
+@container (min-width: 480px) {
+    .producto {
+        grid-template-columns: 200px 1fr;
+    }
+}
+
+@container (min-width: 720px) {
+    .producto {
+        grid-template-columns: 260px 1fr auto;
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>¿Cuándo usar cada una?</figcaption>
+<pre>@media       el diseño general de la página:
+             menú, columnas principales
+
+@container   componentes que pueden estar
+             en lugares de distinto ancho:
+             la misma tarjeta en la columna
+             principal y en la barra lateral
+
+container-type: inline-size convierte
+al elemento en contenedor que se puede
+consultar por su ancho.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-fluida" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Tipografía fluida con <code>clamp()</code></h2>
+            <p>El título crece y se encoge con su caja, pero nunca baja de un mínimo ni pasa de un máximo. El tercer texto tiene tamaño fijo: en cajas angostas se corta mal.</p>
+            <div class="resultado">
+                <div class="redimensionable">
+                    <p class="pista">↘ Arrastra la esquina</p>
+                    <h3 class="titulo">Vacaciones de verano</h3>
+                    <p class="subtitulo">Hasta 40 % de descuento en paquetes seleccionados</p>
+                    <p class="fijo">Tamaño fijo de 2.5rem</p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.titulo {
+    font-size: clamp(1.4rem, 8cqi, 3.5rem);
+}
+
+.subtitulo {
+    font-size: clamp(0.9rem, 3cqi, 1.3rem);
+}
+
+.fijo {
+    font-size: 2.5rem;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>clamp(mínimo, ideal, máximo)</figcaption>
+<pre>1.4rem   nunca más pequeño
+8cqi     8 % del ancho del contenedor
+3.5rem   nunca más grande
+
+Para que dependa de la VENTANA en vez
+del contenedor se usa vw:
+
+h1 {
+    font-size: clamp(2rem, 5vw, 4rem);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-imagenes" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Imágenes que no se salen</h2>
+            <p>Arriba (borde rojo), una imagen con ancho fijo. Abajo (borde verde), la regla que casi todos los sitios aplican a sus imágenes.</p>
+            <div class="resultado">
+                <div class="redimensionable">
+                    <p class="pista">↘ Arrastra la esquina</p>
+                    <img class="fija" src="assets/imgs/pic_trulli.jpg" alt="Trulli con ancho fijo" width="500" height="333">
+                    <img class="fluida" src="assets/imgs/pic_trulli.jpg" alt="Trulli con ancho fluido" width="500" height="333">
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.fija {
+    width: 500px;
+}
+
+.fluida {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué max-width y no width</figcaption>
+<pre>width: 100%
+    la imagen siempre llena la caja,
+    aunque eso signifique estirarla
+    más allá de su tamaño real
+
+max-width: 100%
+    la imagen mide su tamaño real,
+    pero se encoge si no cabe
+
+height: auto mantiene la proporción.
+
+Para enviar archivos distintos según la
+pantalla: srcset y &lt;picture&gt; (lección 07).</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tabla" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Dos soluciones para tablas en celular</h2>
+            <p>Arriba, la tabla se desplaza en horizontal. Abajo, cuando la caja es angosta, cada fila se convierte en una tarjeta.</p>
+            <div class="resultado">
+                <div class="redimensionable">
+                    <p class="pista">↘ Arrastra la esquina</p>
+                    <div class="scroll-x">
+                        <table>
+                            <thead><tr><th>Pedido</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead>
+                            <tbody>
+                                <tr><td>#1042</td><td>Ana Pérez</td><td>12/11/2026</td><td>$58.60</td><td>Entregado</td></tr>
+                                <tr><td>#1043</td><td>Bruno Díaz</td><td>14/11/2026</td><td>$120.00</td><td>Enviado</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <table class="tarjetas-tabla">
+                        <thead><tr><th>Pedido</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead>
+                        <tbody>
+                            <tr><td data-label="Pedido">#1042</td><td data-label="Cliente">Ana Pérez</td><td data-label="Fecha">12/11/2026</td><td data-label="Total">$58.60</td><td data-label="Estado">Entregado</td></tr>
+                            <tr><td data-label="Pedido">#1043</td><td data-label="Cliente">Bruno Díaz</td><td data-label="Fecha">14/11/2026</td><td data-label="Total">$120.00</td><td data-label="Estado">Enviado</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="scroll-x"&gt;
+    &lt;table&gt;...&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;table class="tarjetas-tabla"&gt;
+    ...
+    &lt;td data-label="Cliente"&gt;Ana Pérez&lt;/td&gt;
+    ...
+&lt;/table&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.scroll-x {
+    overflow-x: auto;
+}
+
+@container (max-width: 520px) {
+    .tarjetas-tabla thead {
+        display: none;
+    }
+
+    .tarjetas-tabla tr {
+        display: block;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+    }
+
+    .tarjetas-tabla td {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .tarjetas-tabla td::before {
+        content: attr(data-label);
+    }
+}</pre>
+                </figure>
+            </div>
+            <p><code>attr(data-label)</code> lee el atributo del HTML y lo muestra como texto: así cada dato conserva su nombre aunque el encabezado esté oculto.</p>
+        </section>
+
+        <section id="ej-prioridad" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Ocultar columnas menos importantes</h2>
+            <p>Una bandeja de correo. Al achicar la caja desaparecen primero las columnas de etiqueta y tamaño, después la fecha.</p>
+            <div class="resultado">
+                <div class="redimensionable">
+                    <p class="pista">↘ Arrastra la esquina</p>
+                    <table>
+                        <thead><tr><th>De</th><th>Asunto</th><th class="p2">Fecha</th><th class="p3">Tamaño</th><th class="p3">Etiqueta</th></tr></thead>
+                        <tbody>
+                            <tr><td>Banco</td><td class="asunto">Estado de cuenta</td><td class="p2">18 nov</td><td class="p3">240 KB</td><td class="p3">Finanzas</td></tr>
+                            <tr><td>Profesor</td><td class="asunto">Entrega del proyecto</td><td class="p2">17 nov</td><td class="p3">12 KB</td><td class="p3">Curso</td></tr>
+                            <tr><td>Tienda</td><td class="asunto">Tu pedido fue enviado</td><td class="p2">15 nov</td><td class="p3">80 KB</td><td class="p3">Compras</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>@container (max-width: 640px) {
+    .p3 {
+        display: none;
+    }
+}
+
+@container (max-width: 440px) {
+    .p2 {
+        display: none;
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Prioridades</figcaption>
+<pre>p1   siempre visible: De, Asunto
+p2   se oculta en pantallas pequeñas
+p3   se oculta primero
+
+Así trabajan las apps de correo:
+en el celular ves quién escribe y el
+asunto; el resto aparece al abrir.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-layout" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Estructura de página en tres tamaños</h2>
+            <p>Una columna en celular, dos en tablet y tres en escritorio. Arrastra la esquina para ver las tres versiones.</p>
+            <div class="resultado">
+                <div class="redimensionable">
+                    <p class="pista">↘ Arrastra la esquina</p>
+                    <div class="layout">
+                        <div class="l-cabecera">Cabecera</div>
+                        <div class="l-menu">Menú</div>
+                        <div class="l-contenido">Contenido principal</div>
+                        <div class="l-lateral">Lateral</div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.layout {
+    display: grid;
+    gap: 10px;
+}
+
+@container (min-width: 560px) {
+    .layout {
+        grid-template-columns: 160px 1fr;
+    }
+
+    .l-cabecera,
+    .l-lateral {
+        grid-column: 1 / -1;
+    }
+}
+
+@container (min-width: 820px) {
+    .layout {
+        grid-template-columns: 160px 1fr 180px;
+    }
+
+    .l-lateral {
+        grid-column: auto;
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Los tres diseños</figcaption>
+<pre>Celular       Tablet          Escritorio
+┌──────┐     ┌──────────┐    ┌──────────────┐
+│ cab. │     │ cabecera │    │   cabecera   │
+├──────┤     ├───┬──────┤    ├───┬──────┬───┤
+│ menú │     │ m │ cont │    │ m │ cont │ l │
+├──────┤     ├───┴──────┤    └───┴──────┴───┘
+│ cont │     │ lateral  │
+├──────┤     └──────────┘
+│ lat. │
+└──────┘</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-unidades" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Unidades relativas a la pantalla</h2>
+            <p>Las barras usan distintas unidades. Cambia el tamaño de la ventana: algunas cambian y otras no.</p>
+            <div class="resultado">
+                <div class="barra-u w-50p">width: 50%</div>
+                <div class="barra-u w-50vw">width: 50vw</div>
+                <div class="barra-u w-20rem">width: 20rem</div>
+                <div class="barra-u w-40ch">width: 40ch</div>
+                <div class="alto-vh">height: 25vh (un cuarto del alto de la ventana)</div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.w-50p   { width: 50%; }
+.w-50vw  { width: 50vw; }
+.w-20rem { width: 20rem; }
+.w-40ch  { width: 40ch; }
+
+.alto-vh {
+    height: 25vh;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Tabla de unidades</figcaption>
+<pre>%     del contenedor padre
+vw    1% del ancho de la ventana
+vh    1% del alto de la ventana
+dvh   alto real que cambia cuando el celular
+      oculta o muestra la barra de direcciones
+svh   alto más pequeño posible (con la barra)
+cqi   1% del ancho del contenedor
+rem   tamaño de letra de la raíz (16px)
+ch    ancho del carácter "0"
+
+Portada a pantalla completa en celular:
+.portada { min-height: 100svh; }</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tema" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Modo oscuro automático</h2>
+            <p>La tarjeta lee la preferencia de tu sistema operativo. Para probarlo, cambia tu sistema a modo oscuro, o en las herramientas del navegador abre <em>Rendering</em> → <em>Emulate prefers-color-scheme</em>.</p>
+            <div class="resultado">
+                <div class="tarjeta-tema">
+                    <h3>Configuración de la cuenta</h3>
+                    <p>Esta tarjeta cambia sus colores según la preferencia del sistema, sin ningún botón.</p>
+                    <span class="modo"></span>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tarjeta-tema {
+    background: #ffffff;
+    color: #0f172a;
+}
+
+@media (prefers-color-scheme: dark) {
+    .tarjeta-tema {
+        background: #0f172a;
+        color: #e2e8f0;
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Siguiente paso</figcaption>
+<pre>Repetir colores en cada regla se vuelve
+difícil de mantener. En la lección 16
+usaremos variables CSS para cambiar el
+tema completo de la página con unas
+pocas líneas.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-movimiento" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Respetar a quien prefiere menos movimiento</h2>
+            <p>Algunas personas se marean con las animaciones y lo indican en su sistema. Si activas "reducir movimiento", la pelota se detiene.</p>
+            <div class="resultado">
+                <div class="pista-animacion"><div class="pelota"></div></div>
+                <p class="estado"></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.pelota {
+    animation: ej-rebote 1s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pelota {
+        animation: none;
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Dónde se activa</figcaption>
+<pre>Windows   Configuración → Accesibilidad
+          → Efectos visuales → Efectos de animación
+macOS     Ajustes → Accesibilidad → Pantalla
+          → Reducir movimiento
+Android   Accesibilidad → Quitar animaciones
+iPhone    Accesibilidad → Movimiento
+
+Las animaciones se ven en la lección 15.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-puntero" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Mouse o pantalla táctil, vertical u horizontal</h2>
+            <p>Las etiquetas describen tu dispositivo actual. En una pantalla táctil el botón se hace más grande y no depende del hover.</p>
+            <div class="resultado">
+                <p><span class="chip dispositivo"></span><span class="chip orientacion"></span></p>
+                <button type="button" class="boton-h">Pasa el mouse o toca aquí</button>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>@media (hover: hover) and (pointer: fine) {
+    .boton-h:hover {
+        background: #ea580c;
+        color: #ffffff;
+    }
+}
+
+@media (pointer: coarse) {
+    .boton-h {
+        padding: 16px 26px;
+    }
+}
+
+@media (orientation: landscape) {
+    ...
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué importa</figcaption>
+<pre>En un celular no existe el hover. Un menú
+que solo se abre al pasar el mouse no
+funciona con el dedo.
+
+pointer: fine     mouse, trackpad, lápiz
+pointer: coarse   dedo: botones de al
+                  menos 44 × 44 px</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-intrinseco" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Responsive sin una sola media query</h2>
+            <p>Grid con <code>auto-fit</code>, Flexbox con <code>flex-wrap</code> y la función <code>min()</code> se adaptan solos. Arrastra la esquina.</p>
+            <div class="resultado">
+                <div class="redimensionable">
+                    <p class="pista">↘ Arrastra la esquina</p>
+                    <div class="tarjetas-i">
+                        <div>Diseño</div><div>Desarrollo</div><div>Marketing</div><div>Soporte</div>
+                    </div>
+                    <div class="botones">
+                        <button type="button">Aceptar</button>
+                        <button type="button">Rechazar</button>
+                        <button type="button">Más tarde</button>
+                    </div>
+                    <div class="caja-min">width: min(100%, 400px): mide 400px, salvo que no quepa.</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tarjetas-i {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+}
+
+.botones {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.botones button {
+    flex: 1 1 140px;
+}
+
+.caja-min {
+    width: min(100%, 400px);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>min(200px, 100%)</figcaption>
+<pre>Con minmax(200px, 1fr), si la caja
+mide menos de 200px la tarjeta se sale.
+
+min(200px, 100%) elige el valor más
+pequeño de los dos: en cajas muy
+angostas usa 100% y nunca se desborda.
+
+Regla práctica: primero intenta sin
+media queries; agrégalas solo cuando
+el diseño realmente cambie.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-form" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Formulario de envío: una o dos columnas</h2>
+            <div class="resultado">
+                <div class="redimensionable">
+                    <p class="pista">↘ Arrastra la esquina</p>
+                    <form class="form" action="#" onsubmit="return false">
+                        <label>Nombre<input type="text" autocomplete="given-name"></label>
+                        <label>Apellido<input type="text" autocomplete="family-name"></label>
+                        <label class="ancho">Dirección<input type="text" autocomplete="street-address"></label>
+                        <label>Ciudad<input type="text" autocomplete="address-level2"></label>
+                        <label>País<select autocomplete="country-name"><option>Panamá</option><option>México</option><option>Colombia</option></select></label>
+                        <button type="submit">Continuar</button>
+                    </form>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.form {
+    display: grid;
+    gap: 12px;
+}
+
+@container (min-width: 520px) {
+    .form {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .form .ancho {
+        grid-column: 1 / -1;
+    }
+
+    .form button {
+        grid-column: 2;
+        justify-self: end;
+    }
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-video" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Video incrustado que se adapta</h2>
+            <p>El iframe de YouTube viene con <code>width="560" height="315"</code> fijos. Con <code>aspect-ratio</code> llena el ancho disponible sin deformarse.</p>
+            <div class="resultado">
+                <div class="redimensionable">
+                    <p class="pista">↘ Arrastra la esquina</p>
+                    <div class="video">
+                        <iframe src="https://www.youtube.com/embed/5bExPGw9yKw" title="Video de YouTube" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.video {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+}
+
+.video iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-imprimir" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Estilos para imprimir</h2>
+            <p>Esta lección tiene reglas especiales para papel. Pulsa <kbd>Ctrl</kbd> + <kbd>P</kbd> (o <kbd>⌘</kbd> + <kbd>P</kbd>) y mira la vista previa.</p>
+            <div class="resultado">
+                <div class="aviso-impresion">
+                    <p class="no-imprimir">👀 Este párrafo se ve en pantalla, pero <strong>no</strong> sale en papel.</p>
+                    <p class="solo-impresion">🖨️ Este párrafo <strong>solo</strong> aparece al imprimir.</p>
+                    <p>Este enlace muestra su dirección al imprimir: <a href="https://developer.mozilla.org/es/docs/Web/CSS/@media">MDN: @media</a></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.solo-impresion {
+    display: none;
+}
+
+@media print {
+    .indice-local,
+    .boton-copiar,
+    .no-imprimir {
+        display: none;
+    }
+
+    .solo-impresion {
+        display: block;
+    }
+
+    .ejemplo {
+        break-inside: avoid;
+    }
+
+    a[href^="http"]::after {
+        content: " (" attr(href) ")";
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Qué se cambia al imprimir</figcaption>
+<pre>Ocultar     menús, botones, publicidad
+Mostrar     direcciones de los enlaces
+Evitar      cortar un ejemplo entre dos hojas
+            (break-inside: avoid)
+Quitar      fondos oscuros que gastan tinta
+
+Útil para facturas, recibos, recetas,
+boletos y certificados.</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="13-css-grid.html">Anterior: Grid</a> |
+            <a href="index.html">Índice</a> |
+            <a href="15-css-transiciones-animaciones.html">Siguiente: transiciones y animaciones</a>
+        </nav>
+    </footer>
+</body>
+</html>

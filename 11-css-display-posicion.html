@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11. CSS: display y posición</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <link rel="stylesheet" href="css/11-css-display-posicion.css">
+</head>
+<body id="arriba">
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>11. CSS: display y posición</h1>
+        <p>Con <code>position</code> un elemento sale del orden normal y se coloca donde queramos: encima de una foto, pegado a una esquina o fijo en la pantalla mientras todo lo demás se desplaza.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-ocultar">Ocultar</a></li>
+            <li><a href="#ej-relative">relative</a></li>
+            <li><a href="#ej-insignias">Insignias</a></li>
+            <li><a href="#ej-notificaciones">Contadores</a></li>
+            <li><a href="#ej-tooltip">Tooltips</a></li>
+            <li><a href="#ej-dropdown">Menú desplegable</a></li>
+            <li><a href="#ej-centrar">Centrar</a></li>
+            <li><a href="#ej-galeria">Galería</a></li>
+            <li><a href="#ej-cintas">Cintas y sellos</a></li>
+            <li><a href="#ej-zindex">z-index</a></li>
+            <li><a href="#ej-modal">Ventana modal</a></li>
+            <li><a href="#ej-sticky-tabla">Tabla sticky</a></li>
+            <li><a href="#ej-contactos">Agenda</a></li>
+            <li><a href="#ej-app">App móvil</a></li>
+            <li><a href="#ej-posiciones">fixed</a></li>
+            <li><a href="#ej-pasos">Pasos</a></li>
+            <li><a href="#ej-globos">Globos</a></li>
+            <li><a href="#ej-hero">Portada</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Los cinco valores de <code>position</code></h2>
+            <table>
+                <thead>
+                    <tr><th>Valor</th><th>Se mueve respecto a</th><th>¿Deja su hueco?</th><th>Uso típico</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>static</code></td><td>no se mueve</td><td>sí</td><td>valor por defecto</td></tr>
+                    <tr><td><code>relative</code></td><td>su propia posición original</td><td>sí</td><td>pequeños ajustes y servir de referencia</td></tr>
+                    <tr><td><code>absolute</code></td><td>el ancestro posicionado más cercano</td><td>no</td><td>insignias, tooltips, menús, capas</td></tr>
+                    <tr><td><code>fixed</code></td><td>la ventana del navegador</td><td>no</td><td>botones flotantes, barras fijas</td></tr>
+                    <tr><td><code>sticky</code></td><td>su contenedor con scroll</td><td>sí</td><td>encabezados que se quedan pegados</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>El patrón más usado</figcaption>
+<pre>.padre {
+    position: relative;
+}
+
+.hijo {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+}
+
+El padre con relative no se mueve: solo
+se convierte en la "referencia" del hijo.</pre>
+                </figure>
+                <figure>
+                    <figcaption>Propiedades de desplazamiento</figcaption>
+<pre>top      distancia desde arriba
+right    distancia desde la derecha
+bottom   distancia desde abajo
+left     distancia desde la izquierda
+
+inset: 0;   es lo mismo que top, right,
+            bottom y left en 0: cubre
+            todo el padre
+
+z-index     qué capa queda encima
+            (solo en elementos posicionados)</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-ocultar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Tres formas de ocultar un elemento</h2>
+            <p>En cada fila la caja B está oculta. Fíjate en qué pasa con su espacio.</p>
+            <div class="resultado">
+                <p><code>display: none</code></p>
+                <div class="cajas con-display"><div class="a">A</div><div class="b">B</div><div class="c">C</div></div>
+                <p><code>visibility: hidden</code></p>
+                <div class="cajas con-visibility"><div class="a">A</div><div class="b">B</div><div class="c">C</div></div>
+                <p><code>opacity: 0</code></p>
+                <div class="cajas con-opacity"><div class="a">A</div><div class="b">B</div><div class="c">C</div></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.con-display .b {
+    display: none;
+}
+
+.con-visibility .b {
+    visibility: hidden;
+}
+
+.con-opacity .b {
+    opacity: 0;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Diferencias</figcaption>
+<pre>                  ¿ocupa espacio?  ¿se puede hacer clic?
+display: none          no               no
+visibility: hidden     sí               no
+opacity: 0             sí               sí
+
+display: none   menús cerrados, pestañas inactivas
+visibility      tooltips que aparecen y desaparecen
+opacity         animaciones de entrada y salida</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-relative" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2><code>position: relative</code>: moverse sin molestar</h2>
+            <p>La caja 2 se desplaza 20px hacia abajo y a la derecha, pero su hueco original sigue ahí: las demás cajas no se enteran.</p>
+            <div class="resultado">
+                <div class="caja">1</div><div class="caja movida">2</div><div class="caja">3</div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.movida {
+    position: relative;
+    top: 20px;
+    left: 20px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Ojo con la dirección</figcaption>
+<pre>top: 20px    empuja desde arriba → baja
+left: 20px   empuja desde la izquierda → va a la derecha
+
+Para subir:  top: -20px
+             o bottom: 20px</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-insignias" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Insignias sobre una tarjeta de producto</h2>
+            <p>La etiqueta de descuento y el botón de favorito se colocan en las esquinas de la tarjeta, encima de la foto.</p>
+            <div class="resultado">
+                <article class="producto">
+                    <img src="https://picsum.photos/id/26/480/320" alt="Accesorios de viaje sobre una mesa">
+                    <span class="descuento">-20 %</span>
+                    <button type="button" class="favorito" aria-label="Agregar a favoritos">♥</button>
+                    <div class="info"><h3>Kit de viaje</h3><p>$48.00</p></div>
+                </article>
+                <article class="producto">
+                    <img src="assets/imgs/pic_trulli.jpg" alt="Casas trulli">
+                    <span class="nuevo">Nuevo</span>
+                    <button type="button" class="favorito" aria-label="Agregar a favoritos">♡</button>
+                    <div class="info"><h3>Tour por Alberobello</h3><p>$120.00</p></div>
+                </article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;article class="producto"&gt;
+    &lt;img src="..." alt="..."&gt;
+    &lt;span class="descuento"&gt;-20 %&lt;/span&gt;
+    &lt;button class="favorito"&gt;♥&lt;/button&gt;
+    &lt;div class="info"&gt;...&lt;/div&gt;
+&lt;/article&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.producto {
+    position: relative;
+}
+
+.descuento {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+}
+
+.favorito {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-notificaciones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Contadores de notificaciones y estado de conexión</h2>
+            <p>El número rojo se sale un poco del ícono gracias a valores negativos. El punto de estado se pega a la esquina del avatar.</p>
+            <div class="resultado">
+                <div class="fila">
+                    <span class="icono" aria-label="Notificaciones">🔔<span class="contador">3</span></span>
+                    <span class="icono" aria-label="Carrito">🛒<span class="contador">12</span></span>
+                    <span class="icono" aria-label="Mensajes">✉️<span class="contador">99+</span></span>
+                </div>
+                <div class="fila">
+                    <span class="avatar"><img src="https://picsum.photos/id/64/120/120" alt="Laura"><span class="estado en-linea"></span></span>
+                    <span class="avatar"><img src="https://picsum.photos/id/91/120/120" alt="Mario"><span class="estado ausente"></span></span>
+                    <span class="avatar"><img src="https://picsum.photos/id/177/120/120" alt="Sofía"><span class="estado desconectado"></span></span>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.icono {
+    position: relative;
+}
+
+.contador {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    background: #dc2626;
+}
+
+.avatar {
+    position: relative;
+}
+
+.estado {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+}
+
+.en-linea     { background: #22c55e; }
+.ausente      { background: #f59e0b; }
+.desconectado { background: #94a3b8; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>El borde blanco</figcaption>
+<pre>El borde del mismo color que el fondo
+crea una separación entre el contador
+y el ícono. Sin él, los dos colores
+se mezclan y se ve sucio.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tooltip" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Tooltips solo con CSS</h2>
+            <p>Pasa el mouse o usa <kbd>Tab</kbd> sobre cada término. La flecha es un triángulo hecho con bordes.</p>
+            <div class="resultado">
+                <span class="con-tooltip" tabindex="0">IVA<span class="tooltip">Impuesto al valor agregado</span></span>
+                <span class="con-tooltip" tabindex="0">API<span class="tooltip">Interfaz de programación de aplicaciones</span></span>
+                <span class="con-tooltip abajo" tabindex="0">Tooltip abajo<span class="tooltip">También puede aparecer debajo</span></span>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;span class="con-tooltip" tabindex="0"&gt;
+    IVA
+    &lt;span class="tooltip"&gt;Impuesto al valor agregado&lt;/span&gt;
+&lt;/span&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.con-tooltip {
+    position: relative;
+}
+
+.tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    visibility: hidden;
+}
+
+.tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border: 6px solid transparent;
+    border-top-color: #0f172a;
+}
+
+.con-tooltip:hover .tooltip,
+.con-tooltip:focus .tooltip {
+    opacity: 1;
+    visibility: visible;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-dropdown" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Menú desplegable de una tienda</h2>
+            <p>Pasa el mouse sobre "Productos" o "Ayuda". El submenú aparece justo debajo de su opción.</p>
+            <div class="resultado">
+                <nav aria-label="Menú de la tienda">
+                    <ul class="menu">
+                        <li><a href="#ej-dropdown">Inicio</a></li>
+                        <li>
+                            <a href="#ej-dropdown">Productos ▾</a>
+                            <ul class="submenu">
+                                <li><a href="#ej-dropdown">Computadoras</a></li>
+                                <li><a href="#ej-dropdown">Celulares</a></li>
+                                <li><a href="#ej-dropdown">Audífonos</a></li>
+                                <li><a href="#ej-dropdown">Accesorios</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#ej-dropdown">Ayuda ▾</a>
+                            <ul class="submenu">
+                                <li><a href="#ej-dropdown">Envíos</a></li>
+                                <li><a href="#ej-dropdown">Devoluciones</a></li>
+                                <li><a href="#ej-dropdown">Contacto</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;ul class="menu"&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Inicio&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;
+        &lt;a href="#"&gt;Productos ▾&lt;/a&gt;
+        &lt;ul class="submenu"&gt;
+            &lt;li&gt;&lt;a href="#"&gt;Computadoras&lt;/a&gt;&lt;/li&gt;
+            ...
+        &lt;/ul&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.menu &gt; li {
+    position: relative;
+    display: inline-block;
+}
+
+.submenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    display: none;
+    min-width: 200px;
+}
+
+.menu &gt; li:hover .submenu,
+.menu &gt; li:focus-within .submenu {
+    display: block;
+}</pre>
+                </figure>
+            </div>
+            <p><code>top: 100%</code> coloca el submenú justo donde termina su opción. <code>:focus-within</code> permite abrirlo también con el teclado.</p>
+        </section>
+
+        <section id="ej-centrar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Centrar con <code>absolute</code>: miniatura de video</h2>
+            <p>El botón de reproducir queda en el centro exacto, sin importar el tamaño de la imagen. La duración se pega a la esquina inferior derecha.</p>
+            <div class="resultado">
+                <div class="miniatura">
+                    <img src="assets/imgs/pic_trulli.jpg" alt="Miniatura del video: recorrido por Alberobello" width="500" height="333">
+                    <button type="button" class="play" aria-label="Reproducir">▶</button>
+                    <span class="duracion">12:34</span>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.miniatura {
+    position: relative;
+}
+
+.play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.duracion {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué translate(-50%, -50%)</figcaption>
+<pre>top: 50% y left: 50% colocan la ESQUINA
+superior izquierda del botón en el centro.
+
+translate(-50%, -50%) lo mueve hacia atrás
+la mitad de su propio ancho y alto, así
+el CENTRO del botón queda en el centro.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-galeria" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Galería con descripción al pasar el mouse</h2>
+            <p>La descripción vive dentro de cada foto, escondida debajo del borde. Al pasar el mouse sube.</p>
+            <div class="resultado">
+                <div class="galeria">
+                    <figure class="foto"><img src="https://picsum.photos/id/1015/400/300" alt="Río entre montañas"><figcaption><strong>Valle del río</strong><br>Noruega</figcaption></figure>
+                    <figure class="foto"><img src="https://picsum.photos/id/1016/400/300" alt="Cañón rocoso"><figcaption><strong>Cañón</strong><br>Estados Unidos</figcaption></figure>
+                    <figure class="foto"><img src="https://picsum.photos/id/1036/400/300" alt="Bosque nevado"><figcaption><strong>Bosque nevado</strong><br>Canadá</figcaption></figure>
+                    <figure class="foto"><img src="https://picsum.photos/id/1039/400/300" alt="Cascada"><figcaption><strong>Cascada</strong><br>Islandia</figcaption></figure>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.foto {
+    position: relative;
+    overflow: hidden;
+}
+
+.foto figcaption {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(transparent, rgb(0 0 0 / 0.8));
+    transform: translateY(100%);
+    transition: transform 0.3s;
+}
+
+.foto:hover figcaption {
+    transform: translateY(0);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo funciona</figcaption>
+<pre>left: 0 y right: 0 estiran la descripción
+a todo el ancho de la foto.
+
+translateY(100%) la empuja hacia abajo
+toda su altura: queda fuera de la foto.
+
+overflow: hidden en el padre la esconde.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-cintas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Cintas, sellos y etiquetas de esquina</h2>
+            <div class="resultado">
+                <div class="tarjeta"><h3>Curso de HTML</h3><p>40 horas</p><span class="cinta">OFERTA</span></div>
+                <div class="tarjeta"><h3>Curso de Python</h3><p>60 horas</p><span class="sello">Agotado</span></div>
+                <div class="tarjeta"><h3>Curso de CSS</h3><p>30 horas</p><span class="esquina">Gratis</span></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tarjeta {
+    position: relative;
+    overflow: hidden;
+}
+
+.cinta {
+    position: absolute;
+    top: 22px;
+    right: -38px;
+    width: 150px;
+    transform: rotate(45deg);
+}
+
+.sello {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    border: 3px solid #64748b;
+    transform: rotate(-12deg);
+}
+
+.esquina {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-bottom-right-radius: 12px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>La cinta diagonal</figcaption>
+<pre>1. Se coloca en la esquina superior derecha
+   con right negativo para que sobresalga.
+2. Se gira 45 grados.
+3. overflow: hidden en la tarjeta recorta
+   las puntas que se salen.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-zindex" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2><code>z-index</code>: un abanico de cartas</h2>
+            <p>Cada carta tiene un <code>z-index</code> mayor que la anterior. Pasa el mouse por una carta de atrás: sube al frente.</p>
+            <div class="resultado">
+                <div class="mazo">
+                    <div class="carta c1">A ♥</div>
+                    <div class="carta c2">K ♠</div>
+                    <div class="carta c3">Q ♦</div>
+                    <div class="carta c4">J ♣</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.mazo {
+    position: relative;
+}
+
+.carta {
+    position: absolute;
+    top: 30px;
+}
+
+.c1 { left: 0;     z-index: 1; }
+.c2 { left: 90px;  z-index: 2; }
+.c3 { left: 180px; z-index: 3; }
+.c4 { left: 270px; z-index: 4; }
+
+.carta:hover {
+    z-index: 10;
+    transform: translateY(-20px);
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Reglas de z-index</figcaption>
+<pre>El número más alto queda encima.
+
+Solo funciona en elementos con position
+distinto de static (o dentro de flex y grid).
+
+Sin z-index, el que aparece después en el
+HTML se dibuja encima.
+
+Usa saltos amplios (1, 10, 100) para tener
+espacio si luego necesitas una capa intermedia.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-modal" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Ventana modal con fondo oscuro</h2>
+            <p>Haz clic en el botón. Una capa oscura cubre todo con <code>inset: 0</code> y la ventana queda centrada encima. Cierra con la ✕ o haciendo clic fuera.</p>
+            <div class="resultado">
+                <div class="pantalla">
+                    <input type="checkbox" id="m-abrir">
+                    <h3>Mi cuenta</h3>
+                    <p>Desde aquí puedes administrar tu suscripción y tus datos personales.</p>
+                    <label for="m-abrir" class="boton-abrir">Cancelar suscripción</label>
+                    <label for="m-abrir" class="fondo-modal" aria-label="Cerrar"></label>
+                    <div class="modal" role="dialog" aria-labelledby="m-titulo">
+                        <label for="m-abrir" class="cerrar" aria-label="Cerrar">✕</label>
+                        <h3 id="m-titulo">¿Estás seguro?</h3>
+                        <p>Perderás el acceso a todos los cursos al final del mes.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.pantalla {
+    position: relative;
+    overflow: hidden;
+}
+
+.fondo-modal {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: none;
+    background: rgb(15 23 42 / 0.6);
+}
+
+.modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 20;
+    display: none;
+    transform: translate(-50%, -50%);
+}
+
+#m-abrir:checked ~ .fondo-modal,
+#m-abrir:checked ~ .modal {
+    display: block;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Capas</figcaption>
+<pre>z-index 20   ventana modal
+z-index 10   fondo oscuro
+sin z-index  contenido de la página
+
+En un sitio real la modal usa
+position: fixed para cubrir toda la
+ventana, y se abre con JavaScript
+(lección 23). Aquí usa absolute para
+quedarse dentro del ejemplo.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-sticky-tabla" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2><code>sticky</code>: tabla con encabezado y primera columna fijos</h2>
+            <p>Desplázate hacia abajo y hacia la derecha dentro de la tabla. Los meses y los nombres de los productos nunca se pierden.</p>
+            <div class="resultado">
+                <div class="scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Producto</th><th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th><th>May</th><th>Jun</th><th>Jul</th><th>Ago</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><th>Laptop</th><td>42</td><td>38</td><td>51</td><td>47</td><td>55</td><td>60</td><td>58</td><td>63</td></tr>
+                            <tr><th>Celular</th><td>120</td><td>110</td><td>135</td><td>128</td><td>140</td><td>152</td><td>149</td><td>160</td></tr>
+                            <tr><th>Tableta</th><td>30</td><td>28</td><td>33</td><td>35</td><td>31</td><td>29</td><td>36</td><td>40</td></tr>
+                            <tr><th>Audífonos</th><td>85</td><td>90</td><td>88</td><td>95</td><td>102</td><td>110</td><td>108</td><td>115</td></tr>
+                            <tr><th>Monitor</th><td>22</td><td>25</td><td>24</td><td>27</td><td>30</td><td>28</td><td>32</td><td>35</td></tr>
+                            <tr><th>Teclado</th><td>64</td><td>60</td><td>70</td><td>72</td><td>68</td><td>75</td><td>80</td><td>78</td></tr>
+                            <tr><th>Mouse</th><td>95</td><td>98</td><td>101</td><td>99</td><td>110</td><td>115</td><td>112</td><td>120</td></tr>
+                            <tr><th>Impresora</th><td>12</td><td>10</td><td>14</td><td>13</td><td>15</td><td>11</td><td>16</td><td>18</td></tr>
+                            <tr><th>Parlante</th><td>40</td><td>44</td><td>39</td><td>48</td><td>50</td><td>53</td><td>49</td><td>57</td></tr>
+                            <tr><th>Cámara web</th><td>18</td><td>20</td><td>22</td><td>19</td><td>24</td><td>26</td><td>25</td><td>28</td></tr>
+                            <tr><th>Disco externo</th><td>33</td><td>35</td><td>31</td><td>38</td><td>40</td><td>37</td><td>42</td><td>45</td></tr>
+                            <tr><th>Cargador</th><td>150</td><td>145</td><td>160</td><td>158</td><td>170</td><td>175</td><td>168</td><td>180</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.scroll {
+    max-height: 260px;
+    overflow: auto;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+tbody th {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+}
+
+thead th:first-child {
+    left: 0;
+    z-index: 3;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo funciona sticky</figcaption>
+<pre>El elemento se comporta como normal hasta
+que el scroll lo lleva al borde indicado
+(top: 0 o left: 0). Ahí se queda pegado.
+
+Necesita:
+  1. un valor en top, left, right o bottom
+  2. un contenedor con scroll
+  3. un fondo, para tapar lo que pasa
+     por debajo</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-contactos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Agenda de contactos con letras pegadas</h2>
+            <p>Desplázate por la lista. Cada letra se queda arriba hasta que la siguiente la empuja.</p>
+            <div class="resultado">
+                <div class="agenda">
+                    <h3 class="letra">A</h3>
+                    <ul><li>Ana Castillo</li><li>Andrés Molina</li><li>Antonia Reyes</li></ul>
+                    <h3 class="letra">B</h3>
+                    <ul><li>Beatriz Luna</li><li>Bruno Herrera</li></ul>
+                    <h3 class="letra">C</h3>
+                    <ul><li>Camila Torres</li><li>Carlos Vega</li><li>Cecilia Paz</li><li>Cristian Soto</li></ul>
+                    <h3 class="letra">D</h3>
+                    <ul><li>Daniela Ríos</li><li>Diego Navarro</li></ul>
+                    <h3 class="letra">E</h3>
+                    <ul><li>Elena Campos</li><li>Esteban Mora</li><li>Eva Quintero</li></ul>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="agenda"&gt;
+    &lt;h3 class="letra"&gt;A&lt;/h3&gt;
+    &lt;ul&gt;
+        &lt;li&gt;Ana Castillo&lt;/li&gt;
+        ...
+    &lt;/ul&gt;
+    &lt;h3 class="letra"&gt;B&lt;/h3&gt;
+    ...
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.agenda {
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.letra {
+    position: sticky;
+    top: 0;
+    background: #e0e7ff;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-app" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Pantalla de una app móvil</h2>
+            <p>Desplázate dentro del teléfono. La barra superior es <code>sticky</code>; el botón rosa y la barra de pestañas son <code>absolute</code> respecto al teléfono, así que no se mueven con el contenido.</p>
+            <div class="resultado">
+                <div class="telefono">
+                    <div class="contenido-app">
+                        <div class="barra-app">Comunidad</div>
+                        <div class="publicacion"><strong>Ana</strong>Terminé mi primera página con CSS 🎉</div>
+                        <div class="publicacion"><strong>Bruno</strong>¿Alguien entiende z-index? 😅</div>
+                        <div class="publicacion"><strong>Carla</strong>El truco del margen negativo para el avatar es genial.</div>
+                        <div class="publicacion"><strong>Diego</strong>Compartiendo mi galería con hover.</div>
+                        <div class="publicacion"><strong>Elena</strong>Ya casi termino el menú desplegable.</div>
+                        <div class="publicacion"><strong>Fabián</strong>sticky salvó mi tabla de 200 filas.</div>
+                        <div class="publicacion"><strong>Gabriela</strong>¿Qué ven mejor, absolute o fixed para un chat?</div>
+                        <div class="publicacion"><strong>Hugo</strong>Mañana empezamos Flexbox.</div>
+                    </div>
+                    <button type="button" class="fab" aria-label="Nueva publicación">+</button>
+                    <nav class="pestanas-app" aria-label="Pestañas de la app"><span>🏠</span><span>🔍</span><span>💬</span><span>👤</span></nav>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="telefono"&gt;
+    &lt;div class="contenido-app"&gt;
+        &lt;div class="barra-app"&gt;Comunidad&lt;/div&gt;
+        &lt;div class="publicacion"&gt;...&lt;/div&gt;
+        ...
+    &lt;/div&gt;
+    &lt;button class="fab"&gt;+&lt;/button&gt;
+    &lt;nav class="pestanas-app"&gt;...&lt;/nav&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.telefono {
+    position: relative;
+    height: 520px;
+    overflow: hidden;
+}
+
+.contenido-app {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.barra-app {
+    position: sticky;
+    top: 0;
+}
+
+.fab {
+    position: absolute;
+    right: 16px;
+    bottom: 76px;
+}
+
+.pestanas-app {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}</pre>
+                </figure>
+            </div>
+            <p>La clave: el botón y las pestañas están <strong>fuera</strong> del elemento que hace scroll, pero <strong>dentro</strong> del teléfono.</p>
+        </section>
+
+        <section id="ej-posiciones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2><code>position: fixed</code>: el botón de esta página</h2>
+            <p>Mira la esquina inferior derecha de la ventana: el botón <strong>↑</strong> te acompaña durante toda la lección. Púlsalo para volver arriba.</p>
+            <div class="resultado">
+                <table class="comparar">
+                    <thead><tr><th>Valor</th><th>Al hacer scroll…</th><th>Ejemplo en esta página</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>absolute</code></td><td>se mueve junto con su padre</td><td>insignias, contadores, cintas</td></tr>
+                        <tr><td><code>sticky</code></td><td>se mueve hasta tocar el borde y ahí se queda</td><td>tabla, agenda, barra de la app</td></tr>
+                        <tr><td><code>fixed</code></td><td>nunca se mueve, está pegado a la ventana</td><td>el botón ↑</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;body id="arriba"&gt;
+    ...
+    &lt;a href="#arriba" class="volver-arriba" aria-label="Volver arriba"&gt;↑&lt;/a&gt;
+&lt;/body&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.volver-arriba {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 100;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}</pre>
+                </figure>
+            </div>
+            <p>Otros usos de <code>fixed</code>: el botón de WhatsApp de una tienda, el aviso de cookies, la barra de navegación de muchos sitios.</p>
+        </section>
+
+        <section id="ej-pasos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Indicador de pasos de una compra</h2>
+            <p>La línea gris y la línea morada son pseudo-elementos colocados detrás de los círculos.</p>
+            <div class="resultado">
+                <ol class="pasos">
+                    <li class="hecho"><span>✓</span>Carrito</li>
+                    <li class="hecho"><span>✓</span>Envío</li>
+                    <li class="actual"><span>3</span>Pago</li>
+                    <li><span>4</span>Confirmar</li>
+                </ol>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.pasos {
+    position: relative;
+}
+
+.pasos::before,
+.pasos::after {
+    content: "";
+    position: absolute;
+    top: 18px;
+    left: 40px;
+    height: 4px;
+}
+
+.pasos::before {
+    right: 40px;
+    background: #e2e8f0;
+}
+
+.pasos::after {
+    width: calc((100% - 80px) * 2 / 3);
+    background: #4f46e5;
+}
+
+.pasos li {
+    position: relative;
+    z-index: 1;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Las medidas</figcaption>
+<pre>top: 18px     centro del círculo de 40px
+              menos la mitad de la línea (2px)
+
+left: 40px    centro del primer paso
+              (cada paso mide 80px)
+
+2 / 3         van 2 tramos completados
+              de los 3 que hay entre 4 pasos
+
+z-index: 1    los círculos tapan las líneas</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-globos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Globos de diálogo con flecha</h2>
+            <p>La flecha es un <code>::after</code> sin tamaño con un borde grueso: solo uno de sus cuatro lados tiene color.</p>
+            <div class="resultado">
+                <span class="globo abajo">¡Hola! Soy un globo con la flecha abajo.</span>
+                <span class="globo izquierda">Yo apunto a la izquierda.</span>
+                <span class="globo arriba">Y yo, hacia arriba.</span>
+                <p>El truco del triángulo: una caja de 0 × 0 con cuatro bordes de colores.</p>
+                <span class="triangulo"></span>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.globo {
+    position: relative;
+}
+
+.globo::after {
+    content: "";
+    position: absolute;
+    border: 10px solid transparent;
+}
+
+.abajo::after {
+    top: 100%;
+    left: 24px;
+    border-top-color: #4f46e5;
+}
+
+.izquierda::after {
+    top: 16px;
+    right: 100%;
+    border-right-color: #4f46e5;
+}
+
+.triangulo {
+    width: 0;
+    height: 0;
+    border: 40px solid;
+    border-color: #ef4444 #f59e0b #22c55e #3b82f6;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Qué borde pintar</figcaption>
+<pre>Flecha hacia abajo     border-top-color
+Flecha hacia arriba    border-bottom-color
+Flecha a la izquierda  border-right-color
+Flecha a la derecha    border-left-color
+
+Se pinta el borde OPUESTO a la dirección
+de la flecha.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-hero" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Portada de una guía de viaje</h2>
+            <p>Todo junto: capa oscura con <code>inset: 0</code>, texto anclado abajo y etiquetas en las esquinas superiores.</p>
+            <div class="resultado">
+                <div class="hero">
+                    <span class="categoria">Europa</span>
+                    <span class="valoracion">★ 4.8</span>
+                    <div class="texto">
+                        <h3>Alberobello, Italia</h3>
+                        <p>El pueblo de las casas con techo de cono.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.hero {
+    position: relative;
+    height: 320px;
+    background: url("../assets/imgs/pic_trulli.jpg") center / cover;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.8), transparent 60%);
+}
+
+.texto {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    left: 24px;
+}
+
+.categoria {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+}
+
+.valoracion {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Mapa de la portada</figcaption>
+<pre>┌─────────────────────────────────┐
+│ [Europa]              [★ 4.8]   │  top: 16px
+│                                 │
+│                                 │
+│ Alberobello, Italia             │
+│ El pueblo de las casas...       │  bottom: 24px
+└─────────────────────────────────┘
+  left: 16/24px         right: 16/24px</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="10-css-modelo-caja.html">Anterior: modelo de caja</a> |
+            <a href="index.html">Índice</a> |
+            <a href="12-css-flexbox.html">Siguiente: Flexbox</a>
+        </nav>
+    </footer>
+
+    <a href="#arriba" class="volver-arriba" aria-label="Volver arriba">↑</a>
+</body>
+</html>

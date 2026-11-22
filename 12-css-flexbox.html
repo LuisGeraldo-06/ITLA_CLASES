@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12. CSS: Flexbox</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <link rel="stylesheet" href="css/12-css-flexbox.css">
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>12. CSS: Flexbox</h1>
+        <p>Flexbox acomoda elementos <strong>en una fila o en una columna</strong>: los reparte, los alinea y decide cuánto crece o se encoge cada uno. Es la herramienta que más se usa para barras de navegación, tarjetas, formularios y botones.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-playground">Laboratorio</a></li>
+            <li><a href="#ej-basico">display: flex</a></li>
+            <li><a href="#ej-navbar">Barra de navegación</a></li>
+            <li><a href="#ej-centrado">Centrado</a></li>
+            <li><a href="#ej-precios">Precios</a></li>
+            <li><a href="#ej-footer">Footer</a></li>
+            <li><a href="#ej-chat">Chat</a></li>
+            <li><a href="#ej-comentarios">Comentarios</a></li>
+            <li><a href="#ej-buscador">Buscador</a></li>
+            <li><a href="#ej-chips">Filtros</a></li>
+            <li><a href="#ej-grow">grow y shrink</a></li>
+            <li><a href="#ej-order">order</a></li>
+            <li><a href="#ej-align-self">align-self</a></li>
+            <li><a href="#ej-carrito">Carrito</a></li>
+            <li><a href="#ej-dashboard">Dashboard</a></li>
+            <li><a href="#ej-layout">Página completa</a></li>
+            <li><a href="#ej-botones">Botones con ícono</a></li>
+            <li><a href="#ej-toolbar">Barra de herramientas</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Contenedor e ítems</h2>
+            <p>Flexbox siempre tiene dos protagonistas: el <strong>contenedor</strong>, al que se le pone <code>display: flex</code>, y sus <strong>hijos directos</strong>, que pasan a ser ítems flexibles.</p>
+            <table>
+                <thead>
+                    <tr><th>Se aplica al contenedor</th><th>Qué hace</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>display: flex</code></td><td>activa flexbox</td></tr>
+                    <tr><td><code>flex-direction</code></td><td>fila o columna, normal o invertida</td></tr>
+                    <tr><td><code>justify-content</code></td><td>reparte en el eje principal</td></tr>
+                    <tr><td><code>align-items</code></td><td>alinea en el eje cruzado</td></tr>
+                    <tr><td><code>flex-wrap</code></td><td>permite pasar a otra línea</td></tr>
+                    <tr><td><code>gap</code></td><td>espacio entre ítems</td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Se aplica a cada ítem</th><th>Qué hace</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>flex-grow</code></td><td>cuánto crece si sobra espacio</td></tr>
+                    <tr><td><code>flex-shrink</code></td><td>cuánto se encoge si falta espacio</td></tr>
+                    <tr><td><code>flex-basis</code></td><td>tamaño inicial antes de crecer o encoger</td></tr>
+                    <tr><td><code>flex</code></td><td>las tres anteriores juntas</td></tr>
+                    <tr><td><code>align-self</code></td><td>alineación propia, distinta al resto</td></tr>
+                    <tr><td><code>order</code></td><td>cambia el orden visual</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Los dos ejes</figcaption>
+<pre>flex-direction: row
+
+    eje principal (justify-content) →
+   ┌──────────────────────────────────┐
+ ↓ │ [ 1 ]  [ 2 ]  [ 3 ]              │
+   └──────────────────────────────────┘
+ eje cruzado (align-items)
+
+flex-direction: column
+
+   los ejes se intercambian:
+   justify-content trabaja en vertical
+   align-items trabaja en horizontal</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-playground" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Laboratorio de Flexbox</h2>
+            <p>Elige valores y mira cómo se reacomodan las cajas. El código de abajo cambia con cada opción. Funciona sin JavaScript, usando <code>:has()</code> de la lección 08.</p>
+            <div class="resultado">
+                <div class="controles">
+                    <fieldset>
+                        <legend>flex-direction</legend>
+                        <label><input type="radio" name="fd" id="fd-row" checked> row</label>
+                        <label><input type="radio" name="fd" id="fd-row-reverse"> row-reverse</label>
+                        <label><input type="radio" name="fd" id="fd-column"> column</label>
+                        <label><input type="radio" name="fd" id="fd-column-reverse"> column-reverse</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>justify-content</legend>
+                        <label><input type="radio" name="jc" id="jc-flex-start" checked> flex-start</label>
+                        <label><input type="radio" name="jc" id="jc-center"> center</label>
+                        <label><input type="radio" name="jc" id="jc-flex-end"> flex-end</label>
+                        <label><input type="radio" name="jc" id="jc-space-between"> space-between</label>
+                        <label><input type="radio" name="jc" id="jc-space-around"> space-around</label>
+                        <label><input type="radio" name="jc" id="jc-space-evenly"> space-evenly</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>align-items</legend>
+                        <label><input type="radio" name="ai" id="ai-stretch" checked> stretch</label>
+                        <label><input type="radio" name="ai" id="ai-flex-start"> flex-start</label>
+                        <label><input type="radio" name="ai" id="ai-center"> center</label>
+                        <label><input type="radio" name="ai" id="ai-flex-end"> flex-end</label>
+                        <label><input type="radio" name="ai" id="ai-baseline"> baseline</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>flex-wrap</legend>
+                        <label><input type="radio" name="fw" id="fw-nowrap" checked> nowrap</label>
+                        <label><input type="radio" name="fw" id="fw-wrap"> wrap</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>gap</legend>
+                        <label><input type="radio" name="gp" id="gp-0" checked> 0</label>
+                        <label><input type="radio" name="gp" id="gp-8"> 8px</label>
+                        <label><input type="radio" name="gp" id="gp-24"> 24px</label>
+                    </fieldset>
+                </div>
+                <div class="contenedor">
+                    <div class="item">1</div>
+                    <div class="item">2</div>
+                    <div class="item">3</div>
+                    <div class="item">4</div>
+                    <div class="item">5</div>
+                    <div class="item">6</div>
+                </div>
+                <div class="css-actual">.contenedor {
+    display: flex;
+    flex-direction: <span class="v-fd"></span>;
+    justify-content: <span class="v-jc"></span>;
+    align-items: <span class="v-ai"></span>;
+    flex-wrap: <span class="v-fw"></span>;
+    gap: <span class="v-gp"></span>;
+}</div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Qué probar</figcaption>
+<pre>1. justify-content: space-between
+   → los extremos tocan los bordes
+
+2. align-items: center
+   → las cajas de distinta altura quedan
+     centradas en vertical
+
+3. align-items: baseline
+   → se alinea la línea base del texto
+     (fíjate en la caja 4, que es más grande)
+
+4. flex-wrap: wrap
+   → si no caben, bajan a otra línea
+
+5. flex-direction: column + justify-content
+   → ahora justify-content trabaja en vertical</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-basico" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Una sola línea cambia todo: <code>display: flex</code></h2>
+            <div class="resultado">
+                <p>Sin flexbox: cada <code>div</code> ocupa toda la fila.</p>
+                <div class="fila sin-flex"><div>Uno</div><div>Dos</div><div>Tres</div></div>
+                <p>Con <code>display: flex</code>: se ponen uno al lado del otro.</p>
+                <div class="fila con-flex"><div>Uno</div><div>Dos</div><div>Tres</div></div>
+                <p>Con <code>flex-direction: row-reverse</code>: mismo HTML, orden invertido.</p>
+                <div class="fila con-reverse"><div>Uno</div><div>Dos</div><div>Tres</div></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.con-flex {
+    display: flex;
+    gap: 4px;
+}
+
+.con-reverse {
+    display: flex;
+    flex-direction: row-reverse;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-navbar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Barras de navegación</h2>
+            <p>Arriba, <code>margin-left: auto</code> empuja los botones a la derecha. Abajo, <code>space-between</code> reparte las tres partes.</p>
+            <div class="resultado">
+                <nav class="navbar" aria-label="Navegación con margin auto">
+                    <span class="logo">◆ Codely</span>
+                    <ul class="enlaces">
+                        <li><a href="#ej-navbar">Cursos</a></li>
+                        <li><a href="#ej-navbar">Precios</a></li>
+                        <li><a href="#ej-navbar">Blog</a></li>
+                    </ul>
+                    <div class="acciones">
+                        <a href="#ej-navbar">Ingresar</a>
+                        <a href="#ej-navbar" class="registrarse">Registrarse</a>
+                    </div>
+                </nav>
+                <nav class="navbar repartida" aria-label="Navegación repartida">
+                    <span class="logo">☕ Café Aroma</span>
+                    <ul class="enlaces">
+                        <li><a href="#ej-navbar">Menú</a></li>
+                        <li><a href="#ej-navbar">Locales</a></li>
+                        <li><a href="#ej-navbar">Nosotros</a></li>
+                    </ul>
+                    <div class="acciones">
+                        <a href="#ej-navbar" class="registrarse">Pedir ahora</a>
+                    </div>
+                </nav>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;nav class="navbar"&gt;
+    &lt;span class="logo"&gt;◆ Codely&lt;/span&gt;
+    &lt;ul class="enlaces"&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Cursos&lt;/a&gt;&lt;/li&gt;
+        ...
+    &lt;/ul&gt;
+    &lt;div class="acciones"&gt;
+        &lt;a href="#"&gt;Ingresar&lt;/a&gt;
+        &lt;a href="#" class="registrarse"&gt;Registrarse&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/nav&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.navbar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.enlaces {
+    display: flex;
+    gap: 20px;
+}
+
+.acciones {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.repartida {
+    justify-content: space-between;
+}</pre>
+                </figure>
+            </div>
+            <p>Fíjate en que hay flexbox dentro de flexbox: la barra es flex, y la lista de enlaces dentro de ella también.</p>
+        </section>
+
+        <section id="ej-centrado" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Centrado perfecto: carrito vacío</h2>
+            <p>Durante años centrar en vertical fue difícil en CSS. Con flexbox son tres líneas.</p>
+            <div class="resultado">
+                <div class="pantalla">
+                    <span class="icono">🛒</span>
+                    <h3>Tu carrito está vacío</h3>
+                    <p>Agrega productos para verlos aquí.</p>
+                    <a href="#ej-centrado">Ver productos</a>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.pantalla {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-height: 300px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Las tres líneas</figcaption>
+<pre>display: flex;
+justify-content: center;    centra en el eje principal
+align-items: center;        centra en el eje cruzado
+
+El contenedor necesita altura (min-height)
+para que haya espacio donde centrar.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-precios" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Tarjetas de precios con el botón siempre abajo</h2>
+            <p>Las listas tienen distinta cantidad de líneas, pero las tarjetas miden lo mismo y los botones quedan alineados.</p>
+            <div class="resultado">
+                <div class="planes">
+                    <div class="plan">
+                        <h3>Gratis</h3>
+                        <p class="precio">$0</p>
+                        <ul><li>3 cursos</li></ul>
+                        <button type="button">Empezar</button>
+                    </div>
+                    <div class="plan destacado">
+                        <h3>Estudiante</h3>
+                        <p class="precio">$9</p>
+                        <ul><li>Todos los cursos</li><li>Certificados</li><li>Proyectos guiados</li><li>Comunidad privada</li></ul>
+                        <button type="button">Suscribirme</button>
+                    </div>
+                    <div class="plan">
+                        <h3>Equipos</h3>
+                        <p class="precio">$29</p>
+                        <ul><li>Todo lo anterior</li><li>Panel de equipo</li></ul>
+                        <button type="button">Contactar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.planes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.plan {
+    display: flex;
+    flex: 1 1 200px;
+    flex-direction: column;
+}
+
+.plan button {
+    margin-top: auto;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Dos trucos</figcaption>
+<pre>1. Las tarjetas miden lo mismo porque
+   align-items es stretch por defecto:
+   todas se estiran a la altura de la
+   más alta.
+
+2. Cada tarjeta es también una columna
+   flex. margin-top: auto en el botón
+   se come todo el espacio libre de
+   arriba y lo empuja al fondo.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-footer" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Footer de un sitio web</h2>
+            <p>Achica la ventana: las columnas bajan solas cuando ya no caben.</p>
+            <div class="resultado">
+                <div class="pie">
+                    <div class="marca">
+                        <strong>◆ Codely</strong>
+                        <p>Aprende a programar con proyectos reales, a tu ritmo y en español.</p>
+                        <div class="redes"><a href="#ej-footer" aria-label="Facebook">f</a><a href="#ej-footer" aria-label="Instagram">◎</a><a href="#ej-footer" aria-label="YouTube">▶</a></div>
+                    </div>
+                    <div class="columna">
+                        <h4>Cursos</h4>
+                        <ul><li><a href="#ej-footer">HTML</a></li><li><a href="#ej-footer">CSS</a></li><li><a href="#ej-footer">JavaScript</a></li></ul>
+                    </div>
+                    <div class="columna">
+                        <h4>Empresa</h4>
+                        <ul><li><a href="#ej-footer">Nosotros</a></li><li><a href="#ej-footer">Empleos</a></li><li><a href="#ej-footer">Prensa</a></li></ul>
+                    </div>
+                    <div class="columna">
+                        <h4>Ayuda</h4>
+                        <ul><li><a href="#ej-footer">Preguntas</a></li><li><a href="#ej-footer">Contacto</a></li><li><a href="#ej-footer">Privacidad</a></li></ul>
+                    </div>
+                    <div class="legal">
+                        <span>© 2026 Codely. Todos los derechos reservados.</span>
+                        <span>Hecho con HTML y CSS</span>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.pie {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+
+.marca {
+    flex: 2 1 240px;
+}
+
+.columna {
+    flex: 1 1 140px;
+}
+
+.legal {
+    display: flex;
+    flex-basis: 100%;
+    justify-content: space-between;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>flex: 2 1 240px</figcaption>
+<pre>flex: grow shrink basis
+
+2      crece el doble que las columnas
+1      puede encogerse
+240px  quiere medir al menos 240px;
+       si no cabe, baja de línea
+
+flex-basis: 100% en .legal la obliga
+a ocupar una línea completa al final.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-chat" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Chat con <code>align-self</code></h2>
+            <p>En la lección 10 hicimos burbujas con márgenes. Con flexbox, cada mensaje elige su lado con <code>align-self</code>.</p>
+            <div class="resultado">
+                <div class="chat">
+                    <div class="msg">¿Ya viste la lección de flexbox?</div>
+                    <div class="msg mio">¡Sí! El laboratorio está genial.</div>
+                    <div class="msg mio">Ya entendí la diferencia entre justify y align 🙌</div>
+                    <div class="msg">Mañana seguimos con Grid.</div>
+                    <div class="escribiendo" aria-label="Escribiendo"><span></span><span></span><span></span></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.chat {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.msg {
+    align-self: flex-start;
+    max-width: 75%;
+}
+
+.msg.mio {
+    align-self: flex-end;
+}
+
+.escribiendo {
+    display: flex;
+    align-self: flex-start;
+    gap: 4px;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-comentarios" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Sección de comentarios</h2>
+            <p>Avatar a la izquierda con tamaño fijo y el texto ocupando el resto. Es uno de los patrones más repetidos de la web.</p>
+            <div class="resultado">
+                <div class="comentario">
+                    <img src="https://picsum.photos/id/64/96/96" alt="Laura">
+                    <div class="cuerpo">
+                        <div class="autor"><strong>Laura Méndez</strong><span class="fecha">hace 2 horas</span></div>
+                        <p>Excelente explicación del modelo de caja. Por fin entendí por qué mi botón medía más de lo que esperaba.</p>
+                        <div class="reacciones"><span>👍 24</span><span>Responder</span><span>Compartir</span></div>
+                    </div>
+                </div>
+                <div class="comentario respuesta">
+                    <img src="https://picsum.photos/id/91/96/96" alt="Mario">
+                    <div class="cuerpo">
+                        <div class="autor"><strong>Mario Ruiz</strong><span class="fecha">hace 1 hora</span></div>
+                        <p>¡A mí me pasó igual! box-sizing: border-box lo arregla.</p>
+                        <div class="reacciones"><span>👍 8</span><span>Responder</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="comentario"&gt;
+    &lt;img src="..." alt="Laura"&gt;
+    &lt;div class="cuerpo"&gt;
+        &lt;div class="autor"&gt;
+            &lt;strong&gt;Laura Méndez&lt;/strong&gt;
+            &lt;span class="fecha"&gt;hace 2 horas&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;p&gt;...&lt;/p&gt;
+        &lt;div class="reacciones"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.comentario {
+    display: flex;
+    gap: 12px;
+}
+
+.comentario img {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+}
+
+.cuerpo {
+    flex: 1;
+}
+
+.autor {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.respuesta {
+    margin-left: 60px;
+}</pre>
+                </figure>
+            </div>
+            <p><code>flex-shrink: 0</code> evita que el avatar se aplaste cuando el comentario es muy largo.</p>
+        </section>
+
+        <section id="ej-buscador" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Buscador y formulario de suscripción</h2>
+            <p>El campo de texto ocupa todo el espacio que dejan el selector y el botón. Cambia el ancho de la ventana para comprobarlo.</p>
+            <div class="resultado">
+                <form class="buscador" action="#" onsubmit="return false" role="search">
+                    <select aria-label="Categoría"><option>Todo</option><option>Cursos</option><option>Blog</option></select>
+                    <input type="search" placeholder="¿Qué quieres aprender?" aria-label="Buscar">
+                    <button type="submit">Buscar</button>
+                </form>
+                <form class="suscripcion" action="#" onsubmit="return false">
+                    <input type="email" placeholder="tu@correo.com" aria-label="Correo electrónico">
+                    <button type="submit">Suscribirme</button>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.buscador {
+    display: flex;
+    overflow: hidden;
+    border-radius: 999px;
+}
+
+.buscador input {
+    flex: 1;
+    min-width: 0;
+}
+
+.suscripcion {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.suscripcion input {
+    flex: 1 1 220px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>min-width: 0</figcaption>
+<pre>Los inputs tienen un ancho mínimo
+interno. Sin min-width: 0, en pantallas
+pequeñas el campo empuja al botón fuera
+del buscador.
+
+En la suscripción, si el campo no puede
+medir 220px, el botón baja a otra línea.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-chips" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Filtros y etiquetas que se acomodan solas</h2>
+            <p><code>flex-wrap</code> más <code>gap</code>: las etiquetas bajan de línea cuando no caben, sin márgenes extra.</p>
+            <div class="resultado">
+                <ul class="chips">
+                    <li class="activo">Todos <span class="cantidad">48</span></li>
+                    <li>HTML <span class="cantidad">12</span></li>
+                    <li>CSS <span class="cantidad">15</span></li>
+                    <li>JavaScript <span class="cantidad">10</span></li>
+                    <li>Diseño <span class="cantidad">6</span></li>
+                    <li>Accesibilidad <span class="cantidad">3</span></li>
+                    <li>Rendimiento <span class="cantidad">2</span></li>
+                </ul>
+                <ul class="chips">
+                    <li>#principiantes</li><li>#flexbox</li><li>#maquetación</li><li>#responsive</li><li>#frontend</li><li>#tutorial</li><li>#css3</li><li>#webdev</li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chips li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>gap frente a margin</figcaption>
+<pre>Con margin, el último elemento de cada
+línea deja un espacio sobrante y hay que
+quitarlo con :last-child.
+
+gap solo pone espacio ENTRE elementos,
+nunca en los bordes. Funciona igual
+en horizontal y en vertical.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-grow" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2><code>flex-grow</code>, <code>flex-shrink</code> y <code>flex-basis</code></h2>
+            <p>Cada fila tiene tres cajas. Solo cambia cómo se reparten el espacio.</p>
+            <div class="resultado">
+                <div class="barra r1"><div class="a">sin flex</div><div class="b">sin flex</div><div class="c">sin flex</div></div>
+                <div class="barra r2"><div class="a">grow: 1</div><div class="b">grow: 1</div><div class="c">grow: 1</div></div>
+                <div class="barra r3"><div class="a">grow: 1</div><div class="b">grow: 2</div><div class="c">grow: 1</div></div>
+                <div class="barra r4"><div class="a">0 0 120px</div><div class="b">flex: 1</div><div class="c">0 0 80px</div></div>
+                <div class="barra r5"><div class="a">basis 300px</div><div class="b">shrink: 0</div><div class="c">basis 300px</div></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.r2 div { flex-grow: 1; }
+
+.r3 .a, .r3 .c { flex-grow: 1; }
+.r3 .b         { flex-grow: 2; }
+
+.r4 .a { flex: 0 0 120px; }
+.r4 .b { flex: 1; }
+.r4 .c { flex: 0 0 80px; }
+
+.r5 div { flex-basis: 300px; }
+.r5 .b  { flex-shrink: 0; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo leerlo</figcaption>
+<pre>Fila 1  cada caja mide lo que su texto
+Fila 2  el espacio sobrante se reparte igual
+Fila 3  la del medio recibe el doble del sobrante
+Fila 4  laterales fijos, el centro se estira
+        (como un menú + contenido + barra)
+Fila 5  no caben 3 × 300px: todas se encogen
+        menos la rosa, que no puede encogerse
+
+Atajos comunes:
+flex: 1       crece y se encoge, base 0
+flex: none    tamaño fijo, ni crece ni encoge
+flex: 0 0 Xpx exactamente X píxeles</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-order" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2><code>order</code>: la oferta primero, lo agotado al final</h2>
+            <p>En el HTML la oferta es el tercer producto y el agotado el primero. Visualmente se reordenan sin tocar el HTML.</p>
+            <div class="resultado">
+                <div class="tarjetas">
+                    <div class="agotado">1. Teclado<br>(agotado)</div>
+                    <div>2. Mouse</div>
+                    <div class="oferta">3. Audífonos<br>¡Oferta!</div>
+                    <div>4. Monitor</div>
+                    <div>5. Webcam</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tarjetas {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.oferta {
+    order: -1;
+}
+
+.agotado {
+    order: 1;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo funciona</figcaption>
+<pre>Todos los ítems tienen order: 0.
+Se ordenan de menor a mayor:
+
+-1  oferta
+ 0  mouse, monitor, webcam (orden del HTML)
+ 1  agotado
+
+Cuidado: el teclado y los lectores de
+pantalla siguen el orden del HTML.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-align-self" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2><code>align-self</code> y alineación por línea base</h2>
+            <p>Arriba, cada caja rompe la regla del contenedor con su propio <code>align-self</code>. Abajo, un precio con tres tamaños de letra alineado por la base del texto.</p>
+            <div class="resultado">
+                <div class="contenedor">
+                    <div>flex-start</div>
+                    <div class="s-center">center</div>
+                    <div class="s-end">flex-end</div>
+                    <div class="s-stretch">stretch</div>
+                </div>
+                <div class="precio-linea">
+                    <span class="moneda">$</span><span class="entero">49</span><span class="centavos">.99</span><span class="periodo">/ mes</span>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.contenedor {
+    display: flex;
+    align-items: flex-start;
+    height: 180px;
+}
+
+.s-center  { align-self: center; }
+.s-end     { align-self: flex-end; }
+.s-stretch { align-self: stretch; }
+
+.precio-linea {
+    display: flex;
+    align-items: baseline;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>baseline</figcaption>
+<pre>Con align-items: center los textos de
+distinto tamaño quedan "flotando".
+
+Con baseline, la parte de abajo de las
+letras queda en la misma línea, como
+cuando escribes en un cuaderno.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-carrito" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Carrito de compras</h2>
+            <p>Cada fila combina una imagen fija, datos que se estiran, un selector de cantidad y un precio alineado a la derecha.</p>
+            <div class="resultado">
+                <div class="item">
+                    <img src="https://picsum.photos/id/1/128/128" alt="Laptop">
+                    <div class="datos"><h4>Laptop 14"</h4><small>Gris espacial · 512 GB</small></div>
+                    <div class="cantidad"><button type="button" aria-label="Quitar uno">−</button><span>1</span><button type="button" aria-label="Agregar uno">+</button></div>
+                    <span class="precio">$899.00</span>
+                </div>
+                <div class="item">
+                    <img src="https://picsum.photos/id/96/128/128" alt="Mochila">
+                    <div class="datos"><h4>Mochila urbana</h4><small>Negra · 20 L</small></div>
+                    <div class="cantidad"><button type="button" aria-label="Quitar uno">−</button><span>2</span><button type="button" aria-label="Agregar uno">+</button></div>
+                    <span class="precio">$78.00</span>
+                </div>
+                <div class="total"><span>Total</span><span>$977.00</span></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="item"&gt;
+    &lt;img src="..." alt="Laptop"&gt;
+    &lt;div class="datos"&gt;...&lt;/div&gt;
+    &lt;div class="cantidad"&gt;
+        &lt;button&gt;−&lt;/button&gt;&lt;span&gt;1&lt;/span&gt;&lt;button&gt;+&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;span class="precio"&gt;$899.00&lt;/span&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.item img {
+    flex-shrink: 0;
+}
+
+.datos {
+    flex: 1;
+    min-width: 0;
+}
+
+.cantidad {
+    display: flex;
+    align-items: center;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-dashboard" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Indicadores de un panel de administración</h2>
+            <p>Cuatro tarjetas que se reparten la fila y bajan de dos en dos, o de una en una, según el ancho.</p>
+            <div class="resultado">
+                <div class="stats">
+                    <div class="stat"><span class="icono i1">👥</span><div><span class="valor">1,284</span><span class="nombre">Estudiantes</span></div><span class="cambio sube">▲ 12 %</span></div>
+                    <div class="stat"><span class="icono i2">💰</span><div><span class="valor">$8,420</span><span class="nombre">Ventas</span></div><span class="cambio sube">▲ 5 %</span></div>
+                    <div class="stat"><span class="icono i3">📚</span><div><span class="valor">36</span><span class="nombre">Cursos</span></div><span class="cambio sube">▲ 2</span></div>
+                    <div class="stat"><span class="icono i4">↩️</span><div><span class="valor">14</span><span class="nombre">Reembolsos</span></div><span class="cambio baja">▼ 3 %</span></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.stat {
+    display: flex;
+    flex: 1 1 200px;
+    align-items: center;
+    gap: 14px;
+}
+
+.icono {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 48px;
+    height: 48px;
+}
+
+.cambio {
+    margin-left: auto;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-layout" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Estructura de página completa</h2>
+            <p>Cabecera arriba, pie siempre al fondo y tres columnas en el medio. En pantallas angostas las columnas se apilan.</p>
+            <div class="resultado">
+                <div class="pagina">
+                    <div class="p-cabecera">Cabecera</div>
+                    <div class="p-cuerpo">
+                        <div class="p-menu">Menú</div>
+                        <div class="p-principal">Contenido principal: crece para ocupar todo el espacio disponible.</div>
+                        <div class="p-lateral">Barra lateral</div>
+                    </div>
+                    <div class="p-pie">Pie de página</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.pagina {
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
+}
+
+.p-cuerpo {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.p-menu      { flex: 1 0 140px; }
+.p-principal { flex: 3 1 240px; }
+.p-lateral   { flex: 1 0 140px; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>El pie siempre abajo</figcaption>
+<pre>.pagina es una columna.
+.p-cuerpo tiene flex: 1, así que se
+estira y empuja el pie hasta el fondo,
+aunque haya poco contenido.
+
+En una web real, .pagina sería el &lt;body&gt;
+con min-height: 100vh.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-botones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Botones con ícono: <code>inline-flex</code></h2>
+            <p>El ícono y el texto quedan centrados en vertical, sin importar el tamaño de cada uno.</p>
+            <div class="resultado">
+                <button type="button" class="btn primario"><span>⬇</span>Descargar</button>
+                <button type="button" class="btn"><span>✉️</span>Mensajes<span class="insignia">5</span></button>
+                <button type="button" class="btn"><span>⚙️</span>Configuración</button>
+                <button type="button" class="btn solo-icono" aria-label="Compartir">↗</button>
+                <button type="button" class="btn solo-icono" aria-label="Eliminar">🗑</button>
+                <br>
+                <button type="button" class="btn vertical"><span>🏠</span><span>Inicio</span></button>
+                <button type="button" class="btn vertical"><span>🔍</span><span>Buscar</span></button>
+                <button type="button" class="btn vertical"><span>👤</span><span>Perfil</span></button>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn.solo-icono {
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+}
+
+.btn.vertical {
+    flex-direction: column;
+    gap: 4px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>flex frente a inline-flex</figcaption>
+<pre>display: flex
+    el contenedor se comporta como bloque:
+    ocupa toda la fila
+
+display: inline-flex
+    el contenedor se comporta como inline:
+    mide lo que su contenido y deja otros
+    elementos a su lado
+
+Por dentro, los dos funcionan igual.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-toolbar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Barra de herramientas de un editor de texto</h2>
+            <p>Grupos de botones separados por líneas verticales y el botón de guardar empujado al final. Puedes escribir en el área de abajo.</p>
+            <div class="resultado">
+                <div class="toolbar" role="toolbar" aria-label="Formato de texto">
+                    <div class="grupo">
+                        <button type="button" class="activo" aria-label="Negrita"><strong>B</strong></button>
+                        <button type="button" aria-label="Cursiva"><em>I</em></button>
+                        <button type="button" aria-label="Subrayado"><u>U</u></button>
+                    </div>
+                    <span class="separador"></span>
+                    <div class="grupo">
+                        <button type="button" aria-label="Alinear a la izquierda">⇤</button>
+                        <button type="button" aria-label="Centrar">↔</button>
+                        <button type="button" aria-label="Alinear a la derecha">⇥</button>
+                    </div>
+                    <span class="separador"></span>
+                    <div class="grupo">
+                        <button type="button" aria-label="Lista">•</button>
+                        <button type="button" aria-label="Enlace">🔗</button>
+                        <button type="button" aria-label="Imagen">🖼</button>
+                    </div>
+                    <button type="button" class="guardar">Guardar</button>
+                </div>
+                <div class="editor" contenteditable="true">Escribe aquí tu documento…</div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="toolbar"&gt;
+    &lt;div class="grupo"&gt;
+        &lt;button&gt;&lt;strong&gt;B&lt;/strong&gt;&lt;/button&gt;
+        ...
+    &lt;/div&gt;
+    &lt;span class="separador"&gt;&lt;/span&gt;
+    &lt;div class="grupo"&gt;...&lt;/div&gt;
+    &lt;button class="guardar"&gt;Guardar&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.grupo {
+    display: flex;
+    gap: 2px;
+}
+
+.separador {
+    width: 1px;
+    height: 24px;
+    background: #cbd5e1;
+}
+
+.guardar {
+    margin-left: auto;
+}</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="11-css-display-posicion.html">Anterior: display y posición</a> |
+            <a href="index.html">Índice</a> |
+            <a href="13-css-grid.html">Siguiente: Grid</a>
+        </nav>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13. CSS: Grid</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <link rel="stylesheet" href="css/13-css-grid.css">
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>13. CSS: Grid</h1>
+        <p>Flexbox trabaja en <strong>una dirección</strong>. Grid trabaja en <strong>dos a la vez</strong>: filas y columnas. Es la herramienta para galerías, paneles, calendarios y la estructura completa de una página.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-playground">Laboratorio</a></li>
+            <li><a href="#ej-unidades">Unidades</a></li>
+            <li><a href="#ej-galeria">Galería</a></li>
+            <li><a href="#ej-fit-fill">auto-fit y auto-fill</a></li>
+            <li><a href="#ej-blog">Áreas</a></li>
+            <li><a href="#ej-dashboard">Dashboard</a></li>
+            <li><a href="#ej-bento">Mosaico</a></li>
+            <li><a href="#ej-calendario">Calendario</a></li>
+            <li><a href="#ej-calculadora">Calculadora</a></li>
+            <li><a href="#ej-formulario">Formularios</a></li>
+            <li><a href="#ej-tableros">Tableros</a></li>
+            <li><a href="#ej-superponer">Superponer</a></li>
+            <li><a href="#ej-kanban">Kanban</a></li>
+            <li><a href="#ej-noticias">Noticias</a></li>
+            <li><a href="#ej-full-bleed">Artículo</a></li>
+            <li><a href="#ej-subgrid">subgrid</a></li>
+            <li><a href="#ej-agenda">Agenda</a></li>
+            <li><a href="#ej-logos">Logos</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Filas, columnas y celdas</h2>
+            <table>
+                <thead>
+                    <tr><th>Propiedad</th><th>Dónde</th><th>Qué hace</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>display: grid</code></td><td>contenedor</td><td>activa grid</td></tr>
+                    <tr><td><code>grid-template-columns</code></td><td>contenedor</td><td>cuántas columnas y de qué tamaño</td></tr>
+                    <tr><td><code>grid-template-rows</code></td><td>contenedor</td><td>cuántas filas y de qué tamaño</td></tr>
+                    <tr><td><code>grid-template-areas</code></td><td>contenedor</td><td>dibuja el diseño con nombres</td></tr>
+                    <tr><td><code>gap</code></td><td>contenedor</td><td>espacio entre filas y columnas</td></tr>
+                    <tr><td><code>justify-items</code> / <code>align-items</code></td><td>contenedor</td><td>alinea el contenido dentro de cada celda</td></tr>
+                    <tr><td><code>grid-column</code></td><td>ítem</td><td>en qué columnas se coloca o cuántas ocupa</td></tr>
+                    <tr><td><code>grid-row</code></td><td>ítem</td><td>en qué filas se coloca o cuántas ocupa</td></tr>
+                    <tr><td><code>grid-area</code></td><td>ítem</td><td>en qué área con nombre se coloca</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Las líneas de la cuadrícula</figcaption>
+<pre>     1       2       3       4      ← líneas de columna
+   1 ┌───────┬───────┬───────┐
+     │       │       │       │
+   2 ├───────┼───────┼───────┤
+     │       │       │       │
+   3 └───────┴───────┴───────┘
+   ↑
+   líneas de fila
+
+grid-column: 1 / 3;      de la línea 1 a la 3 (2 columnas)
+grid-column: span 2;     ocupa 2 columnas desde donde caiga
+grid-column: 1 / -1;     de la primera a la última línea</pre>
+                </figure>
+                <figure>
+                    <figcaption>La unidad fr</figcaption>
+<pre>fr = una fracción del espacio libre
+
+grid-template-columns: 1fr 1fr 1fr;
+    tres columnas iguales
+
+grid-template-columns: 1fr 2fr;
+    la segunda mide el doble
+
+grid-template-columns: 250px 1fr;
+    barra lateral fija + contenido flexible</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-playground" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Laboratorio de Grid</h2>
+            <p>Elige las columnas, el espacio y la alineación. La caja naranja (1) puede ocupar varias columnas o filas. El código de abajo cambia con cada opción.</p>
+            <div class="resultado">
+                <div class="controles">
+                    <fieldset>
+                        <legend>columnas</legend>
+                        <label><input type="radio" name="gc" id="gc-3" checked> repeat(3, 1fr)</label>
+                        <label><input type="radio" name="gc" id="gc-sidebar"> 200px 1fr</label>
+                        <label><input type="radio" name="gc" id="gc-4"> repeat(4, 1fr)</label>
+                        <label><input type="radio" name="gc" id="gc-121"> 1fr 2fr 1fr</label>
+                        <label><input type="radio" name="gc" id="gc-auto"> auto-fit</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>gap</legend>
+                        <label><input type="radio" name="gg" id="gg-0" checked> 0</label>
+                        <label><input type="radio" name="gg" id="gg-8"> 8px</label>
+                        <label><input type="radio" name="gg" id="gg-24"> 24px</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>justify-items</legend>
+                        <label><input type="radio" name="gji" id="gji-stretch" checked> stretch</label>
+                        <label><input type="radio" name="gji" id="gji-start"> start</label>
+                        <label><input type="radio" name="gji" id="gji-center"> center</label>
+                        <label><input type="radio" name="gji" id="gji-end"> end</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>align-items</legend>
+                        <label><input type="radio" name="gai" id="gai-stretch" checked> stretch</label>
+                        <label><input type="radio" name="gai" id="gai-start"> start</label>
+                        <label><input type="radio" name="gai" id="gai-center"> center</label>
+                        <label><input type="radio" name="gai" id="gai-end"> end</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>caja 1: columnas</legend>
+                        <label><input type="radio" name="gs" id="gs-1" checked> span 1</label>
+                        <label><input type="radio" name="gs" id="gs-2"> span 2</label>
+                        <label><input type="radio" name="gs" id="gs-3"> span 3</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>caja 1: filas</legend>
+                        <label><input type="radio" name="gr" id="gr-1" checked> span 1</label>
+                        <label><input type="radio" name="gr" id="gr-2"> span 2</label>
+                    </fieldset>
+                </div>
+                <div class="contenedor">
+                    <div class="item item-1">1</div>
+                    <div class="item">2</div>
+                    <div class="item">3</div>
+                    <div class="item">4</div>
+                    <div class="item">5</div>
+                    <div class="item">6</div>
+                    <div class="item">7</div>
+                    <div class="item">8</div>
+                </div>
+                <div class="css-actual">.contenedor {
+    display: grid;
+    grid-template-columns: <span class="v-cols"></span>;
+    gap: <span class="v-gap"></span>;
+    justify-items: <span class="v-ji"></span>;
+    align-items: <span class="v-ai"></span>;
+}
+
+.item-1 {
+    grid-column: <span class="v-span"></span>;
+    grid-row: <span class="v-rspan"></span>;
+}</div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Qué probar</figcaption>
+<pre>1. 200px 1fr
+   → barra lateral fija y contenido flexible
+
+2. auto-fit + achicar la ventana
+   → las columnas se reacomodan solas,
+     sin media queries
+
+3. caja 1 con span 2 en columnas y filas
+   → se vuelve un bloque grande; las demás
+     rellenan el espacio que queda
+
+4. justify-items: center
+   → cada caja deja de estirarse y se
+     centra dentro de su celda
+
+5. align-items: start
+   → la caja 3, que es más alta, ya no
+     estira a las de su fila</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-unidades" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Medidas de columnas: <code>fr</code>, <code>px</code>, <code>auto</code>, <code>%</code> y <code>minmax()</code></h2>
+            <p>Cada fila es una cuadrícula de tres columnas. Cambia el ancho de la ventana y observa cuáles se adaptan.</p>
+            <div class="resultado">
+                <div class="fila u1"><div>1fr</div><div>1fr</div><div>1fr</div></div>
+                <div class="fila u2"><div>1fr</div><div>2fr</div><div>1fr</div></div>
+                <div class="fila u3"><div>150px</div><div>1fr</div><div>150px</div></div>
+                <div class="fila u4"><div>auto</div><div>1fr</div><div>auto (texto más largo)</div></div>
+                <div class="fila u5"><div>25%</div><div>50%</div><div>25%</div></div>
+                <div class="fila u6"><div>minmax(100px, 200px)</div><div>1fr</div><div>minmax(100px, 200px)</div></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.fila {
+    display: grid;
+    gap: 8px;
+}
+
+.u1 { grid-template-columns: 1fr 1fr 1fr; }
+.u2 { grid-template-columns: 1fr 2fr 1fr; }
+.u3 { grid-template-columns: 150px 1fr 150px; }
+.u4 { grid-template-columns: auto 1fr auto; }
+.u5 { grid-template-columns: 25% 50% 25%; }
+.u6 { grid-template-columns: minmax(100px, 200px) 1fr minmax(100px, 200px); }</pre>
+                </figure>
+                <figure>
+                    <figcaption>¿Por qué la fila roja se sale?</figcaption>
+<pre>25% + 50% + 25% = 100% del ancho
+más 2 huecos de 8px de gap
+= 100% + 16px → no cabe
+
+fr reparte el espacio que QUEDA después
+del gap, por eso nunca se desborda.
+
+auto       mide lo que mide su contenido
+minmax()   nunca menos de A ni más de B</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-galeria" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Galería que se adapta sola, sin media queries</h2>
+            <p>Achica y agranda la ventana: el número de columnas cambia automáticamente. Es la línea de CSS más útil de toda la lección.</p>
+            <div class="resultado">
+                <div class="galeria">
+                    <img src="https://picsum.photos/id/1011/400/400" alt="Persona en un kayak">
+                    <img src="https://picsum.photos/id/1012/400/400" alt="Perro en la playa">
+                    <img src="https://picsum.photos/id/1013/400/400" alt="Persona en la calle">
+                    <img src="https://picsum.photos/id/1014/400/400" alt="Costa rocosa">
+                    <img src="https://picsum.photos/id/1018/400/400" alt="Montañas">
+                    <img src="https://picsum.photos/id/1019/400/400" alt="Mar en calma">
+                    <img src="https://picsum.photos/id/1020/400/400" alt="Oso en el bosque">
+                    <img src="https://picsum.photos/id/1021/400/400" alt="Niebla sobre el campo">
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.galeria {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+}
+
+.galeria img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Leída en voz alta</figcaption>
+<pre>repeat(auto-fit, minmax(160px, 1fr))
+
+"crea tantas columnas como quepan,
+ cada una de al menos 160px,
+ y reparte entre ellas lo que sobre"
+
+Pantalla de 1000px → 5 columnas
+Pantalla de  700px → 4 columnas
+Pantalla de  360px → 2 columnas</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-fit-fill" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2><code>auto-fit</code> frente a <code>auto-fill</code></h2>
+            <p>Con pocos elementos se nota la diferencia. En una pantalla ancha, <code>auto-fit</code> estira las tres cajas y <code>auto-fill</code> deja columnas vacías reservadas.</p>
+            <div class="resultado">
+                <p><code>auto-fit</code></p>
+                <div class="demo fit"><div>1</div><div>2</div><div>3</div></div>
+                <p><code>auto-fill</code></p>
+                <div class="demo fill"><div>1</div><div>2</div><div>3</div></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.fit {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+.fill {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cuál elegir</figcaption>
+<pre>auto-fit    las columnas vacías desaparecen
+            y los elementos se estiran
+            → galerías, tarjetas
+
+auto-fill   las columnas vacías se conservan
+            y los elementos mantienen su tamaño
+            → catálogos que se irán llenando</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-blog" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2><code>grid-template-areas</code>: dibujar el diseño con palabras</h2>
+            <p>Los dos diseños tienen exactamente el mismo HTML. Solo cambia el "dibujo" de las áreas en el CSS.</p>
+            <div class="resultado">
+                <div class="blog">
+                    <div class="b-cabecera">cabecera</div>
+                    <div class="b-lateral">lateral</div>
+                    <div class="b-contenido">contenido</div>
+                    <div class="b-pie">pie</div>
+                </div>
+                <div class="blog invertido">
+                    <div class="b-cabecera">cabecera</div>
+                    <div class="b-lateral">lateral</div>
+                    <div class="b-contenido">contenido</div>
+                    <div class="b-pie">pie</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.blog {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+        "cabecera cabecera"
+        "lateral  contenido"
+        "pie      pie";
+}
+
+.b-cabecera  { grid-area: cabecera; }
+.b-lateral   { grid-area: lateral; }
+.b-contenido { grid-area: contenido; }
+.b-pie       { grid-area: pie; }
+
+.blog.invertido {
+    grid-template-columns: 3fr 1fr;
+    grid-template-areas:
+        "cabecera  cabecera"
+        "contenido lateral"
+        "pie       pie";
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Reglas de las áreas</figcaption>
+<pre>Cada línea entre comillas es una fila.
+Cada palabra es una columna.
+
+Repetir un nombre une celdas:
+"cabecera cabecera" → la cabecera
+ocupa las dos columnas.
+
+Un punto deja una celda vacía:
+"lateral ."
+
+Las áreas deben ser rectángulos.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-dashboard" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Panel de control con widgets de distintos tamaños</h2>
+            <p>Una cuadrícula de 4 columnas. Cada widget decide cuántas columnas y filas ocupa con <code>span</code>. Hasta el gráfico de barras está hecho con grid.</p>
+            <div class="resultado">
+                <div class="panel">
+                    <div class="widget"><small>Visitas</small><strong>12.4 k</strong></div>
+                    <div class="widget"><small>Ventas</small><strong>$8,420</strong></div>
+                    <div class="widget"><small>Pedidos</small><strong>318</strong></div>
+                    <div class="widget"><small>Clientes</small><strong>1,284</strong></div>
+                    <div class="widget w-grafico">
+                        <small>Ventas de la semana</small>
+                        <div class="barras"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                    </div>
+                    <div class="widget w-lista">
+                        <small>Más vendidos</small>
+                        <ol><li>Audífonos</li><li>Teclado</li><li>Mouse</li><li>Monitor</li></ol>
+                    </div>
+                    <div class="widget w-ancho"><small>Meta mensual</small><strong>78 %</strong></div>
+                    <div class="widget w-ancho"><small>Satisfacción</small><strong>4.7 ★</strong></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.panel {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 110px;
+    gap: 12px;
+}
+
+.w-grafico {
+    grid-column: span 3;
+    grid-row: span 2;
+}
+
+.w-lista {
+    grid-row: span 2;
+}
+
+.w-ancho {
+    grid-column: span 2;
+}
+
+.barras {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    align-items: end;
+    height: 150px;
+}
+
+.barras span:nth-child(1) { height: 40%; }
+.barras span:nth-child(2) { height: 65%; }
+...</pre>
+                </figure>
+                <figure>
+                    <figcaption>grid-auto-rows</figcaption>
+<pre>No se dice cuántas filas habrá:
+grid-auto-rows hace que cada fila que
+se cree automáticamente mida 110px.
+
+Mapa del panel:
+┌────┬────┬────┬────┐
+│ V  │ $  │ P  │ C  │
+├────┴────┴────┼────┤
+│   gráfico    │ más│
+│   (3 × 2)    │vend│
+├─────────┬────┴────┤
+│  meta   │ satisf. │
+└─────────┴─────────┘</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-bento" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Mosaico de fotos con <code>grid-auto-flow: dense</code></h2>
+            <p>Fotos grandes, anchas y altas mezcladas. <code>dense</code> rellena los huecos con las fotos pequeñas que vienen después.</p>
+            <div class="resultado">
+                <div class="bento">
+                    <div class="grande f1">Bosque</div>
+                    <div class="ancha f4">Lago</div>
+                    <div class="f2">Playa</div>
+                    <div class="alta f3">Cascada</div>
+                    <div class="f5">Ciudad</div>
+                    <div class="ancha f7">Montañas</div>
+                    <div class="f6">Desierto</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.bento {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 120px;
+    grid-auto-flow: dense;
+    gap: 10px;
+}
+
+.grande {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+.ancha { grid-column: span 2; }
+.alta  { grid-row: span 2; }
+
+.f1 { background-image: url("https://picsum.photos/id/1043/600/600"); }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Sin dense</figcaption>
+<pre>Grid coloca los elementos en orden. Si
+uno no cabe en el hueco que queda, salta
+a la siguiente fila y deja el hueco vacío.
+
+Con dense vuelve atrás a rellenar huecos
+con elementos más pequeños que encajen.
+
+Cuidado: el orden visual puede dejar de
+coincidir con el orden del HTML.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-calendario" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Calendario mensual</h2>
+            <p>Siete columnas y una sola regla especial: el día 1 cae en domingo, así que empieza en la columna 7. Todos los demás se acomodan solos.</p>
+            <div class="resultado">
+                <div class="calendario">
+                    <h3 class="mes">Noviembre 2026</h3>
+                    <div class="dia-semana">Lun</div><div class="dia-semana">Mar</div><div class="dia-semana">Mié</div><div class="dia-semana">Jue</div><div class="dia-semana">Vie</div><div class="dia-semana">Sáb</div><div class="dia-semana">Dom</div>
+                    <div class="dia primero">1</div><div class="dia">2</div><div class="dia">3</div><div class="dia">4</div><div class="dia evento">5</div><div class="dia">6</div><div class="dia">7</div>
+                    <div class="dia">8</div><div class="dia">9</div><div class="dia">10</div><div class="dia">11</div><div class="dia evento">12</div><div class="dia">13</div><div class="dia">14</div>
+                    <div class="dia">15</div><div class="dia">16</div><div class="dia">17</div><div class="dia">18</div><div class="dia hoy">19</div><div class="dia">20</div><div class="dia">21</div>
+                    <div class="dia">22</div><div class="dia">23</div><div class="dia">24</div><div class="dia">25</div><div class="dia evento">26</div><div class="dia">27</div><div class="dia">28</div>
+                    <div class="dia">29</div><div class="dia">30</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.calendario {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.mes {
+    grid-column: 1 / -1;
+}
+
+.dia {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+}
+
+.primero {
+    grid-column-start: 7;
+}
+
+.evento {
+    box-shadow: inset 0 -4px 0 #f59e0b;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Para otro mes</figcaption>
+<pre>Solo cambia el número de la columna
+donde empieza el día 1:
+
+Lunes      grid-column-start: 1
+Miércoles  grid-column-start: 3
+Domingo    grid-column-start: 7
+
+place-items: center es la forma corta
+de align-items + justify-items.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-calculadora" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Teclado de calculadora</h2>
+            <p>Las teclas <strong>+</strong> e <strong>=</strong> ocupan dos filas y el <strong>0</strong> dos columnas, como en un teclado numérico real.</p>
+            <div class="resultado">
+                <div class="calc">
+                    <div class="pantalla">1,250.5</div>
+                    <button type="button">C</button>
+                    <button type="button" class="op">÷</button>
+                    <button type="button" class="op">×</button>
+                    <button type="button" class="op">−</button>
+                    <button type="button">7</button>
+                    <button type="button">8</button>
+                    <button type="button">9</button>
+                    <button type="button" class="op alto">+</button>
+                    <button type="button">4</button>
+                    <button type="button">5</button>
+                    <button type="button">6</button>
+                    <button type="button">1</button>
+                    <button type="button">2</button>
+                    <button type="button">3</button>
+                    <button type="button" class="igual alto">=</button>
+                    <button type="button" class="cero">0</button>
+                    <button type="button">.</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.calc {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.pantalla {
+    grid-column: 1 / -1;
+}
+
+.alto {
+    grid-row: span 2;
+}
+
+.cero {
+    grid-column: span 2;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Colocación automática</figcaption>
+<pre>┌───────────────────┐
+│          1,250.5  │
+├────┬────┬────┬────┤
+│ C  │ ÷  │ ×  │ −  │
+├────┼────┼────┼────┤
+│ 7  │ 8  │ 9  │    │
+├────┼────┼────┤ +  │
+│ 4  │ 5  │ 6  │    │
+├────┼────┼────┼────┤
+│ 1  │ 2  │ 3  │    │
+├────┴────┼────┤ =  │
+│    0    │ .  │    │
+└─────────┴────┴────┘
+
+No se indica la posición de ninguna
+tecla: grid salta las celdas ocupadas.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-formulario" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Formularios en dos columnas</h2>
+            <p>Arriba, campos en pares con algunos a todo el ancho. Abajo, etiquetas a la izquierda alineadas a la derecha.</p>
+            <div class="resultado">
+                <form class="form" action="#" onsubmit="return false">
+                    <div class="campo"><label for="g-nombre">Nombre</label><input id="g-nombre" type="text"></div>
+                    <div class="campo"><label for="g-apellido">Apellido</label><input id="g-apellido" type="text"></div>
+                    <div class="campo completo"><label for="g-correo">Correo electrónico</label><input id="g-correo" type="email"></div>
+                    <div class="campo"><label for="g-pais">País</label><select id="g-pais"><option>Panamá</option><option>México</option><option>Colombia</option><option>España</option></select></div>
+                    <div class="campo"><label for="g-ciudad">Ciudad</label><input id="g-ciudad" type="text"></div>
+                    <div class="campo completo"><label for="g-mensaje">Mensaje</label><textarea id="g-mensaje" rows="3"></textarea></div>
+                    <button type="submit">Enviar</button>
+                </form>
+                <form class="form-h" action="#" onsubmit="return false">
+                    <label for="h-usuario">Usuario</label><input id="h-usuario" type="text">
+                    <label for="h-clave">Contraseña</label><input id="h-clave" type="password">
+                    <label for="h-confirmar">Confirmar contraseña</label><input id="h-confirmar" type="password">
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 16px;
+}
+
+.campo {
+    display: grid;
+    gap: 4px;
+}
+
+.completo {
+    grid-column: 1 / -1;
+}
+
+.form button {
+    grid-column: 2;
+    justify-self: end;
+}
+
+.form-h {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+}
+
+.form-h label {
+    text-align: right;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>gap con dos valores</figcaption>
+<pre>gap: 14px 16px;
+     fila  columna
+
+En .form-h la primera columna es auto:
+mide lo que mide la etiqueta más larga
+("Confirmar contraseña"), y todas las
+demás se alinean con ella.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tableros" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Tableros de juego: tres en raya y ajedrez</h2>
+            <p>Cuadrículas perfectas. El tablero de ajedrez alterna colores con <code>:nth-child</code> de la lección 08.</p>
+            <div class="resultado">
+                <div class="tableros">
+                    <div class="tres">
+                        <div class="x">✕</div><div class="o">◯</div><div class="x">✕</div>
+                        <div></div><div class="x">✕</div><div class="o">◯</div>
+                        <div class="o">◯</div><div></div><div class="x">✕</div>
+                    </div>
+                    <div class="ajedrez">
+                        <div>♜</div><div>♞</div><div>♝</div><div>♛</div><div>♚</div><div>♝</div><div>♞</div><div>♜</div>
+                        <div>♟</div><div>♟</div><div>♟</div><div>♟</div><div>♟</div><div>♟</div><div>♟</div><div>♟</div>
+                        <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                        <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                        <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                        <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                        <div>♙</div><div>♙</div><div>♙</div><div>♙</div><div>♙</div><div>♙</div><div>♙</div><div>♙</div>
+                        <div>♖</div><div>♘</div><div>♗</div><div>♕</div><div>♔</div><div>♗</div><div>♘</div><div>♖</div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tres {
+    display: grid;
+    grid-template-columns: repeat(3, 80px);
+    grid-template-rows: repeat(3, 80px);
+    gap: 6px;
+    background: #0f172a;
+}
+
+.ajedrez {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    aspect-ratio: 1;
+}
+
+.ajedrez div:nth-child(16n + 2),
+.ajedrez div:nth-child(16n + 4),
+.ajedrez div:nth-child(16n + 6),
+.ajedrez div:nth-child(16n + 8),
+.ajedrez div:nth-child(16n + 9),
+.ajedrez div:nth-child(16n + 11),
+.ajedrez div:nth-child(16n + 13),
+.ajedrez div:nth-child(16n + 15) {
+    background: #b45309;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Las líneas del tres en raya</figcaption>
+<pre>No hay bordes: las líneas oscuras son
+el fondo del tablero que se ve a través
+del gap de 6px entre las casillas.
+
+En el ajedrez cada fila tiene 8 casillas
+y el patrón se repite cada 2 filas
+(16 casillas). Por eso 16n.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-superponer" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Superponer elementos sin <code>position</code></h2>
+            <p>Si varios hijos van a la misma celda, se apilan uno encima del otro. Luego cada uno se alinea con <code>align-self</code> y <code>justify-self</code>.</p>
+            <div class="resultado">
+                <div class="tarjeta-foto">
+                    <img src="assets/imgs/pic_trulli.jpg" alt="Casas trulli de Alberobello">
+                    <div class="capa"><h3>Alberobello</h3><p>Puglia, Italia · 3 noches desde $420</p></div>
+                    <span class="etiqueta">Más reservado</span>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tarjeta-foto {
+    display: grid;
+}
+
+.tarjeta-foto &gt; * {
+    grid-area: 1 / 1;
+}
+
+.capa {
+    align-self: end;
+}
+
+.etiqueta {
+    align-self: start;
+    justify-self: end;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Comparado con la lección 11</figcaption>
+<pre>Con position: absolute el elemento sale
+del flujo y el padre no sabe cuánto mide.
+
+Con grid todos siguen en el flujo:
+si el texto crece, la tarjeta crece.
+
+grid-area: 1 / 1 significa
+"fila 1, columna 1" para todos.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-kanban" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Tablero Kanban de tareas</h2>
+            <p>Tres columnas con tareas. En pantallas pequeñas el tablero se desplaza en horizontal, como en Trello.</p>
+            <div class="resultado">
+                <div class="tablero">
+                    <div class="columna">
+                        <h3>Por hacer (3)</h3>
+                        <div class="tarea">Diseñar la página de inicio<br><span class="tag t-diseno">Diseño</span></div>
+                        <div class="tarea">Crear el formulario de contacto<br><span class="tag t-codigo">Código</span></div>
+                        <div class="tarea">Elegir la paleta de colores<br><span class="tag t-diseno">Diseño</span></div>
+                    </div>
+                    <div class="columna">
+                        <h3>En curso (2)</h3>
+                        <div class="tarea">Maquetar la galería con grid<br><span class="tag t-codigo">Código</span></div>
+                        <div class="tarea">El menú no se ve en celular<br><span class="tag t-bug">Error</span></div>
+                    </div>
+                    <div class="columna">
+                        <h3>Hecho (1)</h3>
+                        <div class="tarea">Estructura HTML del sitio<br><span class="tag t-codigo">Código</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tablero {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+    gap: 16px;
+    overflow-x: auto;
+}
+
+.columna {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>align-content: start</figcaption>
+<pre>Sin esta línea, las tareas de las columnas
+con menos elementos se estirarían para
+ocupar toda la altura.
+
+align-content mueve el bloque completo
+de filas; align-items alinea dentro de
+cada celda.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-noticias" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Portada de un diario digital</h2>
+            <p>La noticia principal ocupa dos columnas y dos filas. Las demás se acomodan alrededor sin reglas extra.</p>
+            <div class="resultado">
+                <div class="portada">
+                    <article class="nota principal">
+                        <img src="https://picsum.photos/id/1067/800/450" alt="Ciudad al atardecer">
+                        <span class="seccion">Ciudad</span>
+                        <h3>La ciudad estrena 40 km de ciclovías conectadas</h3>
+                        <p>El nuevo trazado une los principales barrios con el centro y las estaciones de metro.</p>
+                    </article>
+                    <article class="nota"><img src="https://picsum.photos/id/1080/400/225" alt="Frutas"><span class="seccion">Salud</span><h3>Cinco frutas de temporada y sus beneficios</h3></article>
+                    <article class="nota"><img src="https://picsum.photos/id/180/400/225" alt="Computadora portátil"><span class="seccion">Tecnología</span><h3>Aprender a programar ya es materia obligatoria</h3></article>
+                    <article class="nota"><img src="https://picsum.photos/id/1058/400/225" alt="Estadio"><span class="seccion">Deportes</span><h3>La selección clasifica a la final</h3></article>
+                    <article class="nota"><img src="https://picsum.photos/id/1073/400/225" alt="Libros"><span class="seccion">Cultura</span><h3>Feria del libro: los títulos más vendidos</h3></article>
+                    <article class="nota"><img src="https://picsum.photos/id/1036/400/225" alt="Bosque nevado"><span class="seccion">Clima</span><h3>Llega el primer frente frío del año</h3></article>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.portada {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.principal {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+.nota {
+    display: grid;
+    align-content: start;
+    gap: 6px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Así queda</figcaption>
+<pre>┌───────────────┬───────┐
+│               │ Salud │
+│   PRINCIPAL   ├───────┤
+│               │ Tecno │
+├───────┬───────┼───────┤
+│ Depor │ Cultu │ Clima │
+└───────┴───────┴───────┘</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-full-bleed" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Artículo con texto angosto e imágenes a todo el ancho</h2>
+            <p>El texto se queda en una columna central cómoda de leer, pero la foto y la cita destacada se salen hasta los bordes.</p>
+            <div class="resultado">
+                <article class="articulo">
+                    <h3>Un fin de semana en Puglia</h3>
+                    <p>El sur de Italia guarda pueblos que parecen sacados de un cuento. Alberobello es el más conocido, con sus más de mil casas de piedra y techo cónico.</p>
+                    <img class="ancho-completo" src="assets/imgs/pic_trulli.jpg" alt="Calle de Alberobello con trulli">
+                    <p>Recorrer sus calles a primera hora, antes de que lleguen los grupos de turistas, es la mejor manera de disfrutarlo.</p>
+                    <p class="ancho-completo destacado">"Cada techo tiene un símbolo pintado a mano."</p>
+                    <p>Por la tarde, las terrazas de los restaurantes ofrecen vistas a todo el valle.</p>
+                </article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.articulo {
+    display: grid;
+    grid-template-columns: 1fr min(60ch, 100% - 32px) 1fr;
+}
+
+.articulo &gt; * {
+    grid-column: 2;
+}
+
+.articulo .ancho-completo {
+    grid-column: 1 / -1;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Tres columnas</figcaption>
+<pre>│ 1fr │   60ch de texto   │ 1fr │
+│     │ párrafo           │     │
+│ ◄──────── imagen ─────────────► │
+│     │ párrafo           │     │
+
+Todo va a la columna 2 por defecto.
+Lo que lleva .ancho-completo va de la
+primera a la última línea (1 / -1).
+
+Así lo hacen muchos blogs y revistas.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-subgrid" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2><code>subgrid</code>: partes de tarjetas alineadas entre sí</h2>
+            <p>Los títulos y las descripciones tienen largos distintos, pero las descripciones, los datos y los botones de todas las tarjetas empiezan a la misma altura.</p>
+            <div class="resultado">
+                <div class="cursos">
+                    <article class="curso">
+                        <h3>HTML</h3>
+                        <p>Estructura de páginas web.</p>
+                        <span class="meta">12 lecciones · 6 h</span>
+                        <a href="01-estructura.html">Ver curso</a>
+                    </article>
+                    <article class="curso">
+                        <h3>CSS moderno: Flexbox, Grid y diseño responsive</h3>
+                        <p>Aprende a maquetar cualquier diseño, desde una tarjeta hasta una página completa, en todas las pantallas.</p>
+                        <span class="meta">24 lecciones · 14 h</span>
+                        <a href="12-css-flexbox.html">Ver curso</a>
+                    </article>
+                    <article class="curso">
+                        <h3>JavaScript desde cero</h3>
+                        <p>Haz tus páginas interactivas.</p>
+                        <span class="meta">30 lecciones · 20 h</span>
+                        <a href="index.html#js">Ver curso</a>
+                    </article>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.cursos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.curso {
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo funciona</figcaption>
+<pre>Cada tarjeta tiene 4 partes: título,
+descripción, datos y botón.
+
+grid-row: span 4
+    la tarjeta ocupa 4 filas del padre
+
+grid-template-rows: subgrid
+    en lugar de crear sus propias filas,
+    usa las filas del padre
+
+Como todas las tarjetas comparten las
+mismas filas, cada fila mide lo que
+necesita la parte más alta.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-agenda" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Agenda semanal con eventos de varias horas</h2>
+            <p>Cada evento se coloca con números de línea: en qué columna (día) y de qué hora a qué hora.</p>
+            <div class="resultado">
+                <div class="agenda">
+                    <div></div>
+                    <div class="cab">Lunes</div>
+                    <div class="cab">Martes</div>
+                    <div class="cab">Miércoles</div>
+                    <div class="hora h1">8:00</div>
+                    <div class="hora h2">9:00</div>
+                    <div class="hora h3">10:00</div>
+                    <div class="hora h4">11:00</div>
+                    <div class="hora h5">12:00</div>
+                    <div class="hora h6">13:00</div>
+                    <div class="evento e1">Clase de HTML</div>
+                    <div class="evento e2">Reunión</div>
+                    <div class="evento e3">Taller de CSS Grid</div>
+                    <div class="evento e4">Almuerzo con el equipo</div>
+                    <div class="evento e5">Proyecto final</div>
+                    <div class="evento e6">Tutoría</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.agenda {
+    display: grid;
+    grid-template-columns: 60px repeat(3, 1fr);
+    grid-template-rows: auto repeat(6, 48px);
+}
+
+.e1 { grid-column: 2;     grid-row: 2 / 4; }
+.e2 { grid-column: 3;     grid-row: 3 / 4; }
+.e3 { grid-column: 4;     grid-row: 2 / 5; }
+.e4 { grid-column: 2 / 4; grid-row: 5 / 6; }
+.e5 { grid-column: 3;     grid-row: 6 / 8; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo leer las líneas</figcaption>
+<pre>Columnas: 1 hora · 2 lunes · 3 martes · 4 miércoles
+Filas:    1 días · 2 → 8:00 · 3 → 9:00 · 4 → 10:00 ...
+
+.e1  lunes, de la línea 2 a la 4
+     = de 8:00 a 10:00
+
+.e4  de la columna 2 a la 4
+     = lunes y martes, a las 11:00</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-logos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Franja de logos de clientes</h2>
+            <p>Cada logo queda centrado en su casilla con una sola propiedad. Pasa el mouse para verlo a color.</p>
+            <div class="resultado">
+                <div class="logos">
+                    <div>🌿 Verdana</div>
+                    <div>🚀 Orbita</div>
+                    <div>☕ Molienda</div>
+                    <div>🔷 Prisma</div>
+                    <div>🎧 Sonar</div>
+                    <div>🐙 Pulpo</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.logos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.logos div {
+    display: grid;
+    place-items: center;
+    height: 90px;
+    filter: grayscale(1);
+    opacity: 0.6;
+}
+
+.logos div:hover {
+    filter: grayscale(0);
+    opacity: 1;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>¿Grid o Flexbox?</figcaption>
+<pre>Flexbox   una dirección: fila O columna
+          el contenido decide el tamaño
+          → menús, botones, barras
+
+Grid      dos direcciones: filas Y columnas
+          la cuadrícula decide el tamaño
+          → galerías, paneles, páginas
+
+En la práctica se combinan: una página
+en grid con componentes en flexbox.</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="12-css-flexbox.html">Anterior: Flexbox</a> |
+            <a href="index.html">Índice</a> |
+            <a href="14-css-responsive.html">Siguiente: responsive</a>
+        </nav>
+    </footer>
+</body>
+</html>

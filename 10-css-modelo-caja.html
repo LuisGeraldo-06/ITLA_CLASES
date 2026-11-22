@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10. CSS: modelo de caja</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <link rel="stylesheet" href="css/10-css-modelo-caja.css">
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>10. CSS: modelo de caja</h1>
+        <p>Para el navegador, <strong>todo elemento es una caja</strong>: un contenido rodeado de relleno, borde y margen. Entender estas cuatro capas es entender cómo se mide y se separa todo en una página.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-anatomia">Anatomía</a></li>
+            <li><a href="#ej-sizing">box-sizing</a></li>
+            <li><a href="#ej-botones">Botones</a></li>
+            <li><a href="#ej-producto">Tarjeta de producto</a></li>
+            <li><a href="#ej-perfil">Perfil</a></li>
+            <li><a href="#ej-margin">Márgenes</a></li>
+            <li><a href="#ej-formas">border-radius</a></li>
+            <li><a href="#ej-chat">Chat</a></li>
+            <li><a href="#ej-bordes">Bordes</a></li>
+            <li><a href="#ej-elevacion">Sombras</a></li>
+            <li><a href="#ej-outline">outline</a></li>
+            <li><a href="#ej-dimensiones">Dimensiones</a></li>
+            <li><a href="#ej-object-fit">object-fit</a></li>
+            <li><a href="#ej-overflow">overflow</a></li>
+            <li><a href="#ej-inline">inline y block</a></li>
+            <li><a href="#ej-timeline">Seguimiento</a></li>
+            <li><a href="#ej-boleto">Pase de abordar</a></li>
+            <li><a href="#ej-login">Inicio de sesión</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Las cuatro capas</h2>
+            <table>
+                <thead>
+                    <tr><th>Capa</th><th>Propiedad</th><th>Qué es</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Contenido</td><td><code>width</code>, <code>height</code></td><td>el texto, la imagen o los hijos</td></tr>
+                    <tr><td>Relleno</td><td><code>padding</code></td><td>espacio <strong>dentro</strong> de la caja, entre el contenido y el borde; toma el color de fondo</td></tr>
+                    <tr><td>Borde</td><td><code>border</code></td><td>la línea que rodea la caja</td></tr>
+                    <tr><td>Margen</td><td><code>margin</code></td><td>espacio <strong>fuera</strong> de la caja, la separa de las demás; siempre es transparente</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Formas abreviadas</figcaption>
+<pre>padding: 10px;                 los 4 lados
+padding: 10px 20px;            arriba/abajo  izquierda/derecha
+padding: 10px 20px 30px;       arriba  lados  abajo
+padding: 10px 20px 30px 40px;  arriba derecha abajo izquierda
+
+            ↑ 1
+     4 ←  caja  → 2        sentido del reloj
+            ↓ 3</pre>
+                </figure>
+                <figure>
+                    <figcaption>Un lado a la vez</figcaption>
+<pre>padding-top       margin-top
+padding-right     margin-right
+padding-bottom    margin-bottom
+padding-left      margin-left
+
+border: 2px solid #4f46e5;
+        grosor estilo color
+
+border-top: ...   border-left: ...</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-anatomia" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Anatomía de una caja</h2>
+            <p>Arriba, un esquema de las cuatro capas. Abajo, una caja real: haz clic derecho sobre ella → <em>Inspeccionar</em> y mira la pestaña <em>Computed</em> en las herramientas del navegador.</p>
+            <div class="resultado">
+                <div class="capa margin"><span class="nombre">margin</span>
+                    <div class="capa border"><span class="nombre">border</span>
+                        <div class="capa padding"><span class="nombre">padding</span>
+                            <div class="content">contenido</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="caja-real">Soy una caja de 260px de ancho con 20px de padding, 8px de borde y 24px de margen.</div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS de la caja real</figcaption>
+<pre>.caja-real {
+    width: 260px;
+    margin: 24px;
+    padding: 20px;
+    border: 8px solid #4f46e5;
+    background: #e0e7ff;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Qué colorea el fondo</figcaption>
+<pre>background pinta el contenido
+y el padding.
+
+El borde tiene su propio color.
+
+El margen nunca se pinta:
+deja ver lo que hay detrás.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-sizing" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2><code>box-sizing</code>: ¿cuánto mide de verdad una caja?</h2>
+            <p>Las dos cajas tienen <code>width: 250px</code>. La regla negra mide exactamente 250px.</p>
+            <div class="resultado">
+                <div class="caja content-box">content-box: mido 250 + 40 + 12 = 302px</div>
+                <div class="regla"></div>
+                <div class="caja border-box">border-box: mido 250px, el padding y el borde van por dentro</div>
+                <div class="regla"></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.caja {
+    width: 250px;
+    padding: 20px;
+    border: 6px solid #4f46e5;
+}
+
+.content-box {
+    box-sizing: content-box;
+}
+
+.border-box {
+    box-sizing: border-box;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>La regla que casi todos los sitios usan</figcaption>
+<pre>* {
+    box-sizing: border-box;
+}
+
+Está al inicio de css/base.css.
+Así el ancho que escribes es el
+ancho que ves.
+
+content-box es el valor por defecto
+del navegador.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-botones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Sistema de botones</h2>
+            <p>Variantes, tamaños y formas. Todo sale de combinar <code>padding</code>, <code>border</code> y <code>border-radius</code>.</p>
+            <div class="resultado">
+                <p>
+                    <button type="button" class="btn primario">Primario</button>
+                    <button type="button" class="btn secundario">Secundario</button>
+                    <button type="button" class="btn contorno">Contorno</button>
+                    <button type="button" class="btn texto">Solo texto</button>
+                    <button type="button" class="btn peligro">Eliminar</button>
+                </p>
+                <p>
+                    <button type="button" class="btn primario pequeno">Pequeño</button>
+                    <button type="button" class="btn primario">Normal</button>
+                    <button type="button" class="btn primario grande">Grande</button>
+                </p>
+                <p>
+                    <button type="button" class="btn primario pildora">Píldora</button>
+                    <button type="button" class="btn contorno pildora">Píldora contorno</button>
+                    <button type="button" class="btn primario redondo" aria-label="Agregar">+</button>
+                    <button type="button" class="btn secundario redondo" aria-label="Me gusta">♥</button>
+                </p>
+                <button type="button" class="btn primario bloque">Botón de ancho completo</button>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;button class="btn primario"&gt;Primario&lt;/button&gt;
+&lt;button class="btn contorno pildora"&gt;Píldora&lt;/button&gt;
+&lt;button class="btn primario grande"&gt;Grande&lt;/button&gt;
+&lt;button class="btn primario redondo"&gt;+&lt;/button&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.btn {
+    padding: 10px 20px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+}
+
+.contorno {
+    border-color: #4f46e5;
+    background: transparent;
+}
+
+.pequeno { padding: 6px 12px; }
+.grande  { padding: 16px 32px; }
+.pildora { border-radius: 999px; }
+
+.redondo {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 50%;
+}
+
+.bloque {
+    display: block;
+    width: 100%;
+}</pre>
+                </figure>
+            </div>
+            <p>¿Por qué <code>border: 2px solid transparent</code> en todos? Para que el botón de contorno mida lo mismo que los demás: todos tienen borde, solo que en unos es invisible.</p>
+        </section>
+
+        <section id="ej-producto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Tarjeta de producto</h2>
+            <div class="resultado">
+                <article class="producto">
+                    <img src="assets/imgs/pic_trulli.jpg" alt="Casas trulli de Alberobello">
+                    <div class="cuerpo">
+                        <h3>Tour por Alberobello</h3>
+                        <p class="detalle">Recorrido guiado de 4 horas con almuerzo típico.</p>
+                        <p class="precio">$120</p>
+                        <button type="button">Reservar</button>
+                    </div>
+                </article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;article class="producto"&gt;
+  &lt;img src="assets/imgs/pic_trulli.jpg" alt="..."&gt;
+  &lt;div class="cuerpo"&gt;
+    &lt;h3&gt;Tour por Alberobello&lt;/h3&gt;
+    &lt;p class="detalle"&gt;...&lt;/p&gt;
+    &lt;p class="precio"&gt;$120&lt;/p&gt;
+    &lt;button&gt;Reservar&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/article&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.producto {
+    max-width: 300px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgb(15 23 42 / 0.08);
+}
+
+.producto img {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.cuerpo {
+    padding: 16px 20px 20px;
+}</pre>
+                </figure>
+            </div>
+            <p><code>overflow: hidden</code> recorta la imagen con las esquinas redondeadas de la tarjeta. Sin él, la foto taparía las esquinas superiores.</p>
+        </section>
+
+        <section id="ej-perfil" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Perfil de red social: margen negativo</h2>
+            <p>El avatar sube y se monta sobre la portada gracias a un <code>margin-top</code> negativo.</p>
+            <div class="resultado">
+                <div class="perfil">
+                    <div class="portada"></div>
+                    <img class="avatar" src="https://picsum.photos/id/64/200/200" alt="Foto de perfil de Laura Méndez">
+                    <h3>Laura Méndez</h3>
+                    <p class="usuario">@laura.dev</p>
+                    <div class="stats">
+                        <span><strong>128</strong>publicaciones</span>
+                        <span><strong>2.4 k</strong>seguidores</span>
+                        <span><strong>310</strong>seguidos</span>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.portada {
+    height: 110px;
+    background: linear-gradient(135deg, #4f46e5, #ec4899);
+}
+
+.avatar {
+    display: block;
+    width: 96px;
+    height: 96px;
+    margin: -48px auto 0;
+    border: 4px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px #4f46e5;
+}
+
+.stats span + span {
+    border-left: 1px solid #e2e8f0;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>El truco</figcaption>
+<pre>margin: -48px auto 0;
+         ↑      ↑   ↑
+       arriba  lados abajo
+
+-48px es la mitad del alto del avatar:
+la mitad queda sobre la portada y la
+otra mitad debajo.
+
+auto en los lados lo centra.
+
+El borde blanco separa la foto de la
+portada; la sombra sin desenfoque
+dibuja un segundo anillo morado.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-margin" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Márgenes: centrar, empujar y colapsar</h2>
+            <div class="resultado">
+                <div class="centrado">margin: 0 auto → centrado horizontalmente</div>
+                <div class="derecha">margin-left: auto → empujado a la derecha</div>
+                <div class="colapso">
+                    <p>Párrafo con margin: 24px 0</p>
+                    <p>Párrafo con margin: 24px 0. Entre ambos hay 24px, no 48px.</p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.centrado {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.derecha {
+    width: 220px;
+    margin-left: auto;
+}
+
+.colapso p {
+    margin: 24px 0;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Reglas</figcaption>
+<pre>margin: auto reparte el espacio libre.
+Solo centra si la caja tiene un ancho
+menor que su contenedor.
+
+Colapso de márgenes: cuando dos márgenes
+verticales se tocan, no se suman; gana
+el más grande.
+
+Solo pasa con margin vertical.
+El padding nunca colapsa.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-formas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2><code>border-radius</code>: de rectángulo a cualquier forma</h2>
+            <div class="resultado">
+                <div class="formas">
+                    <div class="forma redondeado">16px</div>
+                    <div class="forma circulo">50%</div>
+                    <div class="forma pildora">999px</div>
+                    <div class="forma hoja">0 60px</div>
+                    <div class="forma huevo">huevo</div>
+                    <div class="forma pestana">16px 16px 0 0</div>
+                    <div class="forma ticket">4px 24px</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.redondeado { border-radius: 16px; }
+.circulo    { border-radius: 50%; }
+.pildora    { border-radius: 999px; }
+.hoja       { border-radius: 0 60px; }
+.pestana    { border-radius: 16px 16px 0 0; }
+.ticket     { border-radius: 4px 24px; }
+
+.huevo {
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Orden de las esquinas</figcaption>
+<pre>border-radius: 1 2 3 4;
+
+   1 ┌──────┐ 2
+     │      │
+   4 └──────┘ 3
+
+1 sup-izq  2 sup-der  3 inf-der  4 inf-izq
+
+Con dos valores: 1 y 3 | 2 y 4
+La barra / separa radio horizontal
+y vertical (formas ovaladas).</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-chat" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Burbujas de chat</h2>
+            <p>Una esquina menos redondeada indica quién habla. <code>margin-left: auto</code> empuja los mensajes enviados a la derecha.</p>
+            <div class="resultado">
+                <div class="chat">
+                    <div class="msg recibido">Hola, ¿ya terminaste la práctica de CSS?<span class="hora">10:02</span></div>
+                    <div class="msg enviado">¡Casi! Me falta la tarjeta de perfil.<span class="hora">10:03</span></div>
+                    <div class="msg recibido">El avatar se sube con margen negativo 😉<span class="hora">10:03</span></div>
+                    <div class="msg enviado">¡Funcionó! Gracias<span class="hora">10:05</span></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.msg {
+    width: fit-content;
+    max-width: 75%;
+    margin-bottom: 8px;
+    padding: 10px 14px;
+    border-radius: 18px;
+}
+
+.recibido {
+    border-bottom-left-radius: 4px;
+    background: #ffffff;
+}
+
+.enviado {
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+    background: #4f46e5;
+    color: #ffffff;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Ancho</figcaption>
+<pre>width: fit-content
+    la burbuja mide lo que mide
+    su texto
+
+max-width: 75%
+    pero nunca más de tres cuartos
+    del chat: los mensajes largos
+    bajan de línea</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-bordes" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Estilos de borde y un cupón de descuento</h2>
+            <div class="resultado">
+                <div class="estilos">
+                    <div class="solid">solid</div>
+                    <div class="dashed">dashed</div>
+                    <div class="dotted">dotted</div>
+                    <div class="double">double</div>
+                    <div class="groove">groove</div>
+                    <div class="ridge">ridge</div>
+                    <div class="inset">inset</div>
+                    <div class="outset">outset</div>
+                </div>
+                <div class="cupon">
+                    <p>Cupón de bienvenida</p>
+                    <p class="descuento">20 % OFF</p>
+                    <p>en tu primera compra</p>
+                    <span class="clave">HOLA20</span>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.estilos div {
+    border-width: 6px;
+    border-color: #4f46e5;
+}
+
+.dashed { border-style: dashed; }
+.double { border-style: double; }
+
+.cupon {
+    border: 3px dashed #16a34a;
+    border-radius: 12px;
+    background: #f0fdf4;
+}
+
+.clave {
+    padding: 6px 18px;
+    border: 2px solid #16a34a;
+    letter-spacing: 0.2em;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Forma corta y forma larga</figcaption>
+<pre>border: 3px dashed #16a34a;
+
+es lo mismo que
+
+border-width: 3px;
+border-style: dashed;
+border-color: #16a34a;
+
+Sin border-style el borde no aparece,
+aunque tenga grosor y color.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-elevacion" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2><code>box-shadow</code>: niveles de elevación</h2>
+            <p>Cuanto más grande y difusa la sombra, más "flota" el elemento. Pasa el mouse por la última tarjeta.</p>
+            <div class="resultado">
+                <div class="niveles">
+                    <div class="nivel s1">Nivel 1<br>borde sutil</div>
+                    <div class="nivel s2">Nivel 2<br>tarjeta</div>
+                    <div class="nivel s3">Nivel 3<br>menú</div>
+                    <div class="nivel s4">Nivel 4<br>ventana modal</div>
+                    <div class="nivel s-color">Sombra de color</div>
+                    <div class="nivel s-interior">Sombra interior</div>
+                    <div class="nivel s-anillo">Anillos</div>
+                    <div class="nivel s-hover">Pasa el mouse</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.s1 { box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
+.s2 { box-shadow: 0 4px 8px rgb(0 0 0 / 0.1); }
+.s3 { box-shadow: 0 10px 24px rgb(0 0 0 / 0.14); }
+.s4 { box-shadow: 0 20px 48px rgb(0 0 0 / 0.22); }
+
+.s-color {
+    box-shadow: 0 10px 24px rgb(79 70 229 / 0.5);
+}
+
+.s-interior {
+    box-shadow: inset 0 3px 8px rgb(0 0 0 / 0.2);
+}
+
+.s-anillo {
+    box-shadow: 0 0 0 4px #a5b4fc, 0 0 0 8px #e0e7ff;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Sintaxis</figcaption>
+<pre>box-shadow: 0  10px  24px  0  color;
+            x   y   desenf. expansión
+
+inset       la sombra va hacia adentro
+varias      separadas por coma
+
+Sombra sin desenfoque y con expansión
+= un borde extra que no ocupa espacio.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-outline" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2><code>outline</code> frente a <code>border</code></h2>
+            <p>Haz clic en cada campo. Con <code>border</code> la caja crece y empuja el texto de abajo; con <code>outline</code> nada se mueve.</p>
+            <div class="resultado">
+                <input class="campo con-border" type="text" placeholder="Foco con border de 5px" aria-label="Campo con border">
+                <p class="debajo">Este texto salta cuando el campo de arriba recibe el foco.</p>
+                <input class="campo con-outline" type="text" placeholder="Foco con outline de 3px" aria-label="Campo con outline">
+                <p class="debajo">Este texto se queda quieto.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.con-border:focus {
+    outline: none;
+    border-width: 5px;
+    border-color: #4f46e5;
+}
+
+.con-outline:focus {
+    outline: 3px solid #4f46e5;
+    outline-offset: 3px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Diferencias</figcaption>
+<pre>border    ocupa espacio
+          puede ser distinto en cada lado
+          sigue el border-radius
+
+outline   no ocupa espacio
+          igual en los 4 lados
+          outline-offset lo separa
+
+Nunca quites el outline del foco sin
+poner otro indicador: quien navega con
+teclado lo necesita.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-dimensiones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Dimensiones: <code>aspect-ratio</code>, <code>max-width</code> y <code>min-height</code></h2>
+            <p>Miniaturas con la proporción de cada red, un bloque de lectura de ancho limitado y tarjetas que miden lo mismo aunque tengan distinto texto.</p>
+            <div class="resultado">
+                <div class="formatos">
+                    <div class="miniatura r-16-9">16 : 9</div>
+                    <div class="miniatura r-1-1">1 : 1</div>
+                    <div class="miniatura r-4-5">4 : 5</div>
+                </div>
+                <p class="lectura">Este párrafo nunca será más ancho que 45 caracteres, sin importar el tamaño de la pantalla. Achica y agranda la ventana para comprobarlo.</p>
+                <div class="iguales">
+                    <div>Texto corto.</div>
+                    <div>Un texto un poco más largo que el anterior.</div>
+                    <div>Este texto es todavía más largo y aun así la tarjeta respeta la altura mínima de las demás.</div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.r-16-9 { aspect-ratio: 16 / 9; }
+.r-1-1  { aspect-ratio: 1; }
+.r-4-5  { aspect-ratio: 4 / 5; }
+
+.lectura {
+    max-width: 45ch;
+}
+
+.iguales div {
+    min-height: 120px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Dónde se usa</figcaption>
+<pre>16 : 9   videos de YouTube
+1 : 1    fotos de perfil, Instagram
+4 : 5    publicaciones verticales
+
+max-width   contenedores, textos, imágenes
+min-height  tarjetas, secciones de portada
+max-height  listas con scroll</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-object-fit" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2><code>object-fit</code>: una foto, cuatro marcos</h2>
+            <p>Los cuatro marcos miden lo mismo. Cambia cómo se acomoda la imagen dentro.</p>
+            <div class="resultado">
+                <div class="marcos">
+                    <figure><img class="fill" src="assets/imgs/pic_trulli.jpg" alt="Trulli deformados"><figcaption>fill</figcaption></figure>
+                    <figure><img class="contain" src="assets/imgs/pic_trulli.jpg" alt="Trulli completos"><figcaption>contain</figcaption></figure>
+                    <figure><img class="cover" src="assets/imgs/pic_trulli.jpg" alt="Trulli recortados"><figcaption>cover</figcaption></figure>
+                    <figure><img class="cover-arriba" src="assets/imgs/pic_trulli.jpg" alt="Trulli recortados desde arriba"><figcaption>cover + top</figcaption></figure>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>img {
+    width: 100%;
+    height: 160px;
+}
+
+.fill    { object-fit: fill; }
+.contain { object-fit: contain; }
+.cover   { object-fit: cover; }
+
+.cover-arriba {
+    object-fit: cover;
+    object-position: top;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Qué hace cada uno</figcaption>
+<pre>fill      estira la foto: se deforma
+contain   la foto entera cabe: sobran bordes
+cover     llena el marco: recorta lo que sobra
+
+object-position elige qué parte se
+conserva al recortar.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-overflow" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2><code>overflow</code>: cuando el contenido no cabe</h2>
+            <div class="resultado">
+                <div class="modos">
+                    <div class="modo visible"><strong>visible</strong><br>El texto se sale de la caja y se dibuja encima de lo que haya debajo, como este párrafo largo que no cabe.</div>
+                    <div class="modo hidden"><strong>hidden</strong><br>El texto que sobra se corta y desaparece. No hay forma de verlo, ni siquiera con scroll.</div>
+                    <div class="modo scroll"><strong>scroll</strong><br>Siempre muestra barras de desplazamiento, aunque el contenido quepa. Aquí sí sobra texto.</div>
+                    <div class="modo auto"><strong>auto</strong><br>Muestra la barra solo cuando hace falta. Es la opción más usada para cajas con scroll.</div>
+                </div>
+                <div class="terminos">
+                    <h3>Términos y condiciones</h3>
+                    <p>1. El acceso a la plataforma es personal e intransferible.</p>
+                    <p>2. El estudiante se compromete a entregar sus trabajos en las fechas indicadas.</p>
+                    <p>3. Los materiales del curso son para uso educativo y no pueden redistribuirse.</p>
+                    <p>4. Las calificaciones se publicarán en un plazo máximo de 10 días hábiles.</p>
+                    <p>5. Cualquier consulta debe hacerse por los canales oficiales del curso.</p>
+                    <p>6. La institución puede actualizar estos términos con aviso previo.</p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.modo {
+    height: 110px;
+}
+
+.visible { overflow: visible; }
+.hidden  { overflow: hidden; }
+.scroll  { overflow: scroll; }
+.auto    { overflow: auto; }
+
+.terminos {
+    height: 160px;
+    overflow-y: auto;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Un solo eje</figcaption>
+<pre>overflow-x   horizontal
+overflow-y   vertical
+
+overflow: hidden también sirve para
+recortar esquinas: ver la tarjeta de
+producto del ejemplo 4.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-inline" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>La caja de los elementos <code>inline</code> y <code>block</code></h2>
+            <p>Los tres <code>span</code> tienen el mismo padding, borde y margen. Solo cambia <code>display</code>.</p>
+            <div class="resultado">
+                <p class="demo d-inline">Texto antes <span>inline</span> y texto después. El padding vertical se dibuja pero no empuja las líneas: se monta sobre el texto de arriba y de abajo.</p>
+                <p class="demo d-inline-block">Texto antes <span>inline-block</span> y texto después. Respeta el padding y el margen en todas direcciones, pero sigue en la misma línea.</p>
+                <p class="demo d-block">Texto antes <span>block</span> y texto después. Ocupa toda la fila y empuja lo demás a otra línea.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.demo span {
+    margin: 8px;
+    padding: 12px;
+    border: 2px solid #4f46e5;
+}
+
+.d-inline span       { display: inline; }
+.d-inline-block span { display: inline-block; }
+.d-block span        { display: block; }</pre>
+                </figure>
+                <figure>
+                    <figcaption>Resumen</figcaption>
+<pre>             width  margin vertical  nueva línea
+inline        no         no              no
+inline-block  sí         sí              no
+block         sí         sí              sí
+
+Inline por defecto: span, a, strong, img
+Block por defecto:  div, p, h1, section</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-timeline" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Seguimiento de un pedido</h2>
+            <p>Una línea de tiempo hecha con <code>border-left</code> y círculos dibujados con <code>::before</code> y <code>border-radius</code>.</p>
+            <div class="resultado">
+                <ul class="linea">
+                    <li class="hecho"><strong>Pedido recibido</strong><small>Lunes 16 · 09:14</small></li>
+                    <li class="hecho"><strong>Preparando el paquete</strong><small>Lunes 16 · 15:40</small></li>
+                    <li class="hecho"><strong>En camino</strong><small>Martes 17 · 08:05</small></li>
+                    <li><strong>Entregado</strong><small>Estimado: miércoles 18</small></li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.linea {
+    padding-left: 28px;
+    border-left: 3px solid #c7d2fe;
+    list-style: none;
+}
+
+.linea li::before {
+    content: "";
+    float: left;
+    width: 16px;
+    height: 16px;
+    margin: 4px 0 0 -37.5px;
+    border: 3px solid #4f46e5;
+    border-radius: 50%;
+    background: #ffffff;
+}
+
+.linea li.hecho::before {
+    background: #4f46e5;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué -37.5px</figcaption>
+<pre>El círculo debe quedar centrado sobre
+la línea del borde:
+
+  28px    padding de la lista
++ 1.5px   mitad del borde de 3px
++ 8px     mitad del círculo de 16px
+= 37.5px  hacia la izquierda</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-boleto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Pase de abordar</h2>
+            <div class="resultado">
+                <div class="boleto">
+                    <div class="cabeza">AEROLÍNEA WEB · PASE DE ABORDAR</div>
+                    <div class="ruta">PTY<span>✈</span>MAD</div>
+                    <div class="datos">
+                        <div><small>Pasajero</small>A. Pérez</div>
+                        <div><small>Asiento</small>14A</div>
+                        <div><small>Puerta</small>B12</div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.boleto {
+    max-width: 520px;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgb(15 23 42 / 0.12);
+}
+
+.cabeza {
+    padding: 12px 20px;
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.ruta {
+    padding: 24px 20px;
+    font-size: 2.2rem;
+}
+
+.ruta span {
+    padding: 0 16px;
+}
+
+.datos {
+    padding: 16px 20px 20px;
+    border-top: 2px dashed #cbd5e1;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Lo que se repite</figcaption>
+<pre>padding        espacio interno de cada franja
+border-top     línea punteada de "corte"
+border-radius  esquinas del boleto
+overflow       recorta la franja oscura
+box-shadow     despega el boleto del fondo</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-login" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Tarjeta de inicio de sesión</h2>
+            <p>Todo lo de la lección junto: padding generoso, bordes suaves, esquinas redondeadas, sombra de nivel 4 y un foco visible.</p>
+            <div class="resultado">
+                <form class="login" action="#" onsubmit="return false">
+                    <h3>Bienvenido</h3>
+                    <p class="sub">Ingresa a tu cuenta del curso</p>
+                    <label for="l-correo">Correo</label>
+                    <input type="email" id="l-correo" placeholder="nombre@correo.com" autocomplete="email">
+                    <label for="l-clave">Contraseña</label>
+                    <input type="password" id="l-clave" placeholder="••••••••" autocomplete="current-password">
+                    <button type="submit">Entrar</button>
+                    <p class="pie">¿No tienes cuenta? <a href="#ej-login">Regístrate</a></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.login {
+    max-width: 380px;
+    margin: 0 auto;
+    padding: 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 20px 48px rgb(15 23 42 / 0.12);
+}
+
+.login input {
+    display: block;
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+.login input:focus {
+    border-color: #4f46e5;
+    outline: 3px solid #c7d2fe;
+}
+
+.pie {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Escala de espacios</figcaption>
+<pre>Usar siempre los mismos valores
+hace que el diseño se vea ordenado:
+
+4px   8px   12px   16px   24px   32px   48px
+
+Aquí:
+  6px   etiqueta → campo
+ 16px   campo → siguiente etiqueta
+ 24px   título → formulario
+ 32px   borde de la tarjeta → contenido</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="09-css-colores-texto.html">Anterior: colores y texto</a> |
+            <a href="index.html">Índice</a> |
+            <a href="11-css-display-posicion.html">Siguiente: display y posición</a>
+        </nav>
+    </footer>
+</body>
+</html>

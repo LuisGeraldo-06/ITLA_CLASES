@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>03. Enlaces, listas e imágenes</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>03. Enlaces, listas e imágenes</h1>
+        <p>Los <strong>enlaces</strong> conectan páginas entre sí, las <strong>listas</strong> agrupan elementos relacionados y las <strong>imágenes</strong> aportan contenido visual. Juntos forman la base de casi cualquier sitio web: menús, recetas, catálogos, glosarios y galerías.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-internos">Internos</a></li>
+            <li><a href="#ej-externos">Externos</a></li>
+            <li><a href="#ej-anclas">Anclas</a></li>
+            <li><a href="#ej-otra-pagina">Sección de otra página</a></li>
+            <li><a href="#ej-contacto">Correo, teléfono y chat</a></li>
+            <li><a href="#ej-descarga">Descargas</a></li>
+            <li><a href="#ej-rutas">Rutas</a></li>
+            <li><a href="#ej-enlace-imagen">Imagen enlazada</a></li>
+            <li><a href="#ej-compras">Lista sin orden</a></li>
+            <li><a href="#ej-pasos">Lista ordenada</a></li>
+            <li><a href="#ej-top">start y reversed</a></li>
+            <li><a href="#ej-tipos">type</a></li>
+            <li><a href="#ej-anidadas">Anidadas</a></li>
+            <li><a href="#ej-dl">Descripciones</a></li>
+            <li><a href="#ej-alt">Texto alternativo</a></li>
+            <li><a href="#ej-figure">Figuras</a></li>
+            <li><a href="#ej-galeria">Galería</a></li>
+            <li><a href="#ej-receta">Receta completa</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Resumen de etiquetas y atributos</h2>
+            <p>El atributo <code>href</code> contiene el destino de un enlace. Las listas siempre contienen elementos <code>li</code> (o <code>dt</code>/<code>dd</code> en las de descripciones). Las imágenes no tienen etiqueta de cierre y siempre llevan <code>alt</code>.</p>
+            <table>
+                <thead>
+                    <tr><th>Etiqueta / atributo</th><th>Para qué sirve</th><th>Ejemplo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>a href</code></td><td>crea un enlace</td><td><code>&lt;a href="index.html"&gt;Inicio&lt;/a&gt;</code></td></tr>
+                    <tr><td><code>target="_blank"</code></td><td>abre el destino en una pestaña nueva</td><td>usar junto con <code>rel="noopener noreferrer"</code></td></tr>
+                    <tr><td><code>href="#id"</code></td><td>salta a un elemento con ese <code>id</code></td><td><code>&lt;a href="#precios"&gt;</code></td></tr>
+                    <tr><td><code>mailto:</code> / <code>tel:</code> / <code>sms:</code></td><td>abre el correo, el marcador o los mensajes</td><td><code>href="tel:+525555550101"</code></td></tr>
+                    <tr><td><code>download</code></td><td>descarga el archivo en vez de abrirlo</td><td><code>&lt;a href="foto.jpg" download&gt;</code></td></tr>
+                    <tr><td><code>title</code></td><td>texto de ayuda al pasar el mouse</td><td><code>title="Abre el catálogo"</code></td></tr>
+                    <tr><td><code>ul</code> / <code>ol</code> / <code>li</code></td><td>lista sin orden / ordenada / elemento</td><td><code>&lt;ol start="5" reversed type="A"&gt;</code></td></tr>
+                    <tr><td><code>dl</code> / <code>dt</code> / <code>dd</code></td><td>lista de términos y descripciones</td><td>glosarios, fichas técnicas</td></tr>
+                    <tr><td><code>img</code></td><td>inserta una imagen</td><td><code>src</code>, <code>alt</code>, <code>width</code>, <code>height</code></td></tr>
+                    <tr><td><code>figure</code> / <code>figcaption</code></td><td>agrupa una imagen con su pie de foto</td><td>fotos de noticias, diagramas</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Anatomía de un enlace</figcaption>
+<pre>&lt;a href="destino" title="ayuda" target="_blank" rel="noopener noreferrer"&gt;
+    texto que se puede pulsar
+&lt;/a&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Anatomía de una imagen</figcaption>
+<pre>&lt;img src="ruta/archivo.jpg"
+     alt="descripción del contenido"
+     width="500" height="333"&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-internos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Enlaces internos: navegar dentro del mismo sitio</h2>
+            <p>Un enlace interno apunta a otra página del mismo proyecto usando solo el nombre del archivo. El atributo <code>title</code> muestra una ayuda al pasar el mouse.</p>
+            <div class="resultado">
+                <p>Continúa con el curso:</p>
+                <p><a href="index.html" title="Lista de todas las lecciones">Índice del curso</a></p>
+                <p><a href="02-texto.html" title="Lección anterior">Repasar: etiquetas de texto</a></p>
+                <p><a href="05-formularios.html" title="Lección 05">Ir directamente a formularios</a></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;Continúa con el curso:&lt;/p&gt;
+&lt;p&gt;&lt;a href="index.html" title="Lista de todas las lecciones"&gt;Índice del curso&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="02-texto.html" title="Lección anterior"&gt;Repasar: etiquetas de texto&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="05-formularios.html" title="Lección 05"&gt;Ir directamente a formularios&lt;/a&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Recuerda</figcaption>
+<pre>Enlace azul subrayado  = aún no visitado
+Enlace morado          = ya visitado
+
+El texto del enlace debe decir a dónde lleva.
+Mal:  "Haz clic aquí"
+Bien: "Índice del curso"</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-externos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Enlaces externos: recursos recomendados</h2>
+            <p>Un enlace externo usa una dirección completa con <code>https://</code>. Con <code>target="_blank"</code> se abre en una pestaña nueva; añade siempre <code>rel="noopener noreferrer"</code> por seguridad.</p>
+            <div class="resultado">
+                <h3>Recursos para estudiar en casa</h3>
+                <ul>
+                    <li><a href="https://developer.mozilla.org/es/docs/Web/HTML" target="_blank" rel="noopener noreferrer">Referencia de HTML en MDN</a> (abre una pestaña nueva)</li>
+                    <li><a href="https://validator.w3.org/" target="_blank" rel="noopener noreferrer">Validador oficial de HTML del W3C</a></li>
+                    <li><a href="https://caniuse.com/" target="_blank" rel="noopener noreferrer">Can I use: compatibilidad entre navegadores</a></li>
+                    <li><a href="https://es.wikipedia.org/wiki/HTML">HTML en Wikipedia</a> (se abre en esta misma pestaña)</li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;li&gt;
+    &lt;a href="https://developer.mozilla.org/es/docs/Web/HTML"
+       target="_blank" rel="noopener noreferrer"&gt;Referencia de HTML en MDN&lt;/a&gt;
+    (abre una pestaña nueva)
+&lt;/li&gt;
+...
+&lt;li&gt;&lt;a href="https://es.wikipedia.org/wiki/HTML"&gt;HTML en Wikipedia&lt;/a&gt;&lt;/li&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Valores de target</figcaption>
+<pre>_self    misma pestaña (valor por defecto)
+_blank   pestaña nueva
+
+noopener    la página nueva no controla la tuya
+noreferrer  no envía de qué página vienes</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-anclas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Anclas: índice de contenidos de unos términos y condiciones</h2>
+            <p>Si un elemento tiene <code>id</code>, un enlace con <code>href="#ese-id"</code> salta directamente a él. Así funcionan los índices de los artículos largos y el botón "volver arriba".</p>
+            <div class="resultado">
+                <h3 id="tyc-inicio">Términos y condiciones de TiendaEjemplo</h3>
+                <nav aria-label="Contenido de los términos">
+                    <ol>
+                        <li><a href="#tyc-compras">Compras y pagos</a></li>
+                        <li><a href="#tyc-envios">Envíos</a></li>
+                        <li><a href="#tyc-devoluciones">Devoluciones</a></li>
+                    </ol>
+                </nav>
+                <h4 id="tyc-compras">1. Compras y pagos</h4>
+                <p>Aceptamos tarjeta de crédito, débito y transferencia. El cargo se realiza al confirmar el pedido.</p>
+                <h4 id="tyc-envios">2. Envíos</h4>
+                <p>Los pedidos se entregan en un plazo de 3 a 5 días hábiles. El envío es gratis a partir de 50 €.</p>
+                <h4 id="tyc-devoluciones">3. Devoluciones</h4>
+                <p>Tienes 30 días para devolver un producto sin usar y en su caja original.</p>
+                <p><a href="#tyc-inicio">Volver al inicio de los términos</a></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3 id="tyc-inicio"&gt;Términos y condiciones de TiendaEjemplo&lt;/h3&gt;
+&lt;nav aria-label="Contenido de los términos"&gt;
+    &lt;ol&gt;
+        &lt;li&gt;&lt;a href="#tyc-compras"&gt;Compras y pagos&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#tyc-envios"&gt;Envíos&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#tyc-devoluciones"&gt;Devoluciones&lt;/a&gt;&lt;/li&gt;
+    &lt;/ol&gt;
+&lt;/nav&gt;
+&lt;h4 id="tyc-compras"&gt;1. Compras y pagos&lt;/h4&gt;
+&lt;p&gt;...&lt;/p&gt;
+&lt;h4 id="tyc-envios"&gt;2. Envíos&lt;/h4&gt;
+...
+&lt;p&gt;&lt;a href="#tyc-inicio"&gt;Volver al inicio de los términos&lt;/a&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Reglas del id</figcaption>
+<pre>- Debe ser único en toda la página.
+- Sin espacios: "tyc-envios", no "tyc envios".
+- En el href se escribe con #: href="#tyc-envios"
+- En el elemento, sin #:     id="tyc-envios"
+- href="#" solo vuelve al principio de la página.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-otra-pagina" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Enlace a una sección de otra página</h2>
+            <p>Se combinan las dos ideas: primero el archivo y luego <code>#id</code>. El navegador abre la página y salta a esa sección, como cuando compartes el enlace a un apartado concreto de un artículo.</p>
+            <div class="resultado">
+                <h3>Repasa antes de seguir</h3>
+                <ul>
+                    <li><a href="01-estructura.html#teoria">Teoría de la estructura básica de un documento</a></li>
+                    <li><a href="08-css-selectores.html#ej-faq">Preguntas frecuentes con :target (lección 08)</a></li>
+                    <li><a href="https://developer.mozilla.org/es/docs/Web/HTML/Element/a#atributos" target="_blank" rel="noopener noreferrer">Atributos del elemento a en MDN</a></li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;a href="01-estructura.html#teoria"&gt;Teoría de la estructura...&lt;/a&gt;
+&lt;a href="08-css-selectores.html#ej-faq"&gt;Preguntas frecuentes...&lt;/a&gt;
+&lt;a href="https://developer.mozilla.org/es/docs/Web/HTML/Element/a#atributos"
+   target="_blank" rel="noopener noreferrer"&gt;Atributos del elemento a en MDN&lt;/a&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Partes de la dirección</figcaption>
+<pre>08-css-selectores.html  #ej-faq
+└──── página ────────┘  └ sección ┘</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-contacto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Correo, teléfono, SMS y WhatsApp: tarjeta de contacto de una pizzería</h2>
+            <p>Los enlaces no solo abren páginas: con <code>mailto:</code>, <code>tel:</code> y <code>sms:</code> abren la aplicación correspondiente del dispositivo. En el móvil, pulsar el teléfono abre directamente el marcador.</p>
+            <div class="resultado">
+                <h3>Pizzería La Esquina</h3>
+                <p>Calle Falsa 123, Ciudad Ejemplo</p>
+                <ul>
+                    <li>Correo: <a href="mailto:reservas@example.com">reservas@example.com</a></li>
+                    <li><a href="mailto:reservas@example.com?subject=Reserva%20de%20mesa&amp;body=Hola%2C%20quiero%20reservar%20una%20mesa%20para%204%20personas.">Reservar mesa por correo (con asunto y mensaje ya escritos)</a></li>
+                    <li><a href="mailto:pedidos@example.com?cc=gerencia@example.com&amp;subject=Pedido%20para%20eventos">Pedidos para eventos (con copia a gerencia)</a></li>
+                    <li>Teléfono: <a href="tel:+525555550101">+52 55 5555 0101</a></li>
+                    <li><a href="sms:+525555550101?body=Quiero%20hacer%20un%20pedido">Enviar un SMS</a></li>
+                    <li><a href="https://wa.me/525555550101?text=Hola%2C%20quiero%20ver%20el%20men%C3%BA" target="_blank" rel="noopener noreferrer">Escribir por WhatsApp</a></li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;a href="mailto:reservas@example.com"&gt;reservas@example.com&lt;/a&gt;
+
+&lt;a href="mailto:reservas@example.com?subject=Reserva%20de%20mesa&amp;amp;body=Hola%2C%20quiero..."&gt;
+    Reservar mesa por correo
+&lt;/a&gt;
+
+&lt;a href="mailto:pedidos@example.com?cc=gerencia@example.com&amp;amp;subject=Pedido%20para%20eventos"&gt;
+    Pedidos para eventos
+&lt;/a&gt;
+
+&lt;a href="tel:+525555550101"&gt;+52 55 5555 0101&lt;/a&gt;
+
+&lt;a href="sms:+525555550101?body=Quiero%20hacer%20un%20pedido"&gt;Enviar un SMS&lt;/a&gt;
+
+&lt;a href="https://wa.me/525555550101?text=Hola%2C%20quiero%20ver%20el%20men%C3%BA"
+   target="_blank" rel="noopener noreferrer"&gt;Escribir por WhatsApp&lt;/a&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Chuleta</figcaption>
+<pre>?          empieza los parámetros
+&amp;          separa un parámetro del siguiente
+           (dentro de HTML el &amp; se escribe &amp;amp;)
+%20        espacio
+%2C        coma
+%C3%BA     ú
+
+subject   asunto     cc   con copia
+body      mensaje    bcc  copia oculta
+
+tel: y wa.me usan el número completo
+con código de país y sin espacios.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-descarga" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Descargar archivos: zona de materiales</h2>
+            <p>El atributo <code>download</code> le pide al navegador que guarde el archivo en lugar de mostrarlo. Si le das un valor, ese será el nombre del archivo descargado.</p>
+            <div class="resultado">
+                <h3>Materiales de la clase</h3>
+                <ul>
+                    <li><a href="assets/imgs/pic_trulli.jpg">Ver la foto de los trulli</a> (se abre en el navegador)</li>
+                    <li><a href="assets/imgs/pic_trulli.jpg" download>Descargar la foto</a> (JPG, 500 × 333 px)</li>
+                    <li><a href="assets/imgs/pic_trulli.jpg" download="trulli-alberobello.jpg">Descargar con otro nombre: trulli-alberobello.jpg</a></li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;a href="assets/imgs/pic_trulli.jpg"&gt;Ver la foto de los trulli&lt;/a&gt;
+
+&lt;a href="assets/imgs/pic_trulli.jpg" download&gt;Descargar la foto&lt;/a&gt;
+
+&lt;a href="assets/imgs/pic_trulli.jpg"
+   download="trulli-alberobello.jpg"&gt;Descargar con otro nombre...&lt;/a&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Buenas prácticas</figcaption>
+<pre>- Indica el formato y el tamaño: (PDF, 2 MB)
+- download solo funciona con archivos
+  del mismo sitio; con otros dominios
+  el navegador puede ignorarlo.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-rutas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Rutas relativas y absolutas</h2>
+            <p>Una ruta <strong>relativa</strong> se calcula desde la carpeta de la página actual. Una ruta <strong>absoluta</strong> incluye el dominio completo y funciona desde cualquier lugar. Este es el árbol de carpetas de un sitio de ejemplo:</p>
+            <div class="resultado">
+                <pre>mi-sitio/
+├── index.html
+├── contacto.html
+├── css/
+│   └── estilos.css
+├── imgs/
+│   └── logo.png
+└── blog/
+    ├── articulo.html
+    └── fotos/
+        └── playa.jpg</pre>
+                <p>Desde esta misma página, estas rutas relativas funcionan:</p>
+                <ul>
+                    <li><a href="index.html">index.html</a>: archivo en la misma carpeta</li>
+                    <li><a href="./02-texto.html">./02-texto.html</a>: el <code>./</code> también significa "esta carpeta"</li>
+                    <li><a href="assets/imgs/pic_trulli.jpg">assets/imgs/pic_trulli.jpg</a>: entra en dos subcarpetas</li>
+                    <li><a href="https://www.example.com/blog/articulo.html">https://www.example.com/blog/articulo.html</a>: ruta absoluta</li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Desde mi-sitio/index.html</figcaption>
+<pre>&lt;a href="contacto.html"&gt;          misma carpeta
+&lt;a href="blog/articulo.html"&gt;     entra en blog/
+&lt;img src="imgs/logo.png" alt="..."&gt;
+&lt;link rel="stylesheet" href="css/estilos.css"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Desde mi-sitio/blog/articulo.html</figcaption>
+<pre>&lt;a href="../index.html"&gt;          sube una carpeta
+&lt;img src="fotos/playa.jpg" alt="..."&gt;
+&lt;img src="../imgs/logo.png" alt="..."&gt;
+
+&lt;a href="https://www.example.com/contacto.html"&gt;
+                                   absoluta: siempre igual
+&lt;a href="/contacto.html"&gt;          desde la raíz del dominio</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-enlace-imagen" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Imagen como enlace: logotipo y banner de oferta</h2>
+            <p>Si pones un <code>img</code> dentro de un <code>a</code>, toda la imagen se puede pulsar. En ese caso el <code>alt</code> debe describir el destino, no el dibujo.</p>
+            <div class="resultado">
+                <p>
+                    <a href="index.html" title="Volver a la página principal">
+                        <img src="https://picsum.photos/id/1/120/60" alt="Inicio del curso" width="120" height="60">
+                    </a>
+                </p>
+                <p>
+                    <a href="#ej-galeria" title="Ver la galería de esta lección">
+                        <img src="https://picsum.photos/id/29/400/120" alt="Ver la galería de paisajes" width="400" height="120">
+                    </a>
+                </p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;a href="index.html" title="Volver a la página principal"&gt;
+    &lt;img src="https://picsum.photos/id/1/120/60"
+         alt="Inicio del curso" width="120" height="60"&gt;
+&lt;/a&gt;
+
+&lt;a href="#ej-galeria" title="Ver la galería de esta lección"&gt;
+    &lt;img src="https://picsum.photos/id/29/400/120"
+         alt="Ver la galería de paisajes" width="400" height="120"&gt;
+&lt;/a&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-compras" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Lista sin orden: la lista del supermercado</h2>
+            <p>Usa <code>ul</code> cuando el orden de los elementos no importa. Cada elemento va en un <code>li</code>, y dentro de un <code>li</code> puede haber otras etiquetas de texto.</p>
+            <div class="resultado">
+                <h3>Compras del sábado</h3>
+                <ul>
+                    <li>Manzanas</li>
+                    <li>Peras</li>
+                    <li>Naranjas</li>
+                    <li>Leche <em>sin lactosa</em></li>
+                    <li>Pan integral</li>
+                    <li><strong>Café</strong> (¡no olvidar!)</li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Compras del sábado&lt;/h3&gt;
+&lt;ul&gt;
+    &lt;li&gt;Manzanas&lt;/li&gt;
+    &lt;li&gt;Peras&lt;/li&gt;
+    &lt;li&gt;Naranjas&lt;/li&gt;
+    &lt;li&gt;Leche &lt;em&gt;sin lactosa&lt;/em&gt;&lt;/li&gt;
+    &lt;li&gt;Pan integral&lt;/li&gt;
+    &lt;li&gt;&lt;strong&gt;Café&lt;/strong&gt; (¡no olvidar!)&lt;/li&gt;
+&lt;/ul&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Dónde se usa ul</figcaption>
+<pre>- menús de navegación
+- características de un producto
+- etiquetas de un artículo
+- enlaces del pie de página</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-pasos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Lista ordenada: instrucciones paso a paso</h2>
+            <p>Usa <code>ol</code> cuando el orden sí importa. El navegador numera los elementos automáticamente: si insertas un paso nuevo, los números se actualizan solos.</p>
+            <div class="resultado">
+                <h3>Cómo crear tu primera página web</h3>
+                <ol>
+                    <li>Abre el editor.</li>
+                    <li>Crea un archivo llamado <code>index.html</code>.</li>
+                    <li>Escribe el HTML.</li>
+                    <li>Guarda los cambios.</li>
+                    <li>Guarda y abre el archivo en el navegador.</li>
+                </ol>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Cómo crear tu primera página web&lt;/h3&gt;
+&lt;ol&gt;
+    &lt;li&gt;Abre el editor.&lt;/li&gt;
+    &lt;li&gt;Crea un archivo llamado &lt;code&gt;index.html&lt;/code&gt;.&lt;/li&gt;
+    &lt;li&gt;Escribe el HTML.&lt;/li&gt;
+    &lt;li&gt;Guarda los cambios.&lt;/li&gt;
+    &lt;li&gt;Guarda y abre el archivo en el navegador.&lt;/li&gt;
+&lt;/ol&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-top" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>start y reversed: cuenta regresiva y lista por partes</h2>
+            <p><code>reversed</code> numera de mayor a menor, perfecto para un "top 10". <code>start</code> indica el primer número, útil para continuar una lista que se cortó con un anuncio o un párrafo.</p>
+            <div class="resultado">
+                <h3>Top 10 de canciones de la semana</h3>
+                <ol reversed>
+                    <li>Lluvia de verano</li>
+                    <li>Camino al sur</li>
+                    <li>Noches de neón</li>
+                    <li>Mar adentro</li>
+                    <li>Ciudad dormida</li>
+                    <li>Bailando sola</li>
+                    <li>Kilómetro cero</li>
+                    <li>Volver a casa</li>
+                    <li>Corazón de papel</li>
+                    <li>El último tren</li>
+                </ol>
+                <h3>Requisitos para la beca (continuación)</h3>
+                <p>...viene de la página anterior.</p>
+                <ol start="4">
+                    <li>Copia del documento de identidad.</li>
+                    <li>Certificado de notas del último curso.</li>
+                    <li>Carta de motivación.</li>
+                </ol>
+                <h3>Cuenta regresiva para el despegue</h3>
+                <ol start="3" reversed>
+                    <li>Motores encendidos</li>
+                    <li>Comprobación final</li>
+                    <li>Despegue</li>
+                </ol>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;ol reversed&gt;
+    &lt;li&gt;Lluvia de verano&lt;/li&gt;
+    ...
+    &lt;li&gt;El último tren&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ol start="4"&gt;
+    &lt;li&gt;Copia del documento de identidad.&lt;/li&gt;
+    &lt;li&gt;Certificado de notas del último curso.&lt;/li&gt;
+    &lt;li&gt;Carta de motivación.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ol start="3" reversed&gt;
+    &lt;li&gt;Motores encendidos&lt;/li&gt;
+    &lt;li&gt;Comprobación final&lt;/li&gt;
+    &lt;li&gt;Despegue&lt;/li&gt;
+&lt;/ol&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>También existe value</figcaption>
+<pre>&lt;li value="100"&gt; cambia el número de
+ese elemento y los siguientes continúan
+desde ahí: 100, 101, 102...</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tipos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>El atributo type: esquema de un examen y cláusulas de un contrato</h2>
+            <p>Con <code>type</code> cambias el tipo de numeración: letras o números romanos, en mayúscula o minúscula. Es habitual en exámenes, contratos y reglamentos.</p>
+            <div class="resultado">
+                <h3>Examen parcial de HTML</h3>
+                <ol type="I">
+                    <li>Parte teórica
+                        <ol type="a">
+                            <li>¿Qué significa HTML?</li>
+                            <li>¿Para qué sirve el atributo <code>alt</code>?</li>
+                        </ol>
+                    </li>
+                    <li>Parte práctica
+                        <ol type="a">
+                            <li>Crea una lista de compras.</li>
+                            <li>Enlaza una página externa en una pestaña nueva.</li>
+                        </ol>
+                    </li>
+                </ol>
+                <h3>Contrato de alquiler: obligaciones del inquilino</h3>
+                <ol type="A">
+                    <li>Pagar la renta antes del día 5 de cada mes.</li>
+                    <li>Mantener la vivienda en buen estado.</li>
+                    <li>Avisar de cualquier avería en un plazo de 48 horas.</li>
+                </ol>
+                <h3>Índice de anexos</h3>
+                <ol type="i">
+                    <li>Inventario del mobiliario</li>
+                    <li>Fotografías del estado inicial</li>
+                    <li>Copia de las llaves entregadas</li>
+                </ol>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;ol type="I"&gt;
+    &lt;li&gt;Parte teórica
+        &lt;ol type="a"&gt;
+            &lt;li&gt;¿Qué significa HTML?&lt;/li&gt;
+            &lt;li&gt;¿Para qué sirve el atributo &lt;code&gt;alt&lt;/code&gt;?&lt;/li&gt;
+        &lt;/ol&gt;
+    &lt;/li&gt;
+    ...
+&lt;/ol&gt;
+
+&lt;ol type="A"&gt;
+    &lt;li&gt;Pagar la renta antes del día 5 de cada mes.&lt;/li&gt;
+    ...
+&lt;/ol&gt;
+
+&lt;ol type="i"&gt;
+    &lt;li&gt;Inventario del mobiliario&lt;/li&gt;
+    ...
+&lt;/ol&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Valores de type</figcaption>
+<pre>type="1"   1, 2, 3   (por defecto)
+type="A"   A, B, C
+type="a"   a, b, c
+type="I"   I, II, III
+type="i"   i, ii, iii</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-anidadas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Listas anidadas: temario del curso y menú con submenú</h2>
+            <p>Una lista puede contener otra lista. La lista interna va <strong>dentro</strong> del <code>li</code>, nunca directamente dentro del <code>ul</code> u <code>ol</code>. Así se construyen temarios y menús desplegables.</p>
+            <div class="resultado">
+                <h3>Temario del curso</h3>
+                <ol>
+                    <li>HTML
+                        <ol>
+                            <li>Estructura básica</li>
+                            <li>Texto</li>
+                            <li>Enlaces, listas e imágenes</li>
+                            <li>Tablas</li>
+                            <li>Formularios</li>
+                        </ol>
+                    </li>
+                    <li>CSS
+                        <ol>
+                            <li>Selectores</li>
+                            <li>Colores y texto</li>
+                            <li>Modelo de caja</li>
+                        </ol>
+                    </li>
+                    <li>JavaScript</li>
+                </ol>
+                <h3>Menú de una tienda en línea</h3>
+                <nav aria-label="Menú de ejemplo">
+                    <ul>
+                        <li><a href="#ej-anidadas">Inicio</a></li>
+                        <li><a href="#ej-anidadas">Ropa</a>
+                            <ul>
+                                <li><a href="#ej-anidadas">Mujer</a></li>
+                                <li><a href="#ej-anidadas">Hombre</a></li>
+                                <li><a href="#ej-anidadas">Niños</a>
+                                    <ul>
+                                        <li><a href="#ej-anidadas">Bebés</a></li>
+                                        <li><a href="#ej-anidadas">De 2 a 12 años</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a href="#ej-anidadas">Calzado</a></li>
+                        <li><a href="#ej-anidadas">Ofertas</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;ol&gt;
+    &lt;li&gt;HTML
+        &lt;ol&gt;
+            &lt;li&gt;Estructura básica&lt;/li&gt;
+            ...
+        &lt;/ol&gt;
+    &lt;/li&gt;
+    &lt;li&gt;CSS
+        &lt;ol&gt;...&lt;/ol&gt;
+    &lt;/li&gt;
+    &lt;li&gt;JavaScript&lt;/li&gt;
+&lt;/ol&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>HTML del menú</figcaption>
+<pre>&lt;nav aria-label="Menú de ejemplo"&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Inicio&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Ropa&lt;/a&gt;
+            &lt;ul&gt;
+                &lt;li&gt;&lt;a href="#"&gt;Mujer&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href="#"&gt;Hombre&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href="#"&gt;Niños&lt;/a&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;&lt;a href="#"&gt;Bebés&lt;/a&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;a href="#"&gt;De 2 a 12 años&lt;/a&gt;&lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Calzado&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Ofertas&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/nav&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-dl" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Lista de descripciones: glosario y ficha técnica de un celular</h2>
+            <p><code>dl</code> agrupa pares de término (<code>dt</code>) y descripción (<code>dd</code>). Un término puede tener varias descripciones. Se usa en glosarios, preguntas frecuentes y fichas de producto.</p>
+            <div class="resultado">
+                <h3>Glosario</h3>
+                <dl>
+                    <dt>HTML</dt>
+                    <dd>Lenguaje de marcado para estructurar contenido web.</dd>
+                    <dt>Elemento</dt>
+                    <dd>Una etiqueta y el contenido que esta delimita.</dd>
+                    <dt>Atributo</dt>
+                    <dd>Información extra que se escribe dentro de la etiqueta de apertura, como <code>href</code> o <code>alt</code>.</dd>
+                    <dt>Navegador</dt>
+                    <dd>Programa que interpreta el HTML y muestra la página.</dd>
+                    <dd>Ejemplos: Firefox, Chrome, Safari, Edge.</dd>
+                </dl>
+                <h3>Ficha técnica: Teléfono Nova X5</h3>
+                <dl>
+                    <dt>Pantalla</dt>
+                    <dd>6,5 pulgadas, 2400 × 1080 píxeles</dd>
+                    <dt>Memoria</dt>
+                    <dd>8 GB de RAM</dd>
+                    <dd>256 GB de almacenamiento</dd>
+                    <dt>Cámaras</dt>
+                    <dd>Trasera: 50 MP + 12 MP gran angular</dd>
+                    <dd>Frontal: 16 MP</dd>
+                    <dt>Batería</dt>
+                    <dd>5000 mAh con carga rápida de 33 W</dd>
+                    <dt>Colores</dt>
+                    <dd>Negro, azul y verde menta</dd>
+                </dl>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;dl&gt;
+    &lt;dt&gt;HTML&lt;/dt&gt;
+    &lt;dd&gt;Lenguaje de marcado para estructurar contenido web.&lt;/dd&gt;
+    ...
+    &lt;dt&gt;Navegador&lt;/dt&gt;
+    &lt;dd&gt;Programa que interpreta el HTML y muestra la página.&lt;/dd&gt;
+    &lt;dd&gt;Ejemplos: Firefox, Chrome, Safari, Edge.&lt;/dd&gt;
+&lt;/dl&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>HTML de la ficha</figcaption>
+<pre>&lt;dl&gt;
+    &lt;dt&gt;Pantalla&lt;/dt&gt;
+    &lt;dd&gt;6,5 pulgadas, 2400 × 1080 píxeles&lt;/dd&gt;
+    &lt;dt&gt;Memoria&lt;/dt&gt;
+    &lt;dd&gt;8 GB de RAM&lt;/dd&gt;
+    &lt;dd&gt;256 GB de almacenamiento&lt;/dd&gt;
+    ...
+&lt;/dl&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-alt" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Texto alternativo: bueno, malo y decorativo</h2>
+            <p>El atributo <code>alt</code> describe la imagen para lectores de pantalla y cuando el archivo no puede mostrarse. Debe contar lo que la imagen aporta. Si la imagen es solo decoración, se deja vacío: <code>alt=""</code>.</p>
+            <div class="resultado">
+                <p><strong>Bien:</strong> describe el contenido.</p>
+                <img src="assets/imgs/pic_trulli.jpg" alt="Casas trulli de techo cónico en Alberobello, Italia" width="250" height="167">
+                <p><strong>Mal:</strong> no aporta nada.</p>
+                <img src="assets/imgs/pic_trulli.jpg" alt="imagen" width="250" height="167">
+                <p><strong>Archivo roto:</strong> el navegador muestra el <code>alt</code> en su lugar.</p>
+                <img src="assets/imgs/no-existe.jpg" alt="Plano de la planta baja del edificio" width="250" height="80">
+                <p><strong>Decorativa:</strong> una línea de adorno entre secciones no necesita descripción.</p>
+                <img src="https://picsum.photos/id/1067/600/20" alt="" width="600" height="20">
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;img src="assets/imgs/pic_trulli.jpg"
+     alt="Casas trulli de techo cónico en Alberobello, Italia"
+     width="250" height="167"&gt;
+
+&lt;img src="assets/imgs/pic_trulli.jpg" alt="imagen" width="250" height="167"&gt;
+
+&lt;img src="assets/imgs/no-existe.jpg"
+     alt="Plano de la planta baja del edificio" width="250" height="80"&gt;
+
+&lt;img src="https://picsum.photos/id/1067/600/20" alt="" width="600" height="20"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo escribir un buen alt</figcaption>
+<pre>Mal:   alt="foto"
+Mal:   alt="imagen de una imagen.jpg"
+Mal:   sin alt (el lector lee el nombre del archivo)
+Bien:  alt="Perro golden jugando con una pelota en la playa"
+Bien:  alt="Gráfico: las ventas subieron un 20 % en marzo"
+Decorativa: alt=""  (vacío, pero presente)</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-figure" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>figure, figcaption, width y height: foto de una noticia</h2>
+            <p><code>figure</code> agrupa una imagen con su pie de foto (<code>figcaption</code>). Escribir <code>width</code> y <code>height</code> reserva el espacio antes de que la imagen cargue y evita que el texto "salte". Si solo cambias uno, respeta la proporción.</p>
+            <div class="resultado">
+                <h3>Alberobello recibe un récord de visitantes</h3>
+                <figure>
+                    <img src="assets/imgs/pic_trulli.jpg" alt="Casas trulli de techo cónico en Alberobello, Italia" width="400" height="267">
+                    <figcaption>Trulli de Alberobello. La imagen está en assets/imgs/pic_trulli.jpg.</figcaption>
+                </figure>
+                <p>El pequeño pueblo del sur de Italia recibió este verano más turistas que nunca, atraídos por sus casas de piedra con techo cónico.</p>
+                <p>La misma imagen a distintos tamaños (original: 500 × 333):</p>
+                <img src="assets/imgs/pic_trulli.jpg" alt="Trulli, tamaño pequeño" width="150" height="100">
+                <img src="assets/imgs/pic_trulli.jpg" alt="Trulli, tamaño mediano" width="250" height="167">
+                <img src="assets/imgs/pic_trulli.jpg" alt="Trulli, deformada" width="250" height="80">
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;figure&gt;
+    &lt;img src="assets/imgs/pic_trulli.jpg"
+         alt="Casas trulli de techo cónico en Alberobello, Italia"
+         width="400" height="267"&gt;
+    &lt;figcaption&gt;Trulli de Alberobello...&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;img src="assets/imgs/pic_trulli.jpg" alt="Trulli, tamaño pequeño" width="150" height="100"&gt;
+&lt;img src="assets/imgs/pic_trulli.jpg" alt="Trulli, tamaño mediano" width="250" height="167"&gt;
+&lt;img src="assets/imgs/pic_trulli.jpg" alt="Trulli, deformada" width="250" height="80"&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Calcular la proporción</figcaption>
+<pre>original   500 × 333
+ancho 400  →  alto = 333 × 400 / 500 = 267
+ancho 250  →  alto = 333 × 250 / 500 = 167
+
+Los valores van sin "px".</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-galeria" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Galería simple de un álbum de viaje</h2>
+            <p>Una galería es una lista de imágenes. Cada miniatura es un enlace a la imagen grande. Las imágenes son elementos en línea, así que se colocan una al lado de la otra mientras quepan.</p>
+            <div class="resultado">
+                <h3>Viaje por la montaña</h3>
+                <ul>
+                    <li>
+                        <a href="https://picsum.photos/id/10/1200/800" target="_blank" rel="noopener noreferrer">
+                            <img src="https://picsum.photos/id/10/150/100" alt="Bosque de pinos junto a un lago" width="150" height="100">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://picsum.photos/id/15/1200/800" target="_blank" rel="noopener noreferrer">
+                            <img src="https://picsum.photos/id/15/150/100" alt="Cascada entre rocas cubiertas de musgo" width="150" height="100">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://picsum.photos/id/28/1200/800" target="_blank" rel="noopener noreferrer">
+                            <img src="https://picsum.photos/id/28/150/100" alt="Sendero entre árboles altos" width="150" height="100">
+                        </a>
+                    </li>
+                </ul>
+                <p>Sin lista, las miniaturas quedan en la misma línea:</p>
+                <p>
+                    <img src="https://picsum.photos/id/16/150/100" alt="Costa con mar tranquilo" width="150" height="100">
+                    <img src="https://picsum.photos/id/17/150/100" alt="Camino de tierra entre campos" width="150" height="100">
+                    <img src="https://picsum.photos/id/18/150/100" alt="Pradera verde bajo el cielo nublado" width="150" height="100">
+                </p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;ul&gt;
+    &lt;li&gt;
+        &lt;a href="https://picsum.photos/id/10/1200/800"
+           target="_blank" rel="noopener noreferrer"&gt;
+            &lt;img src="https://picsum.photos/id/10/150/100"
+                 alt="Bosque de pinos junto a un lago" width="150" height="100"&gt;
+        &lt;/a&gt;
+    &lt;/li&gt;
+    ...
+&lt;/ul&gt;
+
+&lt;p&gt;
+    &lt;img src="https://picsum.photos/id/16/150/100" alt="Costa con mar tranquilo" ...&gt;
+    &lt;img src="https://picsum.photos/id/17/150/100" alt="Camino de tierra..." ...&gt;
+    &lt;img src="https://picsum.photos/id/18/150/100" alt="Pradera verde..." ...&gt;
+&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Nota</figcaption>
+<pre>Con CSS quitaremos las viñetas y
+pondremos las miniaturas en cuadrícula.
+Por ahora vemos cómo lo pinta el
+navegador sin estilos.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-receta" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Receta completa: todo junto</h2>
+            <p>Una receta combina casi todo lo de esta lección: imagen con pie de foto, lista de ingredientes (el orden no importa), lista de pasos (el orden sí importa), una ficha con <code>dl</code> y enlaces.</p>
+            <div class="resultado">
+                <article>
+                    <h3>Panqueques de avena y plátano</h3>
+                    <figure>
+                        <img src="https://picsum.photos/id/1080/400/267" alt="Plato con fresas frescas listas para servir" width="400" height="267">
+                        <figcaption>Sírvelos con fruta fresca.</figcaption>
+                    </figure>
+                    <dl>
+                        <dt>Porciones</dt>
+                        <dd>4 personas</dd>
+                        <dt>Tiempo</dt>
+                        <dd>20 minutos</dd>
+                        <dt>Dificultad</dt>
+                        <dd>Fácil</dd>
+                    </dl>
+                    <h4>Ingredientes</h4>
+                    <ul>
+                        <li>1 taza de avena</li>
+                        <li>1 plátano maduro</li>
+                        <li>2 huevos</li>
+                        <li>1/2 taza de leche</li>
+                        <li>1 cucharadita de canela</li>
+                    </ul>
+                    <h4>Preparación</h4>
+                    <ol>
+                        <li>Tritura la avena hasta hacerla harina.</li>
+                        <li>Añade el plátano, los huevos, la leche y la canela, y mezcla bien.</li>
+                        <li>Calienta una sartén a fuego medio.</li>
+                        <li>Vierte un cucharón de mezcla y cocina 2 minutos por cada lado.</li>
+                        <li>Sirve con fruta o miel.</li>
+                    </ol>
+                    <p>¿Dudas? Escríbenos a <a href="mailto:recetas@example.com?subject=Panqueques%20de%20avena">recetas@example.com</a> o <a href="#ej-receta">vuelve al principio de la receta</a>.</p>
+                </article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;article&gt;
+    &lt;h3&gt;Panqueques de avena y plátano&lt;/h3&gt;
+    &lt;figure&gt;
+        &lt;img src="https://picsum.photos/id/1080/400/267"
+             alt="Plato con fresas frescas listas para servir"
+             width="400" height="267"&gt;
+        &lt;figcaption&gt;Sírvelos con fruta fresca.&lt;/figcaption&gt;
+    &lt;/figure&gt;
+    &lt;dl&gt;
+        &lt;dt&gt;Porciones&lt;/dt&gt;
+        &lt;dd&gt;4 personas&lt;/dd&gt;
+        ...
+    &lt;/dl&gt;
+    &lt;h4&gt;Ingredientes&lt;/h4&gt;
+    &lt;ul&gt;
+        &lt;li&gt;1 taza de avena&lt;/li&gt;
+        ...
+    &lt;/ul&gt;
+    &lt;h4&gt;Preparación&lt;/h4&gt;
+    &lt;ol&gt;
+        &lt;li&gt;Tritura la avena hasta hacerla harina.&lt;/li&gt;
+        ...
+    &lt;/ol&gt;
+    &lt;p&gt;¿Dudas? Escríbenos a
+        &lt;a href="mailto:recetas@example.com?subject=Panqueques%20de%20avena"&gt;recetas@example.com&lt;/a&gt;
+        o &lt;a href="#ej-receta"&gt;vuelve al principio de la receta&lt;/a&gt;.&lt;/p&gt;
+&lt;/article&gt;</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="02-texto.html">Anterior: texto</a> |
+            <a href="index.html">Índice</a> |
+            <a href="04-tablas.html">Siguiente: tablas</a>
+        </nav>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>06. Semántica, interacción y multimedia</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>06. Semántica, interacción y multimedia</h1>
+        <p>Los elementos semánticos describen <strong>qué es</strong> cada parte de una página: una cabecera, un menú, un artículo, una nota al margen. El navegador, los buscadores y los lectores de pantalla entienden mejor una página bien etiquetada. Además, HTML trae elementos interactivos y multimedia que funcionan sin una sola línea de JavaScript.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-blog">Blog completo</a></li>
+            <li><a href="#ej-divitis">div vs semántica</a></li>
+            <li><a href="#ej-noticia">Noticia</a></li>
+            <li><a href="#ej-tienda">section vs article</a></li>
+            <li><a href="#ej-lateral">aside y address</a></li>
+            <li><a href="#ej-migas">Migas de pan</a></li>
+            <li><a href="#ej-figuras">figure</a></li>
+            <li><a href="#ej-faq">Preguntas frecuentes</a></li>
+            <li><a href="#ej-buscador">search</a></li>
+            <li><a href="#ej-agenda">time</a></li>
+            <li><a href="#ej-resaltado">mark y abbr</a></li>
+            <li><a href="#ej-progreso">progress</a></li>
+            <li><a href="#ej-medidores">meter</a></li>
+            <li><a href="#ej-cookies">dialog</a></li>
+            <li><a href="#ej-popover">popover</a></li>
+            <li><a href="#ej-notas">contenteditable</a></li>
+            <li><a href="#ej-audio">Audio</a></li>
+            <li><a href="#ej-video">Video</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Elementos de esta lección</h2>
+            <p>Un <code>div</code> no dice nada sobre su contenido. Los elementos semánticos se ven casi igual por defecto, pero llevan significado. Todos los ejemplos de esta página muestran el aspecto <strong>por defecto</strong> del navegador: el diseño llegará con CSS.</p>
+            <table>
+                <thead>
+                    <tr><th>Elemento</th><th>Representa</th><th>Ejemplo real</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>header</code></td><td>cabecera de la página o de una sección</td><td>logo y menú de un sitio</td></tr>
+                    <tr><td><code>nav</code></td><td>bloque de enlaces de navegación</td><td>menú principal, migas de pan</td></tr>
+                    <tr><td><code>main</code></td><td>contenido principal (solo uno por página)</td><td>el cuerpo de la noticia</td></tr>
+                    <tr><td><code>article</code></td><td>contenido independiente, se entiende solo</td><td>post, noticia, producto, comentario</td></tr>
+                    <tr><td><code>section</code></td><td>grupo temático con su propio título</td><td>"Ofertas", "Opiniones"</td></tr>
+                    <tr><td><code>aside</code></td><td>contenido relacionado pero secundario</td><td>barra lateral, artículos relacionados</td></tr>
+                    <tr><td><code>footer</code></td><td>pie de la página o de una sección</td><td>copyright, autor, enlaces legales</td></tr>
+                    <tr><td><code>figure</code> / <code>figcaption</code></td><td>contenido ilustrativo con leyenda</td><td>foto, gráfico, fragmento de código</td></tr>
+                    <tr><td><code>details</code> / <code>summary</code></td><td>bloque desplegable</td><td>preguntas frecuentes</td></tr>
+                    <tr><td><code>search</code></td><td>zona de búsqueda o filtrado</td><td>buscador del sitio</td></tr>
+                    <tr><td><code>address</code></td><td>datos de contacto</td><td>contacto del autor</td></tr>
+                    <tr><td><code>time</code></td><td>fecha u hora legible por máquinas</td><td>fecha de publicación, evento</td></tr>
+                    <tr><td><code>mark</code> / <code>abbr</code></td><td>texto resaltado / abreviatura</td><td>resultados de búsqueda / siglas</td></tr>
+                    <tr><td><code>progress</code> / <code>meter</code></td><td>avance de una tarea / medida en un rango</td><td>descarga / batería</td></tr>
+                    <tr><td><code>dialog</code></td><td>cuadro de diálogo</td><td>aviso de cookies</td></tr>
+                    <tr><td><code>audio</code> / <code>video</code></td><td>multimedia con controles nativos</td><td>podcast, clase grabada</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="ej-blog" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Estructura de un blog completo</h2>
+            <p>Un blog de cocina con su cabecera, menú, artículo, barra lateral y pie. Sin CSS todo aparece en una sola columna, pero cada región ya tiene nombre propio.</p>
+            <div class="resultado">
+                <header>
+                    <h3>La Cuchara Curiosa</h3>
+                    <p>Recetas caseras para todos los días</p>
+                    <nav aria-label="Menú del blog">
+                        <ul>
+                            <li><a href="#ej-blog">Inicio</a></li>
+                            <li><a href="#ej-blog">Recetas</a></li>
+                            <li><a href="#ej-blog">Postres</a></li>
+                            <li><a href="#ej-blog">Contacto</a></li>
+                        </ul>
+                    </nav>
+                </header>
+                <article>
+                    <h4>Pan de molde sin amasar</h4>
+                    <p>Publicado el <time datetime="2026-10-12">12 de octubre de 2026</time> por Marta Ibarra.</p>
+                    <p>Solo necesitas harina, agua, sal y levadura. Mezcla todo, deja reposar 12 horas y hornea a 220 °C durante 40 minutos.</p>
+                </article>
+                <aside>
+                    <h4>Sobre el blog</h4>
+                    <p>Recetas probadas en una cocina pequeña con un horno viejo.</p>
+                </aside>
+                <footer>
+                    <p>&copy; 2026 La Cuchara Curiosa. Todos los derechos reservados.</p>
+                </footer>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;header&gt;
+    &lt;h3&gt;La Cuchara Curiosa&lt;/h3&gt;
+    &lt;p&gt;Recetas caseras para todos los días&lt;/p&gt;
+    &lt;nav aria-label="Menú del blog"&gt;
+        &lt;ul&gt;
+            &lt;li&gt;&lt;a href="#"&gt;Inicio&lt;/a&gt;&lt;/li&gt;
+            ...
+        &lt;/ul&gt;
+    &lt;/nav&gt;
+&lt;/header&gt;
+&lt;article&gt;
+    &lt;h4&gt;Pan de molde sin amasar&lt;/h4&gt;
+    &lt;p&gt;Publicado el &lt;time datetime="2026-10-12"&gt;12 de octubre...&lt;/time&gt;&lt;/p&gt;
+    &lt;p&gt;Solo necesitas harina, agua, sal...&lt;/p&gt;
+&lt;/article&gt;
+&lt;aside&gt;
+    &lt;h4&gt;Sobre el blog&lt;/h4&gt;
+    &lt;p&gt;Recetas probadas en una cocina pequeña...&lt;/p&gt;
+&lt;/aside&gt;
+&lt;footer&gt;
+    &lt;p&gt;&amp;copy; 2026 La Cuchara Curiosa...&lt;/p&gt;
+&lt;/footer&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Regiones de la página real</figcaption>
+<pre>+--------------------------------------+
+|               header                 |
+|   logo          nav: Inicio Recetas  |
++--------------------------------------+
+|               main                   |
+|  +------------------+  +-----------+ |
+|  |     article      |  |   aside   | |
+|  |  h2, time, p...  |  |  sobre el | |
+|  |                  |  |  blog     | |
+|  +------------------+  +-----------+ |
++--------------------------------------+
+|               footer                 |
++--------------------------------------+
+
+En la página real, article y aside van
+dentro de &lt;main&gt;. Aquí no se repite
+porque solo puede haber un main por
+página: esta lección ya tiene el suyo.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-divitis" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>"Div-itis" frente a HTML semántico</h2>
+            <p>Las dos versiones se ven idénticas en pantalla. La diferencia está en el código: con <code>div</code> hay que adivinar qué es cada caja; con etiquetas semánticas se lee solo.</p>
+            <div class="resultado">
+                <div>
+                    <div>
+                        <p>Gimnasio Fuerza Total</p>
+                    </div>
+                    <div>
+                        <p>Clase de spinning: martes y jueves, 19:00.</p>
+                    </div>
+                    <div>
+                        <p>Av. Central 1500</p>
+                    </div>
+                </div>
+                <hr>
+                <header>
+                    <p>Gimnasio Fuerza Total</p>
+                </header>
+                <article>
+                    <p>Clase de spinning: martes y jueves, 19:00.</p>
+                </article>
+                <footer>
+                    <p>Av. Central 1500</p>
+                </footer>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Con div (no dice nada)</figcaption>
+<pre>&lt;div&gt;
+    &lt;div&gt;
+        &lt;p&gt;Gimnasio Fuerza Total&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;p&gt;Clase de spinning...&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;p&gt;Av. Central 1500&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Semántico (se entiende al leerlo)</figcaption>
+<pre>&lt;header&gt;
+    &lt;p&gt;Gimnasio Fuerza Total&lt;/p&gt;
+&lt;/header&gt;
+&lt;article&gt;
+    &lt;p&gt;Clase de spinning...&lt;/p&gt;
+&lt;/article&gt;
+&lt;footer&gt;
+    &lt;p&gt;Av. Central 1500&lt;/p&gt;
+&lt;/footer&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-noticia" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Noticia con header, hgroup y footer propios</h2>
+            <p>Un <code>article</code> puede tener su propio <code>header</code> y <code>footer</code>. <code>hgroup</code> une un título con su subtítulo (la "bajada" de un diario).</p>
+            <div class="resultado">
+                <article>
+                    <header>
+                        <hgroup>
+                            <h3>El tren eléctrico llega a Villa Serena</h3>
+                            <p>La nueva línea unirá el centro con el puerto en solo 18 minutos.</p>
+                        </hgroup>
+                        <p>Por Andrés Molina &middot; <time datetime="2026-11-18T08:30">18 de noviembre de 2026, 8:30</time></p>
+                    </header>
+                    <p>Después de tres años de obras, la línea Centro–Puerto comenzará a funcionar el próximo lunes. El servicio tendrá frecuencias de 10 minutos en horas punta.</p>
+                    <p>El boleto costará lo mismo que el autobús urbano y se podrá pagar con la misma tarjeta.</p>
+                    <footer>
+                        <p>Sección: Ciudad &middot; Actualizado el <time datetime="2026-11-18T12:05">18/11, 12:05</time></p>
+                    </footer>
+                </article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;article&gt;
+    &lt;header&gt;
+        &lt;hgroup&gt;
+            &lt;h3&gt;El tren eléctrico llega a Villa Serena&lt;/h3&gt;
+            &lt;p&gt;La nueva línea unirá el centro...&lt;/p&gt;
+        &lt;/hgroup&gt;
+        &lt;p&gt;Por Andrés Molina &amp;middot;
+            &lt;time datetime="2026-11-18T08:30"&gt;18 de noviembre...&lt;/time&gt;
+        &lt;/p&gt;
+    &lt;/header&gt;
+    &lt;p&gt;Después de tres años de obras...&lt;/p&gt;
+    &lt;p&gt;El boleto costará lo mismo...&lt;/p&gt;
+    &lt;footer&gt;
+        &lt;p&gt;Sección: Ciudad &amp;middot; Actualizado el
+            &lt;time datetime="2026-11-18T12:05"&gt;18/11, 12:05&lt;/time&gt;
+        &lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/article&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Claves</figcaption>
+<pre>header y footer no son solo de la página:
+cada article o section puede tener
+los suyos.
+
+hgroup contiene un h1–h6 y uno o más
+p con el subtítulo. El subtítulo no
+crea un nuevo nivel de título.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tienda" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>section frente a article: tienda online</h2>
+            <p>Cada <code>section</code> agrupa un tema ("Ofertas", "Opiniones"). Cada producto o reseña es un <code>article</code>: se podría copiar a otra página y seguiría teniendo sentido.</p>
+            <div class="resultado">
+                <section aria-labelledby="titulo-ofertas">
+                    <h3 id="titulo-ofertas">Ofertas de la semana</h3>
+                    <article>
+                        <h4>Auriculares inalámbricos Sonix</h4>
+                        <p>Cancelación de ruido y 30 horas de batería.</p>
+                        <p><del>$89,90</del> <strong>$59,90</strong></p>
+                    </article>
+                    <article>
+                        <h4>Mochila urbana Nómada 20 L</h4>
+                        <p>Compartimento acolchado para portátil de 15".</p>
+                        <p><del>$45,00</del> <strong>$32,00</strong></p>
+                    </article>
+                </section>
+                <section aria-labelledby="titulo-opiniones">
+                    <h3 id="titulo-opiniones">Opiniones de clientes</h3>
+                    <article>
+                        <h4>"Llegó en dos días"</h4>
+                        <p>Los auriculares suenan muy bien y la batería dura lo prometido. &mdash; Lucía R.</p>
+                    </article>
+                </section>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;section aria-labelledby="titulo-ofertas"&gt;
+    &lt;h3 id="titulo-ofertas"&gt;Ofertas de la semana&lt;/h3&gt;
+    &lt;article&gt;
+        &lt;h4&gt;Auriculares inalámbricos Sonix&lt;/h4&gt;
+        &lt;p&gt;Cancelación de ruido...&lt;/p&gt;
+        &lt;p&gt;&lt;del&gt;$89,90&lt;/del&gt; &lt;strong&gt;$59,90&lt;/strong&gt;&lt;/p&gt;
+    &lt;/article&gt;
+    &lt;article&gt;...&lt;/article&gt;
+&lt;/section&gt;
+&lt;section aria-labelledby="titulo-opiniones"&gt;
+    &lt;h3 id="titulo-opiniones"&gt;Opiniones de clientes&lt;/h3&gt;
+    &lt;article&gt;
+        &lt;h4&gt;"Llegó en dos días"&lt;/h4&gt;
+        &lt;p&gt;Los auriculares suenan muy bien...&lt;/p&gt;
+    &lt;/article&gt;
+&lt;/section&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>¿Cuál uso?</figcaption>
+<pre>¿Tiene sentido por sí solo, fuera
+de la página?
+    sí  -&gt; article
+    no  -&gt; ¿agrupa un tema con título?
+              sí -&gt; section
+              no -&gt; div (solo para estilos)
+
+aria-labelledby conecta la section
+con su título para los lectores
+de pantalla.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-lateral" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Barra lateral: artículos relacionados y contacto del autor</h2>
+            <p><code>aside</code> contiene información relacionada pero prescindible. <code>address</code> marca los datos de contacto de la persona o empresa responsable del contenido (no cualquier dirección postal).</p>
+            <div class="resultado">
+                <aside>
+                    <h3>Artículos relacionados</h3>
+                    <ul>
+                        <li><a href="#ej-lateral">Cinco errores al hacer masa madre</a></li>
+                        <li><a href="#ej-lateral">Qué harina elegir para cada pan</a></li>
+                        <li><a href="#ej-lateral">Cómo guardar el pan para que dure</a></li>
+                    </ul>
+                    <h3>Sobre la autora</h3>
+                    <p>Marta Ibarra es panadera aficionada y escribe en este blog desde 2019.</p>
+                    <address>
+                        Escríbele a <a href="mailto:marta@cucharacuriosa.example">marta@cucharacuriosa.example</a><br>
+                        o llámala al <a href="tel:+56911112222">+56 9 1111 2222</a>.<br>
+                        Calle Los Olivos 245, Valle Verde.
+                    </address>
+                </aside>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;aside&gt;
+    &lt;h3&gt;Artículos relacionados&lt;/h3&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Cinco errores al hacer masa madre&lt;/a&gt;&lt;/li&gt;
+        ...
+    &lt;/ul&gt;
+    &lt;h3&gt;Sobre la autora&lt;/h3&gt;
+    &lt;p&gt;Marta Ibarra es panadera aficionada...&lt;/p&gt;
+    &lt;address&gt;
+        Escríbele a &lt;a href="mailto:marta@cucharacuriosa.example"&gt;...&lt;/a&gt;&lt;br&gt;
+        o llámala al &lt;a href="tel:+56911112222"&gt;+56 9 1111 2222&lt;/a&gt;.&lt;br&gt;
+        Calle Los Olivos 245, Valle Verde.
+    &lt;/address&gt;
+&lt;/aside&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Detalles</figcaption>
+<pre>address se muestra en cursiva por
+defecto.
+
+mailto: abre el programa de correo.
+tel: marca el número en un celular.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-migas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Migas de pan (breadcrumb)</h2>
+            <p>Muestran dónde está el usuario dentro del sitio. Es una lista ordenada dentro de un <code>nav</code>; la página actual lleva <code>aria-current="page"</code>.</p>
+            <div class="resultado">
+                <nav aria-label="Migas de pan">
+                    <ol>
+                        <li><a href="#ej-migas">Inicio</a></li>
+                        <li><a href="#ej-migas">Deportes</a></li>
+                        <li><a href="#ej-migas">Calzado</a></li>
+                        <li><a href="#ej-migas" aria-current="page">Zapatillas Runner X</a></li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;nav aria-label="Migas de pan"&gt;
+    &lt;ol&gt;
+        &lt;li&gt;&lt;a href="/"&gt;Inicio&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="/deportes"&gt;Deportes&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="/deportes/calzado"&gt;Calzado&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="..." aria-current="page"&gt;Zapatillas Runner X&lt;/a&gt;&lt;/li&gt;
+    &lt;/ol&gt;
+&lt;/nav&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Con CSS se verá así</figcaption>
+<pre>Inicio &gt; Deportes &gt; Calzado &gt; Zapatillas Runner X
+
+Usamos ol porque el orden importa.
+Cuando hay varios nav en una página,
+aria-label los distingue.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-figuras" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>figure no es solo para fotos</h2>
+            <p><code>figure</code> agrupa cualquier contenido que se pueda mover a un anexo sin romper el texto: un fragmento de código, una cita o una tabla. <code>figcaption</code> le pone la leyenda.</p>
+            <div class="resultado">
+                <figure>
+<pre><code>&lt;p&gt;Hola, mundo&lt;/p&gt;</code></pre>
+                    <figcaption>Figura 1. El primer párrafo de cualquier curso de HTML.</figcaption>
+                </figure>
+                <figure>
+                    <blockquote>
+                        <p>La web es para todos, sin importar el dispositivo, el idioma o la capacidad de quien la usa.</p>
+                    </blockquote>
+                    <figcaption>&mdash; Elena Prado, en <cite>Diseñar para todos</cite></figcaption>
+                </figure>
+                <figure>
+                    <table>
+                        <thead>
+                            <tr><th>Plan</th><th>Precio mensual</th><th>Usuarios</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Básico</td><td>$5</td><td>1</td></tr>
+                            <tr><td>Equipo</td><td>$20</td><td>10</td></tr>
+                        </tbody>
+                    </table>
+                    <figcaption>Tabla 1. Planes de la aplicación de tareas Ordenado.</figcaption>
+                </figure>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;figure&gt;
+    &lt;pre&gt;&lt;code&gt;&amp;lt;p&amp;gt;Hola, mundo&amp;lt;/p&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+    &lt;figcaption&gt;Figura 1. El primer párrafo...&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+    &lt;blockquote&gt;
+        &lt;p&gt;La web es para todos...&lt;/p&gt;
+    &lt;/blockquote&gt;
+    &lt;figcaption&gt;&amp;mdash; Elena Prado, en &lt;cite&gt;Diseñar para todos&lt;/cite&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+    &lt;table&gt;...&lt;/table&gt;
+    &lt;figcaption&gt;Tabla 1. Planes de la aplicación...&lt;/figcaption&gt;
+&lt;/figure&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Reglas</figcaption>
+<pre>figcaption va como primer o último
+hijo de figure, nunca en medio.
+
+Para mostrar etiquetas como texto
+se escriben &amp;lt; y &amp;gt;.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-faq" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Preguntas frecuentes con details y summary</h2>
+            <p>Haz clic en cada pregunta. La primera lista empieza con una respuesta abierta (<code>open</code>). En la segunda, todas comparten <code>name="envios"</code>: al abrir una se cierra la otra, como un acordeón, sin JavaScript.</p>
+            <div class="resultado">
+                <h3>Pagos</h3>
+                <details open>
+                    <summary>¿Qué medios de pago aceptan?</summary>
+                    <p>Tarjeta de crédito, débito y transferencia bancaria.</p>
+                </details>
+                <details>
+                    <summary>¿Puedo pagar en cuotas?</summary>
+                    <p>Sí, hasta 6 cuotas sin interés en compras sobre $100.</p>
+                </details>
+                <h3>Envíos (acordeón exclusivo)</h3>
+                <details name="envios">
+                    <summary>¿Cuánto tarda el envío?</summary>
+                    <p>Entre 2 y 4 días hábiles en la ciudad; hasta 7 en regiones.</p>
+                </details>
+                <details name="envios">
+                    <summary>¿Puedo retirar en tienda?</summary>
+                    <p>Sí, sin costo, en cualquiera de nuestras 12 sucursales.</p>
+                </details>
+                <details name="envios">
+                    <summary>¿Hacen envíos al extranjero?</summary>
+                    <p>Por ahora solo enviamos dentro del país.</p>
+                </details>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;details open&gt;
+    &lt;summary&gt;¿Qué medios de pago aceptan?&lt;/summary&gt;
+    &lt;p&gt;Tarjeta de crédito, débito...&lt;/p&gt;
+&lt;/details&gt;
+&lt;details&gt;
+    &lt;summary&gt;¿Puedo pagar en cuotas?&lt;/summary&gt;
+    &lt;p&gt;Sí, hasta 6 cuotas...&lt;/p&gt;
+&lt;/details&gt;
+
+&lt;details name="envios"&gt;
+    &lt;summary&gt;¿Cuánto tarda el envío?&lt;/summary&gt;
+    &lt;p&gt;Entre 2 y 4 días hábiles...&lt;/p&gt;
+&lt;/details&gt;
+&lt;details name="envios"&gt;...&lt;/details&gt;
+&lt;details name="envios"&gt;...&lt;/details&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Atributos</figcaption>
+<pre>open          empieza desplegado
+name="grupo"  solo uno del grupo
+              puede estar abierto
+
+summary es lo único visible cuando
+está cerrado; debe ser el primer hijo.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-buscador" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Buscador del sitio con search</h2>
+            <p><code>search</code> marca la zona de búsqueda o filtrado. No cambia el aspecto, pero los lectores de pantalla la anuncian como "búsqueda" y permiten saltar a ella.</p>
+            <div class="resultado">
+                <search>
+                    <form action="https://www.google.com/search" target="_blank">
+                        <label for="busqueda-recetas">Buscar recetas</label>
+                        <input type="search" id="busqueda-recetas" name="q" placeholder="Ej.: lasaña de verduras">
+                        <button type="submit">Buscar</button>
+                    </form>
+                </search>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;search&gt;
+    &lt;form action="https://www.google.com/search" target="_blank"&gt;
+        &lt;label for="busqueda-recetas"&gt;Buscar recetas&lt;/label&gt;
+        &lt;input type="search" id="busqueda-recetas" name="q"
+               placeholder="Ej.: lasaña de verduras"&gt;
+        &lt;button type="submit"&gt;Buscar&lt;/button&gt;
+    &lt;/form&gt;
+&lt;/search&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo funciona</figcaption>
+<pre>Al enviar, el navegador abre:
+https://www.google.com/search?q=lo+que+escribiste
+
+type="search" agrega una "x" para
+borrar en algunos navegadores.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-agenda" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Agenda de eventos con time</h2>
+            <p>El texto entre etiquetas es para las personas; el atributo <code>datetime</code> es para las máquinas (buscadores, calendarios, lectores de pantalla). Admite fechas, horas y duraciones.</p>
+            <div class="resultado">
+                <h3>Agenda cultural de diciembre</h3>
+                <ul>
+                    <li><strong>Concierto de jazz en el parque</strong> &mdash; <time datetime="2026-12-05T19:30">sábado 5, a las 19:30</time>. Duración: <time datetime="PT2H">2 horas</time>.</li>
+                    <li><strong>Feria del libro usado</strong> &mdash; del <time datetime="2026-12-10">10</time> al <time datetime="2026-12-14">14 de diciembre</time>.</li>
+                    <li><strong>Taller de cerámica</strong> &mdash; todos los miércoles a las <time datetime="18:00">6 de la tarde</time>.</li>
+                    <li><strong>Cuenta regresiva de Año Nuevo</strong> &mdash; <time datetime="2026-12-31T23:59:59-03:00">último segundo de 2026</time>.</li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;li&gt;&lt;strong&gt;Concierto de jazz en el parque&lt;/strong&gt; &amp;mdash;
+    &lt;time datetime="2026-12-05T19:30"&gt;sábado 5, a las 19:30&lt;/time&gt;.
+    Duración: &lt;time datetime="PT2H"&gt;2 horas&lt;/time&gt;.&lt;/li&gt;
+&lt;li&gt;... del &lt;time datetime="2026-12-10"&gt;10&lt;/time&gt;
+    al &lt;time datetime="2026-12-14"&gt;14 de diciembre&lt;/time&gt;.&lt;/li&gt;
+&lt;li&gt;... a las &lt;time datetime="18:00"&gt;6 de la tarde&lt;/time&gt;.&lt;/li&gt;
+&lt;li&gt;... &lt;time datetime="2026-12-31T23:59:59-03:00"&gt;último segundo...&lt;/time&gt;.&lt;/li&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Formatos de datetime</figcaption>
+<pre>2026-12-05              fecha
+18:00                   hora
+2026-12-05T19:30        fecha y hora
+2026-12-31T23:59:59-03:00  con zona horaria
+PT2H / PT1H30M          duración
+2026-12                 mes</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-resaltado" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Resultados de búsqueda con mark y siglas con abbr</h2>
+            <p><code>mark</code> resalta texto relevante para el contexto actual, como la palabra buscada. <code>abbr</code> marca una abreviatura; con <code>title</code>, al pasar el mouse se ve el significado completo.</p>
+            <div class="resultado">
+                <p>Resultados para: <strong>café</strong></p>
+                <article>
+                    <h3><a href="#ej-resaltado">Cómo preparar <mark>café</mark> de filtro en casa</a></h3>
+                    <p>Usa 60 g de <mark>café</mark> molido por cada litro de agua a 92 °C.</p>
+                </article>
+                <article>
+                    <h3><a href="#ej-resaltado">Beneficios del <mark>café</mark> según la <abbr title="Organización Mundial de la Salud">OMS</abbr></a></h3>
+                    <p>Hasta 3 tazas al día se consideran un consumo moderado. Precio aprox.: 5 <abbr title="dólares estadounidenses">USD</abbr> el kilo.</p>
+                </article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;Resultados para: &lt;strong&gt;café&lt;/strong&gt;&lt;/p&gt;
+&lt;article&gt;
+    &lt;h3&gt;&lt;a href="#"&gt;Cómo preparar &lt;mark&gt;café&lt;/mark&gt; de filtro...&lt;/a&gt;&lt;/h3&gt;
+    &lt;p&gt;Usa 60 g de &lt;mark&gt;café&lt;/mark&gt; molido...&lt;/p&gt;
+&lt;/article&gt;
+&lt;article&gt;
+    &lt;h3&gt;&lt;a href="#"&gt;Beneficios del &lt;mark&gt;café&lt;/mark&gt; según la
+        &lt;abbr title="Organización Mundial de la Salud"&gt;OMS&lt;/abbr&gt;&lt;/a&gt;&lt;/h3&gt;
+    &lt;p&gt;... 5 &lt;abbr title="dólares estadounidenses"&gt;USD&lt;/abbr&gt; el kilo.&lt;/p&gt;
+&lt;/article&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>mark vs strong vs em</figcaption>
+<pre>mark    relevante AHORA (búsqueda, cita)
+strong  importante siempre
+em      énfasis al leerlo en voz alta</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-progreso" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Barras de progreso con progress</h2>
+            <p><code>progress</code> muestra cuánto falta para terminar una tarea. Sin <code>value</code> queda <strong>indeterminado</strong>: se anima para indicar "trabajando, no sé cuánto falta".</p>
+            <div class="resultado">
+                <p>
+                    <label for="descarga-app">Descargando app-instalador.zip (70 de 100 MB):</label><br>
+                    <progress id="descarga-app" value="70" max="100">70 %</progress>
+                </p>
+                <p>
+                    <label for="pasos-curso">Curso "Excel desde cero": lección 3 de 5</label><br>
+                    <progress id="pasos-curso" value="3" max="5">3 de 5</progress>
+                </p>
+                <p>
+                    <label for="carga-pedido">Procesando tu pedido...</label><br>
+                    <progress id="carga-pedido">Procesando</progress>
+                </p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label for="descarga-app"&gt;Descargando ... (70 de 100 MB):&lt;/label&gt;
+&lt;progress id="descarga-app" value="70" max="100"&gt;70 %&lt;/progress&gt;
+
+&lt;label for="pasos-curso"&gt;... lección 3 de 5&lt;/label&gt;
+&lt;progress id="pasos-curso" value="3" max="5"&gt;3 de 5&lt;/progress&gt;
+
+&lt;label for="carga-pedido"&gt;Procesando tu pedido...&lt;/label&gt;
+&lt;progress id="carga-pedido"&gt;Procesando&lt;/progress&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Notas</figcaption>
+<pre>max por defecto es 1.
+El texto interior solo se ve en
+navegadores muy antiguos.
+Para que la barra avance sola
+hace falta JavaScript.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-medidores" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Medidores con meter: batería, disco y notas</h2>
+            <p><code>meter</code> muestra una medida dentro de un rango conocido. Con <code>low</code>, <code>high</code> y <code>optimum</code> el navegador pinta la barra verde, amarilla o roja según si el valor es bueno o malo.</p>
+            <div class="resultado">
+                <p>
+                    <label for="bateria">Batería del celular: 15 %</label><br>
+                    <meter id="bateria" min="0" max="100" low="20" high="60" optimum="100" value="15">15 %</meter>
+                </p>
+                <p>
+                    <label for="bateria-llena">Batería del portátil: 85 %</label><br>
+                    <meter id="bateria-llena" min="0" max="100" low="20" high="60" optimum="100" value="85">85 %</meter>
+                </p>
+                <p>
+                    <label for="disco">Disco usado: 82 de 128 GB</label><br>
+                    <meter id="disco" min="0" max="128" low="64" high="110" optimum="0" value="82">82 GB</meter>
+                </p>
+                <p>
+                    <label for="disco-lleno">Disco externo: 120 de 128 GB</label><br>
+                    <meter id="disco-lleno" min="0" max="128" low="64" high="110" optimum="0" value="120">120 GB</meter>
+                </p>
+                <p>
+                    <label for="nota-examen">Nota del examen de Historia: 6,2 de 7</label><br>
+                    <meter id="nota-examen" min="1" max="7" low="4" high="6" optimum="7" value="6.2">6,2</meter>
+                </p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;meter id="bateria" min="0" max="100"
+       low="20" high="60" optimum="100" value="15"&gt;15 %&lt;/meter&gt;
+
+&lt;meter id="disco" min="0" max="128"
+       low="64" high="110" optimum="0" value="82"&gt;82 GB&lt;/meter&gt;
+
+&lt;meter id="nota-examen" min="1" max="7"
+       low="4" high="6" optimum="7" value="6.2"&gt;6,2&lt;/meter&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>progress vs meter</figcaption>
+<pre>progress  avance de una tarea que termina
+          (descarga, formulario por pasos)
+meter     medida estática en un rango
+          (batería, disco, nota, votos)
+
+optimum indica dónde está lo bueno:
+  batería  -&gt; optimum alto (100)
+  disco    -&gt; optimum bajo (0)</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-cookies" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Aviso de cookies con dialog</h2>
+            <p>Con el atributo <code>open</code> el cuadro aparece visible y se superpone al contenido que lo rodea. Abrirlo, cerrarlo o hacerlo modal (oscureciendo el fondo) necesita JavaScript: lo veremos en la lección 23.</p>
+            <div class="resultado">
+                <p>Bienvenido a Librería El Faro. Esta semana: 20 % de descuento en novelas policiales.</p>
+                <dialog open>
+                    <p><strong>Usamos cookies</strong></p>
+                    <p>Las usamos para recordar tu carrito y medir las visitas.</p>
+                    <form method="dialog">
+                        <button>Rechazar</button>
+                        <button>Aceptar</button>
+                    </form>
+                </dialog>
+                <p>Novedades: "La sombra del puerto", "Crimen en el tren nocturno" y "El último testigo".</p>
+                <p>Envío gratis por compras sobre $30.</p>
+                <p>Horario de la tienda física: lunes a sábado de 10:00 a 20:00.</p>
+                <p>Síguenos para conocer las presentaciones de autores.</p>
+                <p>Club de lectura: primer jueves de cada mes.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;dialog open&gt;
+    &lt;p&gt;&lt;strong&gt;Usamos cookies&lt;/strong&gt;&lt;/p&gt;
+    &lt;p&gt;Las usamos para recordar tu carrito...&lt;/p&gt;
+    &lt;form method="dialog"&gt;
+        &lt;button&gt;Rechazar&lt;/button&gt;
+        &lt;button&gt;Aceptar&lt;/button&gt;
+    &lt;/form&gt;
+&lt;/dialog&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>form method="dialog"</figcaption>
+<pre>Un botón dentro de un form con
+method="dialog" cierra el diálogo
+sin enviar nada al servidor.
+Prueba: haz clic en Aceptar.
+
+Para volver a abrirlo (o abrirlo
+como modal) se usa JavaScript.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-popover" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Menú emergente sin JavaScript: popover</h2>
+            <p>Un elemento con el atributo <code>popover</code> está oculto hasta que un botón con <code>popovertarget</code> lo abre. Se cierra con <kbd>Esc</kbd>, haciendo clic fuera o con otro botón.</p>
+            <div class="resultado">
+                <button popovertarget="menu-cuenta">Mi cuenta</button>
+                <button popovertarget="ayuda-envio">¿Qué es el envío exprés?</button>
+                <div id="menu-cuenta" popover>
+                    <p><strong>Hola, Sofía</strong></p>
+                    <ul>
+                        <li><a href="#ej-popover">Mis pedidos</a></li>
+                        <li><a href="#ej-popover">Direcciones</a></li>
+                        <li><a href="#ej-popover">Cerrar sesión</a></li>
+                    </ul>
+                    <button popovertarget="menu-cuenta" popovertargetaction="hide">Cerrar</button>
+                </div>
+                <div id="ayuda-envio" popover>
+                    <p>El envío exprés llega en menos de 24 horas por $4,90 adicionales.</p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;button popovertarget="menu-cuenta"&gt;Mi cuenta&lt;/button&gt;
+&lt;button popovertarget="ayuda-envio"&gt;¿Qué es el envío exprés?&lt;/button&gt;
+
+&lt;div id="menu-cuenta" popover&gt;
+    &lt;p&gt;&lt;strong&gt;Hola, Sofía&lt;/strong&gt;&lt;/p&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Mis pedidos&lt;/a&gt;&lt;/li&gt;
+        ...
+    &lt;/ul&gt;
+    &lt;button popovertarget="menu-cuenta"
+            popovertargetaction="hide"&gt;Cerrar&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div id="ayuda-envio" popover&gt;
+    &lt;p&gt;El envío exprés llega en menos de 24 horas...&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>popovertargetaction</figcaption>
+<pre>toggle  abre o cierra (por defecto)
+show    solo abre
+hide    solo cierra
+
+Por defecto aparece centrado en la
+pantalla; con CSS se puede ubicar
+junto al botón.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-notas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Bloc de notas con contenteditable</h2>
+            <p><code>contenteditable</code> es un atributo global: convierte cualquier elemento en editable. Haz clic en la lista y escribe. Los cambios se pierden al recargar (guardarlos requiere JavaScript).</p>
+            <div class="resultado">
+                <h3>Lista de compras</h3>
+                <ul contenteditable="true">
+                    <li>Leche</li>
+                    <li>Pan integral</li>
+                    <li>Tomates</li>
+                </ul>
+                <p contenteditable="plaintext-only">Nota rápida: llamar al dentista el lunes.</p>
+                <p>Corrector ortográfico desactivado: <span contenteditable="true" spellcheck="false">Escrive aquí sin subrayado rojo</span></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;ul contenteditable="true"&gt;
+    &lt;li&gt;Leche&lt;/li&gt;
+    &lt;li&gt;Pan integral&lt;/li&gt;
+    &lt;li&gt;Tomates&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p contenteditable="plaintext-only"&gt;Nota rápida: ...&lt;/p&gt;
+&lt;span contenteditable="true" spellcheck="false"&gt;Escrive aquí...&lt;/span&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Valores</figcaption>
+<pre>true            editable, admite formato
+                (Ctrl+B pone negrita)
+plaintext-only  editable, solo texto
+false           no editable
+
+Atributos globales: sirven en
+cualquier etiqueta (id, class, title,
+hidden, lang, contenteditable...).</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-audio" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Audio: podcast, efecto en bucle y varias fuentes</h2>
+            <p>El elemento <code>audio</code> sin <code>controls</code> es invisible. Varios <code>source</code> permiten ofrecer formatos alternativos: el navegador usa el primero que puede reproducir.</p>
+            <div class="resultado">
+                <article>
+                    <h3>Podcast "Bichos raros", episodio 12: el rugido del T-Rex</h3>
+                    <p>¿Cómo sonaba realmente un dinosaurio? Escucha la recreación.</p>
+                    <audio controls preload="metadata" src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3">
+                        Tu navegador no puede reproducir audio. <a href="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3">Descarga el episodio</a>.
+                    </audio>
+                </article>
+                <h3>Efecto de sonido en bucle, empieza silenciado</h3>
+                <audio controls loop muted preload="none">
+                    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3" type="audio/mpeg">
+                    Tu navegador no puede reproducir audio.
+                </audio>
+                <h3>Varias fuentes</h3>
+                <audio controls>
+                    <source src="assets/audios/rugido.ogg" type="audio/ogg">
+                    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3" type="audio/mpeg">
+                    Tu navegador no puede reproducir audio.
+                </audio>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;audio controls preload="metadata" src="https://.../t-rex-roar.mp3"&gt;
+    Tu navegador no puede reproducir audio.
+    &lt;a href="https://.../t-rex-roar.mp3"&gt;Descarga el episodio&lt;/a&gt;.
+&lt;/audio&gt;
+
+&lt;audio controls loop muted preload="none"&gt;
+    &lt;source src="https://.../t-rex-roar.mp3" type="audio/mpeg"&gt;
+    Tu navegador no puede reproducir audio.
+&lt;/audio&gt;
+
+&lt;audio controls&gt;
+    &lt;source src="assets/audios/rugido.ogg" type="audio/ogg"&gt;
+    &lt;source src="https://.../t-rex-roar.mp3" type="audio/mpeg"&gt;
+    Tu navegador no puede reproducir audio.
+&lt;/audio&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Atributos de audio</figcaption>
+<pre>controls  muestra play, volumen, tiempo
+loop      vuelve a empezar al terminar
+muted     empieza sin sonido
+autoplay  intenta reproducir solo (los
+          navegadores lo bloquean si
+          no está muted)
+preload   none      no descarga nada
+          metadata  solo la duración
+          auto      todo el archivo
+
+rugido.ogg no existe: el navegador
+falla con esa fuente y pasa al mp3.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-video" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Video: clase grabada y video de fondo</h2>
+            <p>El primer video muestra una imagen de portada (<code>poster</code>) hasta que se presiona play. El segundo imita la portada de un sitio: arranca solo, sin sonido, en bucle y sin controles.</p>
+            <div class="resultado">
+                <h3>Clase 4: recorrido por Alberobello</h3>
+                <video controls width="480" poster="assets/imgs/pic_trulli.jpg" preload="none">
+                    <source src="assets/videos/video_prueba.mp4" type="video/mp4">
+                    Tu navegador no puede reproducir video. <a href="assets/videos/video_prueba.mp4">Descárgalo aquí</a>.
+                </video>
+                <h3>Hotel Las Dunas: vive el verano</h3>
+                <video width="480" autoplay muted loop playsinline>
+                    <source src="assets/videos/video_prueba.mp4" type="video/mp4">
+                </video>
+                <p>Reserva antes del 31 de diciembre y obtén la segunda noche gratis.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;video controls width="480"
+       poster="assets/imgs/pic_trulli.jpg" preload="none"&gt;
+    &lt;source src="assets/videos/video_prueba.mp4" type="video/mp4"&gt;
+    Tu navegador no puede reproducir video.
+    &lt;a href="assets/videos/video_prueba.mp4"&gt;Descárgalo aquí&lt;/a&gt;.
+&lt;/video&gt;
+
+&lt;video width="480" autoplay muted loop playsinline&gt;
+    &lt;source src="assets/videos/video_prueba.mp4" type="video/mp4"&gt;
+&lt;/video&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Subtítulos con track</figcaption>
+<pre>&lt;video controls&gt;
+    &lt;source src="clase.mp4" type="video/mp4"&gt;
+    &lt;track src="clase-es.vtt" kind="subtitles"
+           srclang="es" label="Español" default&gt;
+&lt;/video&gt;
+
+Los subtítulos van en un archivo .vtt
+aparte (no incluido en el proyecto).
+
+autoplay solo funciona con muted.
+playsinline evita que el iPhone abra
+el video a pantalla completa.</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="05-formularios.html">Anterior: formularios</a> |
+            <a href="index.html">Índice</a> |
+            <a href="07-html-incrustados.html">Siguiente: imágenes e incrustados</a>
+        </nav>
+    </footer>
+</body>
+</html>

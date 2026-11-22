@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>04. Tablas</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>04. Tablas</h1>
+        <p>Las tablas organizan datos relacionados en filas y columnas: facturas, horarios, calendarios, resultados deportivos, comparativas de precios. Si los datos tienen sentido en una hoja de cálculo, probablemente van en una tabla.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-basica">Tabla básica</a></li>
+            <li><a href="#ej-caption">caption y secciones</a></li>
+            <li><a href="#ej-factura">Factura</a></li>
+            <li><a href="#ej-scope">scope</a></li>
+            <li><a href="#ej-horario">Horario escolar</a></li>
+            <li><a href="#ej-liga">Tabla de posiciones</a></li>
+            <li><a href="#ej-colgroup">colgroup</a></li>
+            <li><a href="#ej-planes">Comparativa de planes</a></li>
+            <li><a href="#ej-calendario">Calendario</a></li>
+            <li><a href="#ej-transporte">Transporte</a></li>
+            <li><a href="#ej-boleta">Boleta de notas</a></li>
+            <li><a href="#ej-nutricional">Tabla nutricional</a></li>
+            <li><a href="#ej-abbr">Abreviaturas</a></li>
+            <li><a href="#ej-tallas">Guía de tallas</a></li>
+            <li><a href="#ej-accesible">headers e id</a></li>
+            <li><a href="#ej-maquetacion">No maquetar con tablas</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Elementos de la tabla</h2>
+            <p>Una tabla se construye <strong>fila por fila</strong>: cada <code>tr</code> es una fila y dentro van sus celdas. Las columnas no se escriben: aparecen solas al alinear las celdas de todas las filas.</p>
+            <table>
+                <thead>
+                    <tr><th>Etiqueta / atributo</th><th>Para qué sirve</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>table</code></td><td>crea la tabla</td></tr>
+                    <tr><td><code>caption</code></td><td>título de la tabla; va justo después de <code>&lt;table&gt;</code></td></tr>
+                    <tr><td><code>thead</code>, <code>tbody</code>, <code>tfoot</code></td><td>agrupan filas de encabezado, de datos y de totales</td></tr>
+                    <tr><td><code>tr</code></td><td>una fila</td></tr>
+                    <tr><td><code>th</code></td><td>celda de encabezado (negrita y centrada por defecto)</td></tr>
+                    <tr><td><code>td</code></td><td>celda de datos</td></tr>
+                    <tr><td><code>scope="col"</code> / <code>scope="row"</code></td><td>indica si el <code>th</code> encabeza una columna o una fila</td></tr>
+                    <tr><td><code>colspan="n"</code></td><td>la celda ocupa <em>n</em> columnas</td></tr>
+                    <tr><td><code>rowspan="n"</code></td><td>la celda ocupa <em>n</em> filas</td></tr>
+                    <tr><td><code>colgroup</code> / <code>col span="n"</code></td><td>agrupan columnas para darles estilo después con CSS</td></tr>
+                    <tr><td><code>headers</code> + <code>id</code></td><td>relacionan cada celda con sus encabezados en tablas complejas</td></tr>
+                </tbody>
+            </table>
+            <p>Usa tablas para datos tabulares, no para organizar el diseño de una página.</p>
+            <p><strong>Nota:</strong> los ejemplos de esta página muestran cómo dibuja el navegador una tabla <em>sin estilos</em>: sin bordes ni colores. El viejo atributo <code>border="1"</code> está obsoleto; los bordes, el relleno y los colores de las celdas se añaden con CSS en lecciones posteriores.</p>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Esqueleto de una tabla</figcaption>
+<pre>&lt;table&gt;
+    &lt;caption&gt;Título&lt;/caption&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;&lt;th scope="col"&gt;...&lt;/th&gt;&lt;th scope="col"&gt;...&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;&lt;td&gt;...&lt;/td&gt;&lt;td&gt;...&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+        &lt;tr&gt;&lt;td&gt;...&lt;/td&gt;&lt;td&gt;...&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo se lee</figcaption>
+<pre>table
+└── tr            fila 1
+    ├── th        celda 1
+    └── th        celda 2
+└── tr            fila 2
+    ├── td        celda 1
+    └── td        celda 2
+
+Todas las filas deben sumar
+el mismo número de columnas.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-basica" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Tabla básica: agenda de contactos</h2>
+            <p>Lo mínimo: <code>table</code>, filas <code>tr</code>, encabezados <code>th</code> y datos <code>td</code>. Observa que el navegador pone los <code>th</code> en negrita y centrados.</p>
+            <div class="resultado">
+                <table>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                    </tr>
+                    <tr>
+                        <td>Ana Torres</td>
+                        <td><a href="mailto:ana.torres@example.com">ana.torres@example.com</a></td>
+                        <td><a href="tel:+525555550111">555 555 0111</a></td>
+                    </tr>
+                    <tr>
+                        <td>Jorge Medina</td>
+                        <td><a href="mailto:jorge.medina@example.com">jorge.medina@example.com</a></td>
+                        <td><a href="tel:+525555550122">555 555 0122</a></td>
+                    </tr>
+                    <tr>
+                        <td>Lucía Prado</td>
+                        <td><a href="mailto:lucia.prado@example.com">lucia.prado@example.com</a></td>
+                        <td><a href="tel:+525555550133">555 555 0133</a></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Nombre&lt;/th&gt;
+        &lt;th&gt;Correo&lt;/th&gt;
+        &lt;th&gt;Teléfono&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Ana Torres&lt;/td&gt;
+        &lt;td&gt;&lt;a href="mailto:ana.torres@example.com"&gt;ana.torres@example.com&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="tel:+525555550111"&gt;555 555 0111&lt;/a&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    ...
+&lt;/table&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Recuerda</figcaption>
+<pre>Dentro de una celda puede ir casi
+cualquier cosa: enlaces, imágenes,
+listas, texto en negrita...
+
+Lo que no puede ir es texto suelto
+directamente dentro de &lt;table&gt; o &lt;tr&gt;.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-caption" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>caption, thead, tbody y tfoot: horario de clases</h2>
+            <p><code>caption</code> da un título a la tabla. <code>thead</code>, <code>tbody</code> y <code>tfoot</code> separan encabezado, datos y resumen. <code>colspan</code> hace que una celda abarque varias columnas.</p>
+            <div class="resultado">
+                <table>
+                    <caption>Horario de ejemplo</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Día</th>
+                            <th scope="col">Tema</th>
+                            <th scope="col">Duración</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Lunes</th>
+                            <td>Estructura HTML</td>
+                            <td>45 minutos</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Miércoles</th>
+                            <td>Enlaces y listas</td>
+                            <td>30 minutos</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Viernes</th>
+                            <td colspan="2">Práctica de repaso</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th scope="row">Total</th>
+                            <td colspan="2">Tres sesiones</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table&gt;
+    &lt;caption&gt;Horario de ejemplo&lt;/caption&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th scope="col"&gt;Día&lt;/th&gt;
+            &lt;th scope="col"&gt;Tema&lt;/th&gt;
+            &lt;th scope="col"&gt;Duración&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;th scope="row"&gt;Lunes&lt;/th&gt;
+            &lt;td&gt;Estructura HTML&lt;/td&gt;
+            &lt;td&gt;45 minutos&lt;/td&gt;
+        &lt;/tr&gt;
+        ...
+        &lt;tr&gt;
+            &lt;th scope="row"&gt;Viernes&lt;/th&gt;
+            &lt;td colspan="2"&gt;Práctica de repaso&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+        &lt;tr&gt;
+            &lt;th scope="row"&gt;Total&lt;/th&gt;
+            &lt;td colspan="2"&gt;Tres sesiones&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Por qué agrupar filas</figcaption>
+<pre>- Los lectores de pantalla anuncian
+  el encabezado de cada dato.
+- Al imprimir una tabla larga, el
+  thead se repite en cada hoja.
+- Con CSS se puede dar estilo a cada
+  grupo: thead { ... } tfoot { ... }</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-factura" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Factura de una tienda de informática</h2>
+            <p>El <code>tfoot</code> es ideal para subtotales, impuestos y el total. Las celdas de la etiqueta del total ocupan tres columnas con <code>colspan="3"</code> para que los importes queden alineados.</p>
+            <div class="resultado">
+                <table>
+                    <caption>Factura n.º F-2026-0158 · TecnoEjemplo S.L.</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Producto</th>
+                            <th scope="col">Cantidad</th>
+                            <th scope="col">Precio unitario</th>
+                            <th scope="col">Importe</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Teclado mecánico</td>
+                            <td>1</td>
+                            <td>45,00 €</td>
+                            <td>45,00 €</td>
+                        </tr>
+                        <tr>
+                            <td>Ratón inalámbrico</td>
+                            <td>2</td>
+                            <td>15,50 €</td>
+                            <td>31,00 €</td>
+                        </tr>
+                        <tr>
+                            <td>Monitor de 24 pulgadas</td>
+                            <td>1</td>
+                            <td>189,90 €</td>
+                            <td>189,90 €</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th scope="row" colspan="3">Subtotal</th>
+                            <td>265,90 €</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" colspan="3">IVA (21 %)</th>
+                            <td>55,84 €</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" colspan="3">Total a pagar</th>
+                            <td><strong>321,74 €</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table&gt;
+    &lt;caption&gt;Factura n.º F-2026-0158 · TecnoEjemplo S.L.&lt;/caption&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th scope="col"&gt;Producto&lt;/th&gt;
+            &lt;th scope="col"&gt;Cantidad&lt;/th&gt;
+            &lt;th scope="col"&gt;Precio unitario&lt;/th&gt;
+            &lt;th scope="col"&gt;Importe&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Teclado mecánico&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;45,00 €&lt;/td&gt;
+            &lt;td&gt;45,00 €&lt;/td&gt;
+        &lt;/tr&gt;
+        ...
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+        &lt;tr&gt;
+            &lt;th scope="row" colspan="3"&gt;Subtotal&lt;/th&gt;
+            &lt;td&gt;265,90 €&lt;/td&gt;
+        &lt;/tr&gt;
+        ...
+        &lt;tr&gt;
+            &lt;th scope="row" colspan="3"&gt;Total a pagar&lt;/th&gt;
+            &lt;td&gt;&lt;strong&gt;321,74 €&lt;/strong&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Contar columnas</figcaption>
+<pre>Fila de producto:  1 + 1 + 1 + 1 = 4
+Fila de total:     3 (colspan) + 1 = 4
+
+Si una fila suma menos, queda un
+hueco; si suma más, la tabla se
+desalinea.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-scope" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Encabezados de fila y de columna: clima por ciudad</h2>
+            <p>Cuando la tabla tiene encabezados arriba <strong>y</strong> a la izquierda, <code>scope</code> indica a quién encabeza cada <code>th</code>. Un lector de pantalla leerá, por ejemplo: "Montevideo, julio, 11".</p>
+            <div class="resultado">
+                <table>
+                    <caption>Temperatura media mensual (°C)</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Ciudad</th>
+                            <th scope="col">Enero</th>
+                            <th scope="col">Abril</th>
+                            <th scope="col">Julio</th>
+                            <th scope="col">Octubre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Madrid</th>
+                            <td>6</td>
+                            <td>13</td>
+                            <td>26</td>
+                            <td>16</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Ciudad de México</th>
+                            <td>14</td>
+                            <td>19</td>
+                            <td>18</td>
+                            <td>17</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Buenos Aires</th>
+                            <td>25</td>
+                            <td>18</td>
+                            <td>11</td>
+                            <td>17</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Montevideo</th>
+                            <td>23</td>
+                            <td>17</td>
+                            <td>11</td>
+                            <td>15</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table&gt;
+    &lt;caption&gt;Temperatura media mensual (°C)&lt;/caption&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th scope="col"&gt;Ciudad&lt;/th&gt;
+            &lt;th scope="col"&gt;Enero&lt;/th&gt;
+            ...
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;th scope="row"&gt;Madrid&lt;/th&gt;
+            &lt;td&gt;6&lt;/td&gt;
+            &lt;td&gt;13&lt;/td&gt;
+            &lt;td&gt;26&lt;/td&gt;
+            &lt;td&gt;16&lt;/td&gt;
+        &lt;/tr&gt;
+        ...
+    &lt;/tbody&gt;
+&lt;/table&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Valores de scope</figcaption>
+<pre>col       encabeza la columna de abajo
+row       encabeza la fila de la derecha
+colgroup  encabeza un grupo de columnas
+rowgroup  encabeza un grupo de filas</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-horario" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>colspan y rowspan: horario escolar</h2>
+            <p>Una clase de dos horas ocupa dos filas (<code>rowspan="2"</code>) y el recreo ocupa los cinco días (<code>colspan="5"</code>). En las filas siguientes <strong>no</strong> se escribe la celda que ya está ocupada.</p>
+            <div class="resultado">
+                <table>
+                    <caption>Horario de 2.º B</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Hora</th>
+                            <th scope="col">Lunes</th>
+                            <th scope="col">Martes</th>
+                            <th scope="col">Miércoles</th>
+                            <th scope="col">Jueves</th>
+                            <th scope="col">Viernes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">08:00</th>
+                            <td rowspan="2">Matemáticas</td>
+                            <td>Lengua</td>
+                            <td rowspan="2">Matemáticas</td>
+                            <td>Inglés</td>
+                            <td>Historia</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">09:00</th>
+                            <td>Ciencias</td>
+                            <td>Lengua</td>
+                            <td>Música</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">10:00</th>
+                            <td colspan="5">Recreo</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">10:30</th>
+                            <td>Inglés</td>
+                            <td>Matemáticas</td>
+                            <td rowspan="2">Arte</td>
+                            <td>Ciencias</td>
+                            <td rowspan="2">Educación física</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">11:30</th>
+                            <td>Historia</td>
+                            <td>Inglés</td>
+                            <td>Lengua</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;tr&gt;
+    &lt;th scope="row"&gt;08:00&lt;/th&gt;
+    &lt;td rowspan="2"&gt;Matemáticas&lt;/td&gt;
+    &lt;td&gt;Lengua&lt;/td&gt;
+    &lt;td rowspan="2"&gt;Matemáticas&lt;/td&gt;
+    &lt;td&gt;Inglés&lt;/td&gt;
+    &lt;td&gt;Historia&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+    &lt;th scope="row"&gt;09:00&lt;/th&gt;
+    &lt;td&gt;Ciencias&lt;/td&gt;
+    &lt;td&gt;Lengua&lt;/td&gt;
+    &lt;td&gt;Música&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+    &lt;th scope="row"&gt;10:00&lt;/th&gt;
+    &lt;td colspan="5"&gt;Recreo&lt;/td&gt;
+&lt;/tr&gt;
+...</pre>
+                </figure>
+                <figure>
+                    <figcaption>Mapa de la fila de las 09:00</figcaption>
+<pre>        Lun     Mar       Mié     Jue     Vie
+08:00  [Mate]  Lengua   [Mate]  Inglés  Historia
+09:00  [ ↑  ]  Ciencias [ ↑  ]  Lengua  Música
+
+Las celdas con ↑ ya están ocupadas
+por el rowspan de arriba: la fila de
+las 09:00 solo escribe 3 td.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-liga" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Encabezado de dos niveles: tabla de posiciones de una liga</h2>
+            <p>En la primera fila del encabezado, "Resultados" y "Goles" agrupan varias columnas con <code>colspan</code>, y las columnas sin subdivisión ocupan las dos filas con <code>rowspan</code>.</p>
+            <div class="resultado">
+                <table>
+                    <caption>Liga Regional de Fútbol · Jornada 10</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col" rowspan="2">Pos.</th>
+                            <th scope="col" rowspan="2">Equipo</th>
+                            <th scope="col" rowspan="2"><abbr title="Partidos jugados">PJ</abbr></th>
+                            <th scope="colgroup" colspan="3">Resultados</th>
+                            <th scope="colgroup" colspan="2">Goles</th>
+                            <th scope="col" rowspan="2"><abbr title="Puntos">Pts</abbr></th>
+                        </tr>
+                        <tr>
+                            <th scope="col"><abbr title="Ganados">G</abbr></th>
+                            <th scope="col"><abbr title="Empatados">E</abbr></th>
+                            <th scope="col"><abbr title="Perdidos">P</abbr></th>
+                            <th scope="col"><abbr title="Goles a favor">GF</abbr></th>
+                            <th scope="col"><abbr title="Goles en contra">GC</abbr></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><th scope="row">Atlético Ríoverde</th><td>10</td><td>8</td><td>1</td><td>1</td><td>22</td><td>7</td><td>25</td></tr>
+                        <tr><td>2</td><th scope="row">Deportivo Sierra</th><td>10</td><td>7</td><td>2</td><td>1</td><td>19</td><td>9</td><td>23</td></tr>
+                        <tr><td>3</td><th scope="row">Unión Costa</th><td>10</td><td>5</td><td>3</td><td>2</td><td>15</td><td>11</td><td>18</td></tr>
+                        <tr><td>4</td><th scope="row">Real Valle</th><td>10</td><td>3</td><td>2</td><td>5</td><td>10</td><td>16</td><td>11</td></tr>
+                        <tr><td>5</td><th scope="row">Club Llanura</th><td>10</td><td>1</td><td>1</td><td>8</td><td>6</td><td>25</td><td>4</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;thead&gt;
+    &lt;tr&gt;
+        &lt;th scope="col" rowspan="2"&gt;Pos.&lt;/th&gt;
+        &lt;th scope="col" rowspan="2"&gt;Equipo&lt;/th&gt;
+        &lt;th scope="col" rowspan="2"&gt;&lt;abbr title="Partidos jugados"&gt;PJ&lt;/abbr&gt;&lt;/th&gt;
+        &lt;th scope="colgroup" colspan="3"&gt;Resultados&lt;/th&gt;
+        &lt;th scope="colgroup" colspan="2"&gt;Goles&lt;/th&gt;
+        &lt;th scope="col" rowspan="2"&gt;&lt;abbr title="Puntos"&gt;Pts&lt;/abbr&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th scope="col"&gt;&lt;abbr title="Ganados"&gt;G&lt;/abbr&gt;&lt;/th&gt;
+        &lt;th scope="col"&gt;&lt;abbr title="Empatados"&gt;E&lt;/abbr&gt;&lt;/th&gt;
+        &lt;th scope="col"&gt;&lt;abbr title="Perdidos"&gt;P&lt;/abbr&gt;&lt;/th&gt;
+        &lt;th scope="col"&gt;&lt;abbr title="Goles a favor"&gt;GF&lt;/abbr&gt;&lt;/th&gt;
+        &lt;th scope="col"&gt;&lt;abbr title="Goles en contra"&gt;GC&lt;/abbr&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+    &lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;th scope="row"&gt;Atlético Ríoverde&lt;/th&gt;&lt;td&gt;10&lt;/td&gt;...&lt;td&gt;25&lt;/td&gt;&lt;/tr&gt;
+    ...
+&lt;/tbody&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo se reparte el encabezado</figcaption>
+<pre>┌────┬────────┬────┬───────────┬───────┬─────┐
+│Pos.│ Equipo │ PJ │Resultados │ Goles │ Pts │
+│    │        │    ├───┬───┬───┼───┬───┤     │
+│    │        │    │ G │ E │ P │GF │GC │     │
+└────┴────────┴────┴───┴───┴───┴───┴───┴─────┘
+Fila 1: 6 th  (3+2 columnas agrupadas)
+Fila 2: 5 th  (las demás ya están ocupadas)</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-colgroup" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>colgroup y col: presupuesto familiar</h2>
+            <p><code>colgroup</code> va justo después del <code>caption</code> y define grupos de columnas con <code>col</code>. Por sí solo no cambia el aspecto: sirve para que, más adelante, CSS pueda pintar una columna entera (por ejemplo, el total) sin tocar cada celda.</p>
+            <div class="resultado">
+                <table>
+                    <caption>Presupuesto del primer trimestre</caption>
+                    <colgroup>
+                        <col>
+                        <col span="3">
+                        <col>
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th scope="col">Concepto</th>
+                            <th scope="col">Enero</th>
+                            <th scope="col">Febrero</th>
+                            <th scope="col">Marzo</th>
+                            <th scope="col">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row">Alquiler</th><td>650</td><td>650</td><td>650</td><td>1950</td></tr>
+                        <tr><th scope="row">Supermercado</th><td>320</td><td>290</td><td>340</td><td>950</td></tr>
+                        <tr><th scope="row">Luz y agua</th><td>85</td><td>92</td><td>78</td><td>255</td></tr>
+                        <tr><th scope="row">Transporte</th><td>60</td><td>60</td><td>60</td><td>180</td></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr><th scope="row">Total</th><td>1115</td><td>1092</td><td>1128</td><td>3335</td></tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table&gt;
+    &lt;caption&gt;Presupuesto del primer trimestre&lt;/caption&gt;
+    &lt;colgroup&gt;
+        &lt;col&gt;
+        &lt;col span="3"&gt;
+        &lt;col&gt;
+    &lt;/colgroup&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th scope="col"&gt;Concepto&lt;/th&gt;
+            &lt;th scope="col"&gt;Enero&lt;/th&gt;
+            ...
+            &lt;th scope="col"&gt;Total&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;&lt;th scope="row"&gt;Alquiler&lt;/th&gt;&lt;td&gt;650&lt;/td&gt;...&lt;td&gt;1950&lt;/td&gt;&lt;/tr&gt;
+        ...
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+        &lt;tr&gt;&lt;th scope="row"&gt;Total&lt;/th&gt;&lt;td&gt;1115&lt;/td&gt;...&lt;td&gt;3335&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Grupos definidos</figcaption>
+<pre>col 1          → Concepto
+col span="3"   → Enero, Febrero, Marzo
+col 3          → Total
+
+Orden dentro de table:
+caption → colgroup → thead → tbody → tfoot</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-planes" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Comparativa de planes de una aplicación</h2>
+            <p>Las páginas de precios comparan planes en columnas y características en filas. Los símbolos ✓ y ✗ son caracteres de texto, así que se pueden escribir directamente en la celda; añadir "Sí"/"No" ayuda a quien usa lector de pantalla.</p>
+            <div class="resultado">
+                <table>
+                    <caption>Planes de NubeEjemplo</caption>
+                    <thead>
+                        <tr>
+                            <td></td>
+                            <th scope="col">Básico</th>
+                            <th scope="col">Pro</th>
+                            <th scope="col">Empresa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row">Precio al mes</th><td>Gratis</td><td>9 €</td><td>29 €</td></tr>
+                        <tr><th scope="row">Usuarios</th><td>1</td><td>5</td><td>Ilimitados</td></tr>
+                        <tr><th scope="row">Almacenamiento</th><td>5 GB</td><td>100 GB</td><td>1 TB</td></tr>
+                        <tr><th scope="row">Copias de seguridad</th><td>✗ No</td><td>✓ Sí</td><td>✓ Sí</td></tr>
+                        <tr><th scope="row">Dominio propio</th><td>✗ No</td><td>✓ Sí</td><td>✓ Sí</td></tr>
+                        <tr><th scope="row">Soporte 24 h</th><td>✗ No</td><td>✗ No</td><td>✓ Sí</td></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td><a href="#ej-planes">Empezar gratis</a></td>
+                            <td><a href="#ej-planes">Probar 30 días</a></td>
+                            <td><a href="mailto:ventas@example.com">Contactar con ventas</a></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;thead&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;th scope="col"&gt;Básico&lt;/th&gt;
+        &lt;th scope="col"&gt;Pro&lt;/th&gt;
+        &lt;th scope="col"&gt;Empresa&lt;/th&gt;
+    &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+    &lt;tr&gt;&lt;th scope="row"&gt;Precio al mes&lt;/th&gt;&lt;td&gt;Gratis&lt;/td&gt;&lt;td&gt;9 €&lt;/td&gt;&lt;td&gt;29 €&lt;/td&gt;&lt;/tr&gt;
+    ...
+    &lt;tr&gt;&lt;th scope="row"&gt;Copias de seguridad&lt;/th&gt;&lt;td&gt;✗ No&lt;/td&gt;&lt;td&gt;✓ Sí&lt;/td&gt;&lt;td&gt;✓ Sí&lt;/td&gt;&lt;/tr&gt;
+    ...
+&lt;/tbody&gt;
+&lt;tfoot&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="#"&gt;Empezar gratis&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="#"&gt;Probar 30 días&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href="mailto:ventas@example.com"&gt;Contactar con ventas&lt;/a&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/tfoot&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Celda vacía</figcaption>
+<pre>La esquina superior izquierda no
+encabeza nada: se deja como un
+&lt;td&gt;&lt;/td&gt; vacío. Aun así hay que
+escribirla para que las columnas
+no se desplacen.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-calendario" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Calendario mensual</h2>
+            <p>Un calendario es una tabla de 7 columnas. Los días anteriores al 1 del mes se rellenan con una celda vacía que abarca varias columnas (<code>colspan</code>). Los nombres de los días usan <code>abbr</code> para mostrar solo la inicial.</p>
+            <div class="resultado">
+                <table>
+                    <caption>Noviembre 2026</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col"><abbr title="Lunes">L</abbr></th>
+                            <th scope="col"><abbr title="Martes">M</abbr></th>
+                            <th scope="col"><abbr title="Miércoles">X</abbr></th>
+                            <th scope="col"><abbr title="Jueves">J</abbr></th>
+                            <th scope="col"><abbr title="Viernes">V</abbr></th>
+                            <th scope="col"><abbr title="Sábado">S</abbr></th>
+                            <th scope="col"><abbr title="Domingo">D</abbr></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="6"></td><td>1</td></tr>
+                        <tr><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+                        <tr><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td></tr>
+                        <tr><td>16</td><td>17</td><td>18</td><td><strong>19</strong></td><td>20</td><td>21</td><td>22</td></tr>
+                        <tr><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td></tr>
+                        <tr><td>30</td><td colspan="6"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table&gt;
+    &lt;caption&gt;Noviembre 2026&lt;/caption&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th scope="col"&gt;&lt;abbr title="Lunes"&gt;L&lt;/abbr&gt;&lt;/th&gt;
+            &lt;th scope="col"&gt;&lt;abbr title="Martes"&gt;M&lt;/abbr&gt;&lt;/th&gt;
+            ...
+            &lt;th scope="col"&gt;&lt;abbr title="Domingo"&gt;D&lt;/abbr&gt;&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;&lt;td colspan="6"&gt;&lt;/td&gt;&lt;td&gt;1&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;2&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;...&lt;td&gt;8&lt;/td&gt;&lt;/tr&gt;
+        ...
+        &lt;tr&gt;&lt;td&gt;16&lt;/td&gt;&lt;td&gt;17&lt;/td&gt;&lt;td&gt;18&lt;/td&gt;&lt;td&gt;&lt;strong&gt;19&lt;/strong&gt;&lt;/td&gt;...&lt;/tr&gt;
+        ...
+        &lt;tr&gt;&lt;td&gt;30&lt;/td&gt;&lt;td colspan="6"&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Primera y última semana</figcaption>
+<pre>L  M  X  J  V  S  D
+└──── colspan=6 ───┘ 1
+...
+30 └──── colspan=6 ───┘</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-transporte" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Horario de autobús</h2>
+            <p>Los horarios de transporte ponen las paradas en filas y cada salida en una columna. Un guion indica que ese servicio no se detiene en la parada.</p>
+            <div class="resultado">
+                <table>
+                    <caption>Línea 12 · Centro → Universidad · Días laborables</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Parada</th>
+                            <th scope="col">Salida 1</th>
+                            <th scope="col">Salida 2</th>
+                            <th scope="col">Exprés</th>
+                            <th scope="col">Salida 3</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row">Plaza Mayor</th><td>07:00</td><td>07:30</td><td>07:45</td><td>08:00</td></tr>
+                        <tr><th scope="row">Mercado Central</th><td>07:06</td><td>07:36</td><td>—</td><td>08:06</td></tr>
+                        <tr><th scope="row">Hospital</th><td>07:12</td><td>07:42</td><td>—</td><td>08:12</td></tr>
+                        <tr><th scope="row">Estación de tren</th><td>07:20</td><td>07:50</td><td>07:58</td><td>08:20</td></tr>
+                        <tr><th scope="row">Universidad</th><td>07:30</td><td>08:00</td><td>08:06</td><td>08:30</td></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr><td colspan="5">— El servicio no se detiene en esa parada.</td></tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table&gt;
+    &lt;caption&gt;Línea 12 · Centro → Universidad · Días laborables&lt;/caption&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th scope="col"&gt;Parada&lt;/th&gt;
+            &lt;th scope="col"&gt;Salida 1&lt;/th&gt;
+            ...
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;th scope="row"&gt;Plaza Mayor&lt;/th&gt;
+            &lt;td&gt;07:00&lt;/td&gt;&lt;td&gt;07:30&lt;/td&gt;&lt;td&gt;07:45&lt;/td&gt;&lt;td&gt;08:00&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th scope="row"&gt;Mercado Central&lt;/th&gt;
+            &lt;td&gt;07:06&lt;/td&gt;&lt;td&gt;07:36&lt;/td&gt;&lt;td&gt;—&lt;/td&gt;&lt;td&gt;08:06&lt;/td&gt;
+        &lt;/tr&gt;
+        ...
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+        &lt;tr&gt;&lt;td colspan="5"&gt;— El servicio no se detiene en esa parada.&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-boleta" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Boleta de calificaciones</h2>
+            <p>Encabezados de fila para las asignaturas, de columna para los trimestres, y un <code>tfoot</code> con el promedio. El <code>caption</code> puede contener varias líneas de información.</p>
+            <div class="resultado">
+                <table>
+                    <caption>
+                        <strong>Boleta de calificaciones · Curso 2026</strong><br>
+                        Alumna: Sofía Ramírez · Grupo: 2.º B
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Asignatura</th>
+                            <th scope="col">1.er trimestre</th>
+                            <th scope="col">2.º trimestre</th>
+                            <th scope="col">3.er trimestre</th>
+                            <th scope="col">Nota final</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row">Matemáticas</th><td>7</td><td>8</td><td>9</td><td>8,0</td></tr>
+                        <tr><th scope="row">Lengua</th><td>9</td><td>8</td><td>8</td><td>8,3</td></tr>
+                        <tr><th scope="row">Ciencias</th><td>6</td><td>7</td><td>8</td><td>7,0</td></tr>
+                        <tr><th scope="row">Historia</th><td>8</td><td>9</td><td>9</td><td>8,7</td></tr>
+                        <tr><th scope="row">Inglés</th><td>9</td><td>9</td><td>10</td><td>9,3</td></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr><th scope="row">Promedio</th><td>7,8</td><td>8,2</td><td>8,8</td><td><strong>8,3</strong></td></tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table&gt;
+    &lt;caption&gt;
+        &lt;strong&gt;Boleta de calificaciones · Curso 2026&lt;/strong&gt;&lt;br&gt;
+        Alumna: Sofía Ramírez · Grupo: 2.º B
+    &lt;/caption&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th scope="col"&gt;Asignatura&lt;/th&gt;
+            &lt;th scope="col"&gt;1.er trimestre&lt;/th&gt;
+            ...
+            &lt;th scope="col"&gt;Nota final&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;&lt;th scope="row"&gt;Matemáticas&lt;/th&gt;&lt;td&gt;7&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;&lt;td&gt;9&lt;/td&gt;&lt;td&gt;8,0&lt;/td&gt;&lt;/tr&gt;
+        ...
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+        &lt;tr&gt;&lt;th scope="row"&gt;Promedio&lt;/th&gt;&lt;td&gt;7,8&lt;/td&gt;...&lt;td&gt;&lt;strong&gt;8,3&lt;/strong&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-nutricional" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Tabla nutricional de un alimento</h2>
+            <p>La etiqueta de cualquier paquete de comida es una tabla. Las filas "de las cuales" son subapartados de la fila anterior; aquí se indica con texto, y con CSS se les pondría sangría.</p>
+            <div class="resultado">
+                <table>
+                    <caption>Información nutricional · Cereal de avena crujiente</caption>
+                    <thead>
+                        <tr>
+                            <td></td>
+                            <th scope="col">Por 100 g</th>
+                            <th scope="col">Por ración (30 g)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row">Valor energético</th><td>380 kcal</td><td>114 kcal</td></tr>
+                        <tr><th scope="row">Grasas</th><td>2,5 g</td><td>0,8 g</td></tr>
+                        <tr><th scope="row">de las cuales saturadas</th><td>0,5 g</td><td>0,2 g</td></tr>
+                        <tr><th scope="row">Hidratos de carbono</th><td>80 g</td><td>24 g</td></tr>
+                        <tr><th scope="row">de los cuales azúcares</th><td>12 g</td><td>3,6 g</td></tr>
+                        <tr><th scope="row">Fibra alimentaria</th><td>6 g</td><td>1,8 g</td></tr>
+                        <tr><th scope="row">Proteínas</th><td>8 g</td><td>2,4 g</td></tr>
+                        <tr><th scope="row">Sal</th><td>0,9 g</td><td>0,27 g</td></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr><td colspan="3"><small>Envase de 500 g · aprox. 16 raciones</small></td></tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table&gt;
+    &lt;caption&gt;Información nutricional · Cereal de avena crujiente&lt;/caption&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;/td&gt;
+            &lt;th scope="col"&gt;Por 100 g&lt;/th&gt;
+            &lt;th scope="col"&gt;Por ración (30 g)&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;&lt;th scope="row"&gt;Valor energético&lt;/th&gt;&lt;td&gt;380 kcal&lt;/td&gt;&lt;td&gt;114 kcal&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;th scope="row"&gt;Grasas&lt;/th&gt;&lt;td&gt;2,5 g&lt;/td&gt;&lt;td&gt;0,8 g&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;th scope="row"&gt;de las cuales saturadas&lt;/th&gt;&lt;td&gt;0,5 g&lt;/td&gt;&lt;td&gt;0,2 g&lt;/td&gt;&lt;/tr&gt;
+        ...
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+        &lt;tr&gt;&lt;td colspan="3"&gt;&lt;small&gt;Envase de 500 g · aprox. 16 raciones&lt;/small&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-abbr" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Abreviaturas en los encabezados: estadísticas de baloncesto</h2>
+            <p>Las tablas deportivas usan siglas para ahorrar espacio. Con <code>abbr title="..."</code> el significado aparece al pasar el mouse y los lectores de pantalla pueden leerlo completo.</p>
+            <div class="resultado">
+                <table>
+                    <caption>Halcones del Norte · Partido del 14 de noviembre</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Jugador</th>
+                            <th scope="col"><abbr title="Minutos jugados">MIN</abbr></th>
+                            <th scope="col"><abbr title="Puntos">PTS</abbr></th>
+                            <th scope="col"><abbr title="Rebotes">REB</abbr></th>
+                            <th scope="col"><abbr title="Asistencias">AST</abbr></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row">Marco Díaz</th><td>32</td><td>18</td><td>5</td><td>7</td></tr>
+                        <tr><th scope="row">Iván Soto</th><td>35</td><td>24</td><td>9</td><td>2</td></tr>
+                        <tr><th scope="row">Pablo Ruiz</th><td>28</td><td>9</td><td>11</td><td>1</td></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr><th scope="row">Total</th><td>95</td><td>51</td><td>25</td><td>10</td></tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;thead&gt;
+    &lt;tr&gt;
+        &lt;th scope="col"&gt;Jugador&lt;/th&gt;
+        &lt;th scope="col"&gt;&lt;abbr title="Minutos jugados"&gt;MIN&lt;/abbr&gt;&lt;/th&gt;
+        &lt;th scope="col"&gt;&lt;abbr title="Puntos"&gt;PTS&lt;/abbr&gt;&lt;/th&gt;
+        &lt;th scope="col"&gt;&lt;abbr title="Rebotes"&gt;REB&lt;/abbr&gt;&lt;/th&gt;
+        &lt;th scope="col"&gt;&lt;abbr title="Asistencias"&gt;AST&lt;/abbr&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+    &lt;tr&gt;&lt;th scope="row"&gt;Marco Díaz&lt;/th&gt;&lt;td&gt;32&lt;/td&gt;&lt;td&gt;18&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;7&lt;/td&gt;&lt;/tr&gt;
+    ...
+&lt;/tbody&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tallas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Guía de tallas de una tienda de ropa</h2>
+            <p>Las tablas de equivalencias permiten leer en dos direcciones: busca tu medida en una columna y encuentra la talla en la fila. Los rangos se escriben con una raya: 82–86.</p>
+            <div class="resultado">
+                <table>
+                    <caption>Guía de tallas · Camisetas (medidas en cm)</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Talla</th>
+                            <th scope="col">Pecho</th>
+                            <th scope="col">Cintura</th>
+                            <th scope="col">Equivalencia europea</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row">XS</th><td>82–86</td><td>66–70</td><td>34</td></tr>
+                        <tr><th scope="row">S</th><td>87–91</td><td>71–75</td><td>36</td></tr>
+                        <tr><th scope="row">M</th><td>92–97</td><td>76–81</td><td>38</td></tr>
+                        <tr><th scope="row">L</th><td>98–104</td><td>82–88</td><td>40</td></tr>
+                        <tr><th scope="row">XL</th><td>105–111</td><td>89–95</td><td>42</td></tr>
+                    </tbody>
+                </table>
+                <p>¿Dudas con tu talla? <a href="https://wa.me/525555550144" target="_blank" rel="noopener noreferrer">Pregúntanos por WhatsApp</a>.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table&gt;
+    &lt;caption&gt;Guía de tallas · Camisetas (medidas en cm)&lt;/caption&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th scope="col"&gt;Talla&lt;/th&gt;
+            &lt;th scope="col"&gt;Pecho&lt;/th&gt;
+            &lt;th scope="col"&gt;Cintura&lt;/th&gt;
+            &lt;th scope="col"&gt;Equivalencia europea&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;&lt;th scope="row"&gt;XS&lt;/th&gt;&lt;td&gt;82–86&lt;/td&gt;&lt;td&gt;66–70&lt;/td&gt;&lt;td&gt;34&lt;/td&gt;&lt;/tr&gt;
+        ...
+    &lt;/tbody&gt;
+&lt;/table&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-accesible" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Tabla compleja accesible con headers e id: ventas por región</h2>
+            <p>Cuando hay encabezados intermedios (las regiones), <code>scope</code> no basta. Cada encabezado recibe un <code>id</code> y cada celda lista en <code>headers</code> los <code>id</code> de todos sus encabezados, separados por espacios. Un lector de pantalla leerá: "Región Norte, Sucursal Cumbres, 2.º trimestre, 13 100".</p>
+            <div class="resultado">
+                <table>
+                    <caption>Ventas por sucursal (en euros)</caption>
+                    <thead>
+                        <tr>
+                            <th id="v-suc">Sucursal</th>
+                            <th id="v-t1">1.er trimestre</th>
+                            <th id="v-t2">2.º trimestre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th id="v-norte" colspan="3">Región Norte</th>
+                        </tr>
+                        <tr>
+                            <th id="v-cumbres" headers="v-norte v-suc">Sucursal Cumbres</th>
+                            <td headers="v-norte v-cumbres v-t1">12 400</td>
+                            <td headers="v-norte v-cumbres v-t2">13 100</td>
+                        </tr>
+                        <tr>
+                            <th id="v-valle" headers="v-norte v-suc">Sucursal Valle</th>
+                            <td headers="v-norte v-valle v-t1">9 850</td>
+                            <td headers="v-norte v-valle v-t2">10 200</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <th id="v-sur" colspan="3">Región Sur</th>
+                        </tr>
+                        <tr>
+                            <th id="v-puerto" headers="v-sur v-suc">Sucursal Puerto</th>
+                            <td headers="v-sur v-puerto v-t1">15 300</td>
+                            <td headers="v-sur v-puerto v-t2">14 750</td>
+                        </tr>
+                        <tr>
+                            <th id="v-bahia" headers="v-sur v-suc">Sucursal Bahía</th>
+                            <td headers="v-sur v-bahia v-t1">8 600</td>
+                            <td headers="v-sur v-bahia v-t2">9 900</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;thead&gt;
+    &lt;tr&gt;
+        &lt;th id="v-suc"&gt;Sucursal&lt;/th&gt;
+        &lt;th id="v-t1"&gt;1.er trimestre&lt;/th&gt;
+        &lt;th id="v-t2"&gt;2.º trimestre&lt;/th&gt;
+    &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+    &lt;tr&gt;
+        &lt;th id="v-norte" colspan="3"&gt;Región Norte&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th id="v-cumbres" headers="v-norte v-suc"&gt;Sucursal Cumbres&lt;/th&gt;
+        &lt;td headers="v-norte v-cumbres v-t1"&gt;12 400&lt;/td&gt;
+        &lt;td headers="v-norte v-cumbres v-t2"&gt;13 100&lt;/td&gt;
+    &lt;/tr&gt;
+    ...
+&lt;/tbody&gt;
+&lt;tbody&gt;
+    &lt;tr&gt;
+        &lt;th id="v-sur" colspan="3"&gt;Región Sur&lt;/th&gt;
+    &lt;/tr&gt;
+    ...
+&lt;/tbody&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cuándo usar cada técnica</figcaption>
+<pre>Tabla simple (una fila y/o una
+columna de encabezados)
+    → scope="col" / scope="row"
+
+Tabla con encabezados a varios
+niveles o en medio de los datos
+    → id en cada th
+    → headers="id1 id2 id3" en cada td
+
+Una tabla puede tener varios tbody
+para separar grupos de filas.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-maquetacion" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Datos tabulares sí, maquetación no</h2>
+            <p>Hace años las páginas se maquetaban con tablas: una celda para el menú, otra para el contenido. Hoy es una mala práctica: los lectores de pantalla anuncian "tabla de 2 columnas" sin que haya datos, el diseño no se adapta al móvil y el código es difícil de mantener. Para la estructura se usan etiquetas semánticas y CSS.</p>
+            <div class="resultado">
+                <p><strong>Mal:</strong> una tabla usada para colocar el menú a la izquierda del contenido.</p>
+                <table>
+                    <tr>
+                        <td>
+                            <a href="#ej-maquetacion">Inicio</a><br>
+                            <a href="#ej-maquetacion">Blog</a><br>
+                            <a href="#ej-maquetacion">Contacto</a>
+                        </td>
+                        <td>
+                            <h3>Bienvenidos a mi blog</h3>
+                            <p>Aquí comparto recetas, viajes y fotografías.</p>
+                        </td>
+                    </tr>
+                </table>
+                <p><strong>Bien:</strong> etiquetas que describen qué es cada parte; la posición se decide con CSS.</p>
+                <nav aria-label="Menú del blog de ejemplo">
+                    <ul>
+                        <li><a href="#ej-maquetacion">Inicio</a></li>
+                        <li><a href="#ej-maquetacion">Blog</a></li>
+                        <li><a href="#ej-maquetacion">Contacto</a></li>
+                    </ul>
+                </nav>
+                <article>
+                    <h3>Bienvenidos a mi blog</h3>
+                    <p>Aquí comparto recetas, viajes y fotografías.</p>
+                </article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Mal: tabla para maquetar</figcaption>
+<pre>&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;
+            &lt;a href="#"&gt;Inicio&lt;/a&gt;&lt;br&gt;
+            &lt;a href="#"&gt;Blog&lt;/a&gt;&lt;br&gt;
+            &lt;a href="#"&gt;Contacto&lt;/a&gt;
+        &lt;/td&gt;
+        &lt;td&gt;
+            &lt;h3&gt;Bienvenidos a mi blog&lt;/h3&gt;
+            &lt;p&gt;Aquí comparto recetas...&lt;/p&gt;
+        &lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Bien: HTML semántico</figcaption>
+<pre>&lt;nav aria-label="Menú del blog de ejemplo"&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Inicio&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Blog&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;Contacto&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/nav&gt;
+&lt;article&gt;
+    &lt;h3&gt;Bienvenidos a mi blog&lt;/h3&gt;
+    &lt;p&gt;Aquí comparto recetas...&lt;/p&gt;
+&lt;/article&gt;
+
+¿Es una tabla? Pregúntate:
+¿tendría sentido en una hoja de
+cálculo, con filas y columnas que
+se comparan entre sí?
+  Sí → table
+  No → nav, main, article, section...</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="03-enlaces-listas.html">Anterior: enlaces y listas</a> |
+            <a href="index.html">Índice</a> |
+            <a href="05-formularios.html">Siguiente: formularios</a>
+        </nav>
+    </footer>
+</body>
+</html>

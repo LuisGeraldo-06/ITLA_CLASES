@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>02. Texto y citas</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+</head>
+<body>
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>02. Texto y citas</h1>
+        <p>HTML ofrece etiquetas para expresar <strong>el significado</strong> de fragmentos de texto: importancia, énfasis, citas, código, fechas, abreviaturas… El aspecto se decide después con CSS; lo importante es elegir la etiqueta correcta.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-aviso">strong, em, b, i</a></li>
+            <li><a href="#ej-busqueda">mark</a></li>
+            <li><a href="#ej-contrato">small</a></li>
+            <li><a href="#ej-precios">del, ins, s</a></li>
+            <li><a href="#ej-historial">Historial de cambios</a></li>
+            <li><a href="#ej-ciencia">sub y sup</a></li>
+            <li><a href="#ej-abbr">abbr</a></li>
+            <li><a href="#ej-glosario">dfn</a></li>
+            <li><a href="#ej-resena">q, blockquote, cite</a></li>
+            <li><a href="#ej-atajos">kbd</a></li>
+            <li><a href="#ej-terminal">code, samp, var</a></li>
+            <li><a href="#ej-poema">pre</a></li>
+            <li><a href="#ej-agenda">time</a></li>
+            <li><a href="#ej-contacto">address</a></li>
+            <li><a href="#ej-productos">data</a></li>
+            <li><a href="#ej-ruby">ruby</a></li>
+            <li><a href="#ej-comentarios">bdi</a></li>
+            <li><a href="#ej-wbr">wbr y u</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Elementos de texto en línea</h2>
+            <p>Casi todos estos elementos son <strong>en línea</strong>: van dentro de un párrafo sin romper la línea. Las excepciones son <code>&lt;blockquote&gt;</code>, <code>&lt;pre&gt;</code> y <code>&lt;address&gt;</code>, que son de bloque.</p>
+            <table>
+                <thead>
+                    <tr><th>Elemento</th><th>Significado</th><th>Aspecto por defecto</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>&lt;strong&gt;</code></td><td>importancia, urgencia</td><td><strong>negrita</strong></td></tr>
+                    <tr><td><code>&lt;em&gt;</code></td><td>énfasis al leer en voz alta</td><td><em>cursiva</em></td></tr>
+                    <tr><td><code>&lt;b&gt;</code></td><td>llamar la atención sin importancia extra</td><td><b>negrita</b></td></tr>
+                    <tr><td><code>&lt;i&gt;</code></td><td>voz distinta: términos extranjeros, nombres científicos</td><td><i>cursiva</i></td></tr>
+                    <tr><td><code>&lt;mark&gt;</code></td><td>resaltado relevante en este contexto</td><td><mark>fondo amarillo</mark></td></tr>
+                    <tr><td><code>&lt;small&gt;</code></td><td>letra pequeña, comentarios legales</td><td><small>más pequeño</small></td></tr>
+                    <tr><td><code>&lt;del&gt;</code> / <code>&lt;ins&gt;</code></td><td>texto eliminado / añadido</td><td><del>tachado</del> / <ins>subrayado</ins></td></tr>
+                    <tr><td><code>&lt;s&gt;</code></td><td>ya no es correcto o vigente</td><td><s>tachado</s></td></tr>
+                    <tr><td><code>&lt;sub&gt;</code> / <code>&lt;sup&gt;</code></td><td>subíndice / superíndice</td><td>H<sub>2</sub>O / m<sup>2</sup></td></tr>
+                    <tr><td><code>&lt;abbr&gt;</code></td><td>abreviatura o sigla</td><td><abbr title="Organización Mundial de la Salud">OMS</abbr></td></tr>
+                    <tr><td><code>&lt;dfn&gt;</code></td><td>término que se está definiendo</td><td><dfn>cursiva</dfn></td></tr>
+                    <tr><td><code>&lt;q&gt;</code> / <code>&lt;blockquote&gt;</code></td><td>cita corta / cita larga</td><td><q>comillas</q> / bloque con sangría</td></tr>
+                    <tr><td><code>&lt;cite&gt;</code></td><td>título de una obra</td><td><cite>cursiva</cite></td></tr>
+                    <tr><td><code>&lt;code&gt;</code> / <code>&lt;kbd&gt;</code> / <code>&lt;samp&gt;</code> / <code>&lt;var&gt;</code></td><td>código / tecla / salida de programa / variable</td><td><code>monoespaciada</code> … <var>cursiva</var></td></tr>
+                    <tr><td><code>&lt;pre&gt;</code></td><td>texto preformateado</td><td>conserva espacios</td></tr>
+                    <tr><td><code>&lt;time&gt;</code> / <code>&lt;data&gt;</code></td><td>fecha u hora / valor legible por máquinas</td><td>sin cambios</td></tr>
+                    <tr><td><code>&lt;address&gt;</code></td><td>datos de contacto</td><td><i>cursiva</i>, de bloque</td></tr>
+                    <tr><td><code>&lt;ruby&gt;</code>, <code>&lt;bdi&gt;</code>, <code>&lt;wbr&gt;</code>, <code>&lt;u&gt;</code></td><td>pronunciación, texto bidireccional, posible corte, anotación</td><td>varios</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="ej-aviso" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>strong, em, b e i: normas de la piscina municipal</h2>
+            <p>Se ven igual de dos en dos, pero no significan lo mismo. <code>&lt;strong&gt;</code> indica importancia y <code>&lt;em&gt;</code> expresa énfasis (cambia el sentido de la frase). <code>&lt;b&gt;</code> e <code>&lt;i&gt;</code> solo distinguen el texto, sin darle más peso.</p>
+            <div class="resultado">
+                <h3>Piscina municipal: normas de uso</h3>
+                <p><strong>Prohibido saltar de cabeza en la zona poco profunda.</strong></p>
+                <p>Es obligatorio ducharse <em>antes</em> de entrar al agua, no después.</p>
+                <p>Los menores de 12 años deben ir <em>siempre</em> acompañados de un adulto.</p>
+                <p><b>Horario:</b> de 11:00 a 20:00. <b>Precio:</b> 3,50&nbsp;&euro;.</p>
+                <p>Este verano tenemos clases de <i lang="en">aquagym</i> y de <i lang="en">water polo</i>. En el jardín verás <i>Lavandula angustifolia</i>, es decir, lavanda.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;&lt;strong&gt;Prohibido saltar de cabeza en la zona poco profunda.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Es obligatorio ducharse &lt;em&gt;antes&lt;/em&gt; de entrar al agua...&lt;/p&gt;
+&lt;p&gt;... deben ir &lt;em&gt;siempre&lt;/em&gt; acompañados de un adulto.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;Horario:&lt;/b&gt; de 11:00 a 20:00. &lt;b&gt;Precio:&lt;/b&gt; 3,50&amp;nbsp;&amp;euro;.&lt;/p&gt;
+&lt;p&gt;... clases de &lt;i lang="en"&gt;aquagym&lt;/i&gt; y de &lt;i lang="en"&gt;water polo&lt;/i&gt;.
+   En el jardín verás &lt;i&gt;Lavandula angustifolia&lt;/i&gt;...&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cómo elegir</figcaption>
+<pre>¿Es importante o peligroso?   → strong
+¿Lo dirías con otra entonación?→ em
+¿Solo quieres que destaque
+ visualmente (etiqueta, nombre
+ de producto)?                 → b
+¿Es otra "voz": palabra
+ extranjera, nombre científico,
+ pensamiento de un personaje?  → i
+
+"Ducharse ANTES" ≠ "DUCHARSE antes"
+em cambia el significado.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-busqueda" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>mark: resultados de una búsqueda</h2>
+            <p><code>&lt;mark&gt;</code> resalta un fragmento por ser relevante en este momento, como las palabras que coinciden con lo que has buscado.</p>
+            <div class="resultado">
+                <p>Resultados para: <strong>bizcocho de limón</strong></p>
+                <h3><a href="#ej-busqueda">Bizcocho de limón esponjoso sin mantequilla</a></h3>
+                <p>Este <mark>bizcocho</mark> <mark>de</mark> <mark>limón</mark> queda húmedo gracias al yogur. Ralla la piel de dos <mark>limones</mark> antes de exprimirlos…</p>
+                <h3><a href="#ej-busqueda">Glaseado de limón para tartas</a></h3>
+                <p>Un glaseado rápido de azúcar glas y zumo de <mark>limón</mark>, perfecto para cubrir cualquier <mark>bizcocho</mark>…</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;Resultados para: &lt;strong&gt;bizcocho de limón&lt;/strong&gt;&lt;/p&gt;
+&lt;h3&gt;&lt;a href="#"&gt;Bizcocho de limón esponjoso sin mantequilla&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Este &lt;mark&gt;bizcocho&lt;/mark&gt; &lt;mark&gt;de&lt;/mark&gt; &lt;mark&gt;limón&lt;/mark&gt;
+   queda húmedo gracias al yogur. Ralla la piel de dos
+   &lt;mark&gt;limones&lt;/mark&gt; antes de exprimirlos…&lt;/p&gt;
+...</pre>
+                </figure>
+                <figure>
+                    <figcaption>mark frente a strong</figcaption>
+<pre>strong  importante siempre
+mark    relevante ahora, para este
+        lector o esta búsqueda
+
+Otros usos de mark:
+- frase subrayada en un libro
+  electrónico
+- cambios destacados en una
+  revisión de un documento</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-contrato" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>small: la letra pequeña de una oferta de telefonía</h2>
+            <p><code>&lt;small&gt;</code> representa comentarios secundarios: condiciones legales, avisos, derechos de autor. No sirve solo para «hacer el texto pequeño».</p>
+            <div class="resultado">
+                <h3>Tarifa Fibra 600 Mb + Móvil</h3>
+                <p><strong>25&nbsp;&euro;/mes*</strong> los 6 primeros meses.</p>
+                <p><small>*Precio promocional durante 6 meses; después, 42&nbsp;&euro;/mes. Permanencia de 12 meses. Penalización por baja anticipada de hasta 150&nbsp;&euro;. Impuestos incluidos. Oferta válida hasta el 31/12/2026 para nuevas altas.</small></p>
+                <p><small>&copy; 2026 TeleRápida S.A.</small></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Tarifa Fibra 600 Mb + Móvil&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;25&amp;nbsp;&amp;euro;/mes*&lt;/strong&gt; los 6 primeros meses.&lt;/p&gt;
+&lt;p&gt;&lt;small&gt;*Precio promocional durante 6 meses; después,
+   42&amp;nbsp;&amp;euro;/mes. Permanencia de 12 meses...&lt;/small&gt;&lt;/p&gt;
+&lt;p&gt;&lt;small&gt;&amp;copy; 2026 TeleRápida S.A.&lt;/small&gt;&lt;/p&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-precios" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>del, ins y s: rebajas en una frutería online</h2>
+            <p><code>&lt;del&gt;</code> marca texto eliminado y <code>&lt;ins&gt;</code> texto añadido. <code>&lt;s&gt;</code> indica algo que ya no es correcto o vigente, pero que se deja visible.</p>
+            <div class="resultado">
+                <h3>Ofertas de la semana</h3>
+                <p>Fresas (500&nbsp;g): <del>3,99&nbsp;&euro;</del> <ins>2,49&nbsp;&euro;</ins></p>
+                <p>Aguacates (malla de 3): <del>4,50&nbsp;&euro;</del> <ins>3,20&nbsp;&euro;</ins></p>
+                <p>Naranjas de zumo (2&nbsp;kg): 3,10&nbsp;&euro;</p>
+                <p><s>Entrega en 24 horas</s> Entrega en 48 horas por alta demanda.</p>
+                <p><s>Mangos de Málaga</s> Agotados hasta la próxima temporada.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;Fresas (500&amp;nbsp;g): &lt;del&gt;3,99&amp;nbsp;&amp;euro;&lt;/del&gt; &lt;ins&gt;2,49&amp;nbsp;&amp;euro;&lt;/ins&gt;&lt;/p&gt;
+&lt;p&gt;Aguacates (malla de 3): &lt;del&gt;4,50&amp;nbsp;&amp;euro;&lt;/del&gt; &lt;ins&gt;3,20&amp;nbsp;&amp;euro;&lt;/ins&gt;&lt;/p&gt;
+&lt;p&gt;Naranjas de zumo (2&amp;nbsp;kg): 3,10&amp;nbsp;&amp;euro;&lt;/p&gt;
+&lt;p&gt;&lt;s&gt;Entrega en 24 horas&lt;/s&gt; Entrega en 48 horas por alta demanda.&lt;/p&gt;
+&lt;p&gt;&lt;s&gt;Mangos de Málaga&lt;/s&gt; Agotados hasta la próxima temporada.&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>del frente a s</figcaption>
+<pre>del  el documento se ha editado:
+     esto se quitó (historial).
+s    el dato sigue ahí, pero ya
+     no es exacto (precio antiguo,
+     producto agotado).
+
+Los dos se ven tachados; el
+significado es lo que cambia.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-historial" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>del e ins con fecha: historial de cambios de un reglamento</h2>
+            <p><code>&lt;del&gt;</code> e <code>&lt;ins&gt;</code> aceptan los atributos <code>datetime</code> (cuándo se hizo el cambio) y <code>cite</code> (dirección del documento que explica el cambio). Así funcionan las revisiones de una wiki o de un contrato.</p>
+            <div class="resultado">
+                <h3>Reglamento del club de ajedrez: artículo 4</h3>
+                <p>La cuota anual será de <del datetime="2026-01-10">40&nbsp;&euro;</del> <ins datetime="2026-01-10" cite="https://clubajedrez.example/actas/2026-01">45&nbsp;&euro;</ins>.</p>
+                <p>Las partidas del torneo interno se jugarán los <del datetime="2026-03-02">jueves</del> <ins datetime="2026-03-02">miércoles</ins> a las 19:00.</p>
+                <ins datetime="2026-05-15">
+                    <p>Artículo 4 bis: los menores de 16 años pagarán la mitad de la cuota.</p>
+                </ins>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;La cuota anual será de
+  &lt;del datetime="2026-01-10"&gt;40&amp;nbsp;&amp;euro;&lt;/del&gt;
+  &lt;ins datetime="2026-01-10"
+       cite="https://clubajedrez.example/actas/2026-01"&gt;45&amp;nbsp;&amp;euro;&lt;/ins&gt;.&lt;/p&gt;
+&lt;p&gt;... se jugarán los &lt;del datetime="2026-03-02"&gt;jueves&lt;/del&gt;
+  &lt;ins datetime="2026-03-02"&gt;miércoles&lt;/ins&gt; a las 19:00.&lt;/p&gt;
+&lt;ins datetime="2026-05-15"&gt;
+    &lt;p&gt;Artículo 4 bis: los menores de 16 años...&lt;/p&gt;
+&lt;/ins&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Detalles</figcaption>
+<pre>datetime  AAAA-MM-DD (o con hora:
+          2026-01-10T18:30)
+cite      URL con la explicación;
+          no se ve en pantalla
+
+ins y del pueden envolver
+párrafos completos.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-ciencia" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>sub y sup: artículo de divulgación científica</h2>
+            <p><code>&lt;sub&gt;</code> baja el texto (fórmulas químicas) y <code>&lt;sup&gt;</code> lo sube (potencias, unidades, ordinales y llamadas a notas al pie).</p>
+            <div class="resultado">
+                <h3>¿Por qué sube el nivel del mar?</h3>
+                <p>El dióxido de carbono (CO<sub>2</sub>) y el metano (CH<sub>4</sub>) retienen calor en la atmósfera<sup>1</sup>. Al calentarse, el agua (H<sub>2</sub>O) de los océanos se dilata y los glaciares se funden<sup>2</sup>.</p>
+                <p>Según un informe ficticio, la superficie de hielo perdida en un año superó los 250&nbsp;km<sup>2</sup>, y el volumen de agua liberada se mide en miles de millones de m<sup>3</sup>.</p>
+                <p>La energía y la masa se relacionan por E = mc<sup>2</sup>. Una memoria de 2<sup>10</sup> = 1024 bytes equivale a 1 kibibyte.</p>
+                <p>El grupo de investigación quedó en 1.<sup>er</sup> lugar del congreso y su directora recibió el 2.º premio (también 2.<sup>a</sup> edición, 3.<sup>o</sup> curso).</p>
+                <hr>
+                <p><small><sup>1</sup> Efecto invernadero: fenómeno descrito por primera vez en el siglo XIX.<br>
+                <sup>2</sup> Datos de un informe ficticio usado como ejemplo.</small></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;El dióxido de carbono (CO&lt;sub&gt;2&lt;/sub&gt;) y el metano (CH&lt;sub&gt;4&lt;/sub&gt;)
+   retienen calor en la atmósfera&lt;sup&gt;1&lt;/sup&gt;. Al calentarse,
+   el agua (H&lt;sub&gt;2&lt;/sub&gt;O) ...&lt;sup&gt;2&lt;/sup&gt;.&lt;/p&gt;
+&lt;p&gt;... superó los 250&amp;nbsp;km&lt;sup&gt;2&lt;/sup&gt; ... de m&lt;sup&gt;3&lt;/sup&gt;.&lt;/p&gt;
+&lt;p&gt;... E = mc&lt;sup&gt;2&lt;/sup&gt;. Una memoria de 2&lt;sup&gt;10&lt;/sup&gt; = 1024...&lt;/p&gt;
+&lt;p&gt;... 1.&lt;sup&gt;er&lt;/sup&gt; lugar ... 2.º premio (también 2.&lt;sup&gt;a&lt;/sup&gt;
+   edición, 3.&lt;sup&gt;o&lt;/sup&gt; curso).&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;small&gt;&lt;sup&gt;1&lt;/sup&gt; Efecto invernadero: ...&lt;br&gt;
+&lt;sup&gt;2&lt;/sup&gt; Datos de un informe ficticio...&lt;/small&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Ordinales</figcaption>
+<pre>1.º  2.ª   caracteres ya elevados
+          (º y ª del teclado)
+1.&lt;sup&gt;er&lt;/sup&gt;   cuando no existe
+          el carácter
+
+Siempre con punto: 1.º, no 1º.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-abbr" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>abbr: siglas en una noticia internacional</h2>
+            <p><code>&lt;abbr&gt;</code> marca abreviaturas y siglas. Con el atributo <code>title</code> se muestra el significado completo al pasar el ratón. Lo correcto es explicarla también en el texto la primera vez.</p>
+            <div class="resultado">
+                <h3>Cumbre sanitaria en Ginebra</h3>
+                <p>La <abbr title="Organización Mundial de la Salud">OMS</abbr> y la <abbr title="Organización de las Naciones Unidas">ONU</abbr> presentaron ayer un plan para reducir el uso de antibióticos. La <abbr title="Unión Europea">UE</abbr> aportará 200 millones de euros.</p>
+                <p>El documento, de 80 <abbr title="páginas">págs.</abbr>, se puede descargar en <abbr title="Portable Document Format">PDF</abbr> desde la web oficial. La rueda de prensa será a las 10:00 <abbr title="Hora central europea">CET</abbr>.</p>
+                <p><abbr title="HyperText Markup Language">HTML</abbr> significa lenguaje de marcado de hipertexto.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;La &lt;abbr title="Organización Mundial de la Salud"&gt;OMS&lt;/abbr&gt; y la
+   &lt;abbr title="Organización de las Naciones Unidas"&gt;ONU&lt;/abbr&gt;
+   presentaron ayer... La &lt;abbr title="Unión Europea"&gt;UE&lt;/abbr&gt; ...&lt;/p&gt;
+&lt;p&gt;El documento, de 80 &lt;abbr title="páginas"&gt;págs.&lt;/abbr&gt;, ...
+   &lt;abbr title="Portable Document Format"&gt;PDF&lt;/abbr&gt; ...
+   &lt;abbr title="Hora central europea"&gt;CET&lt;/abbr&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt; significa...&lt;/p&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-glosario" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>dfn: glosario de un curso de fotografía</h2>
+            <p><code>&lt;dfn&gt;</code> marca el término que se está definiendo en esa frase. El párrafo que lo contiene debe ser la definición.</p>
+            <div class="resultado">
+                <h3>Glosario básico de fotografía</h3>
+                <p>La <dfn>apertura</dfn> es el tamaño del agujero por el que entra la luz en el objetivo. Se expresa con números f: f/1.8, f/8…</p>
+                <p>La <dfn>velocidad de obturación</dfn> es el tiempo que el sensor está recibiendo luz, por ejemplo 1/250 de segundo.</p>
+                <p>El <dfn><abbr title="International Organization for Standardization">ISO</abbr></dfn> indica la sensibilidad del sensor: cuanto más alto, más claro sale la foto, pero con más ruido.</p>
+                <p>El <dfn id="def-bokeh">bokeh</dfn> es el desenfoque suave del fondo que se consigue con aperturas grandes.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;La &lt;dfn&gt;apertura&lt;/dfn&gt; es el tamaño del agujero...&lt;/p&gt;
+&lt;p&gt;La &lt;dfn&gt;velocidad de obturación&lt;/dfn&gt; es el tiempo...&lt;/p&gt;
+&lt;p&gt;El &lt;dfn&gt;&lt;abbr title="International Organization for
+   Standardization"&gt;ISO&lt;/abbr&gt;&lt;/dfn&gt; indica la sensibilidad...&lt;/p&gt;
+&lt;p&gt;El &lt;dfn id="def-bokeh"&gt;bokeh&lt;/dfn&gt; es el desenfoque...&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Consejo</figcaption>
+<pre>Usa dfn solo la primera vez que
+aparece el término, donde se
+define. Con un id puedes enlazar
+la definición desde otras partes:
+  &lt;a href="#def-bokeh"&gt;bokeh&lt;/a&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-resena" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>q, blockquote y cite: reseña de una novela</h2>
+            <p><code>&lt;q&gt;</code> es una cita corta dentro de un párrafo (el navegador pone las comillas). <code>&lt;blockquote&gt;</code> es una cita extensa que se separa del texto; su atributo <code>cite</code> puede indicar la fuente. <code>&lt;cite&gt;</code> marca el <strong>título</strong> de una obra: libro, película, canción, cuadro…</p>
+            <div class="resultado">
+                <h3>Reseña: <cite>El jardín de las horas quietas</cite></h3>
+                <p>La nueva novela de Irene Castell es, en palabras de su protagonista, <q>un mapa para perderse a propósito</q>. Recuerda a <cite>Cien años de soledad</cite> por su tono y a la película <cite>Amélie</cite> por su ternura.</p>
+                <blockquote cite="https://revistalibros.example/entrevista-castell">
+                    <p>Escribí este libro en las salas de espera de los hospitales. Quería que cada capítulo durase lo mismo que una espera: ni demasiado, ni demasiado poco.</p>
+                </blockquote>
+                <p>&mdash; Irene Castell, entrevista en <cite>Revista Libros</cite>, marzo de 2026.</p>
+                <p>Como dice el refrán: <q>La práctica hace al maestro</q>, y aquí se nota el oficio.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Reseña: &lt;cite&gt;El jardín de las horas quietas&lt;/cite&gt;&lt;/h3&gt;
+&lt;p&gt;... es, en palabras de su protagonista,
+   &lt;q&gt;un mapa para perderse a propósito&lt;/q&gt;. Recuerda a
+   &lt;cite&gt;Cien años de soledad&lt;/cite&gt; ... &lt;cite&gt;Amélie&lt;/cite&gt; ...&lt;/p&gt;
+&lt;blockquote cite="https://revistalibros.example/entrevista-castell"&gt;
+    &lt;p&gt;Escribí este libro en las salas de espera...&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&amp;mdash; Irene Castell, entrevista en &lt;cite&gt;Revista Libros&lt;/cite&gt;...&lt;/p&gt;
+&lt;p&gt;Como dice el refrán: &lt;q&gt;La práctica hace al maestro&lt;/q&gt;, ...&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Resumen</figcaption>
+<pre>q            cita corta, en línea
+blockquote   cita larga, en bloque
+cite="URL"   atributo: la fuente
+             (no se ve)
+&lt;cite&gt;       elemento: título de
+             la obra (se ve en
+             cursiva)
+
+&lt;cite&gt; NO es para el nombre de la
+persona, sino para el de la obra.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-atajos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>kbd: manual de atajos de teclado</h2>
+            <p><code>&lt;kbd&gt;</code> representa lo que el usuario escribe o pulsa con el teclado. Para combinaciones, se anidan varios <code>&lt;kbd&gt;</code> dentro de uno.</p>
+            <div class="resultado">
+                <h3>Atajos esenciales del editor de textos</h3>
+                <p>Copiar: <kbd><kbd>Ctrl</kbd>+<kbd>C</kbd></kbd></p>
+                <p>Pegar: <kbd><kbd>Ctrl</kbd>+<kbd>V</kbd></kbd></p>
+                <p>Deshacer: <kbd><kbd>Ctrl</kbd>+<kbd>Z</kbd></kbd> (en Mac, <kbd><kbd>Cmd</kbd>+<kbd>Z</kbd></kbd>)</p>
+                <p>Buscar en el documento: <kbd><kbd>Ctrl</kbd>+<kbd>F</kbd></kbd></p>
+                <p>Guardar como: <kbd><kbd>Ctrl</kbd>+<kbd>Mayús</kbd>+<kbd>S</kbd></kbd></p>
+                <p>Para buscar una receta, escribe <kbd>tarta de queso</kbd> en la barra y pulsa <kbd>Intro</kbd>.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;Copiar: &lt;kbd&gt;&lt;kbd&gt;Ctrl&lt;/kbd&gt;+&lt;kbd&gt;C&lt;/kbd&gt;&lt;/kbd&gt;&lt;/p&gt;
+&lt;p&gt;Pegar: &lt;kbd&gt;&lt;kbd&gt;Ctrl&lt;/kbd&gt;+&lt;kbd&gt;V&lt;/kbd&gt;&lt;/kbd&gt;&lt;/p&gt;
+...
+&lt;p&gt;Guardar como:
+   &lt;kbd&gt;&lt;kbd&gt;Ctrl&lt;/kbd&gt;+&lt;kbd&gt;Mayús&lt;/kbd&gt;+&lt;kbd&gt;S&lt;/kbd&gt;&lt;/kbd&gt;&lt;/p&gt;
+&lt;p&gt;... escribe &lt;kbd&gt;tarta de queso&lt;/kbd&gt; en la barra
+   y pulsa &lt;kbd&gt;Intro&lt;/kbd&gt;.&lt;/p&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-terminal" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>code, samp y var: documentación de una herramienta</h2>
+            <p><code>&lt;code&gt;</code> identifica código, <code>&lt;samp&gt;</code> la respuesta que muestra un programa y <code>&lt;var&gt;</code> una variable (en matemáticas o en un comando, el valor que tú pones). Combinados con <code>&lt;pre&gt;</code> dan una sesión de terminal.</p>
+            <div class="resultado">
+                <h3>Instalar el gestor de notas «apuntes»</h3>
+                <p>Para mencionar una etiqueta en línea, se puede usar <code>&lt;header&gt;</code>. Para crear una nota, escribe <kbd>apuntes nueva <var>titulo</var></kbd>, cambiando <var>titulo</var> por el nombre que quieras.</p>
+                <p>Si todo va bien, verás <samp>Nota guardada correctamente.</samp> Si no, aparecerá <samp>Error: falta el título</samp>.</p>
+<pre><samp>usuario@portatil:~$</samp> <kbd>apuntes nueva compra</kbd>
+<samp>Nota guardada correctamente.
+Ruta: /home/usuario/apuntes/compra.txt</samp>
+<samp>usuario@portatil:~$</samp> <kbd>apuntes listar</kbd>
+<samp>1. compra
+2. ideas-viaje</samp></pre>
+                <p>El área de un rectángulo es <var>A</var> = <var>b</var> &times; <var>h</var>, donde <var>b</var> es la base y <var>h</var> la altura.</p>
+                <p>Ejemplo de código HTML:</p>
+<pre><code>&lt;p&gt;Hola, mundo&lt;/p&gt;
+&lt;p&gt;Este texto conserva
+los saltos de línea.&lt;/p&gt;</code></pre>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;... escribe &lt;kbd&gt;apuntes nueva &lt;var&gt;titulo&lt;/var&gt;&lt;/kbd&gt;,
+   cambiando &lt;var&gt;titulo&lt;/var&gt; por...&lt;/p&gt;
+&lt;p&gt;Si todo va bien, verás
+   &lt;samp&gt;Nota guardada correctamente.&lt;/samp&gt;...&lt;/p&gt;
+
+&lt;pre&gt;&lt;samp&gt;usuario@portatil:~$&lt;/samp&gt; &lt;kbd&gt;apuntes nueva compra&lt;/kbd&gt;
+&lt;samp&gt;Nota guardada correctamente.
+Ruta: /home/usuario/apuntes/compra.txt&lt;/samp&gt;
+...&lt;/pre&gt;
+
+&lt;p&gt;El área de un rectángulo es &lt;var&gt;A&lt;/var&gt; =
+   &lt;var&gt;b&lt;/var&gt; &amp;times; &lt;var&gt;h&lt;/var&gt;...&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;p&amp;gt;Hola, mundo&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;Este texto conserva
+los saltos de línea.&amp;lt;/p&amp;gt;&lt;/code&gt;&lt;/pre&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Quién es quién</figcaption>
+<pre>code  lo que escribe el programador
+kbd   lo que escribe el usuario
+samp  lo que responde el programa
+var   un valor que cambia
+
+pre   conserva espacios y saltos;
+      pre + code = bloque de código
+
+Para mostrar &lt; dentro de code hay
+que escribir &amp;lt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-poema" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>pre: un poema visual con sangría</h2>
+            <p>Algunos poemas usan la posición de los versos como parte del significado. Con <code>&lt;pre&gt;</code> se respetan todos los espacios, algo imposible con <code>&lt;p&gt;</code> y <code>&lt;br&gt;</code>.</p>
+            <div class="resultado">
+                <h3>La escalera</h3>
+<pre>Subo
+    un peldaño,
+        luego otro,
+            y otro más,
+                sin mirar atrás...
+                    hasta que el cielo
+                        me queda
+                            a la altura
+                                de los ojos.</pre>
+                <p><em>Poema inventado para esta lección.</em></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;La escalera&lt;/h3&gt;
+&lt;pre&gt;Subo
+    un peldaño,
+        luego otro,
+            y otro más,
+                sin mirar atrás...
+                    ...&lt;/pre&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-agenda" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>time: agenda cultural del fin de semana</h2>
+            <p><code>&lt;time&gt;</code> no cambia el aspecto, pero su atributo <code>datetime</code> da la fecha en un formato que entienden los buscadores, los calendarios y los lectores de pantalla.</p>
+            <div class="resultado">
+                <h3>Agenda cultural</h3>
+                <p><strong>Concierto de jazz en la plaza</strong><br>
+                <time datetime="2026-11-21T21:00">Sábado 21 de noviembre, a las 21:00</time></p>
+                <p><strong>Mercadillo de libros de segunda mano</strong><br>
+                Del <time datetime="2026-11-21">21</time> al <time datetime="2026-11-22">22 de noviembre</time>, de <time datetime="10:00">10:00</time> a <time datetime="14:00">14:00</time></p>
+                <p><strong>Taller de cerámica para niños</strong><br>
+                <time datetime="2026-11-22T11:30">Domingo a las 11:30</time>. Duración: <time datetime="PT1H30M">hora y media</time>.</p>
+                <p><small>Agenda actualizada el <time datetime="2026-11-19">19/11/2026</time>.</small></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;&lt;strong&gt;Concierto de jazz en la plaza&lt;/strong&gt;&lt;br&gt;
+&lt;time datetime="2026-11-21T21:00"&gt;Sábado 21 de noviembre, a las 21:00&lt;/time&gt;&lt;/p&gt;
+&lt;p&gt;... Del &lt;time datetime="2026-11-21"&gt;21&lt;/time&gt; al
+   &lt;time datetime="2026-11-22"&gt;22 de noviembre&lt;/time&gt;, de
+   &lt;time datetime="10:00"&gt;10:00&lt;/time&gt; a &lt;time datetime="14:00"&gt;14:00&lt;/time&gt;&lt;/p&gt;
+&lt;p&gt;... Duración: &lt;time datetime="PT1H30M"&gt;hora y media&lt;/time&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;small&gt;Agenda actualizada el
+   &lt;time datetime="2026-11-19"&gt;19/11/2026&lt;/time&gt;.&lt;/small&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Formatos de datetime</figcaption>
+<pre>2026-11-21          fecha
+21:00               hora
+2026-11-21T21:00    fecha y hora
+2026-11             mes
+2026                año
+PT1H30M             duración
+                    (1 hora 30 min)</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-contacto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>address: ficha de contacto de una clínica veterinaria</h2>
+            <p><code>&lt;address&gt;</code> agrupa los datos de contacto del autor o de la organización de la página (o de un artículo). Es un elemento de bloque y el navegador lo muestra en cursiva.</p>
+            <div class="resultado">
+                <h3>Clínica Veterinaria Cuatro Patas</h3>
+                <address>
+                    Calle del Olmo, 22, bajo<br>
+                    41003 Sevilla<br>
+                    Teléfono: <a href="tel:+34955000111">955 000 111</a><br>
+                    Correo: <a href="mailto:citas@cuatropatas.example">citas@cuatropatas.example</a>
+                </address>
+                <p>Urgencias 24 horas todos los días del año.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;h3&gt;Clínica Veterinaria Cuatro Patas&lt;/h3&gt;
+&lt;address&gt;
+    Calle del Olmo, 22, bajo&lt;br&gt;
+    41003 Sevilla&lt;br&gt;
+    Teléfono: &lt;a href="tel:+34955000111"&gt;955 000 111&lt;/a&gt;&lt;br&gt;
+    Correo: &lt;a href="mailto:citas@cuatropatas.example"&gt;citas@...&lt;/a&gt;
+&lt;/address&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cuándo usarlo</figcaption>
+<pre>Sí: el contacto de quien publica
+la página o el artículo.
+
+No: cualquier dirección que
+aparezca en el texto (por ejemplo,
+la de un cliente en una factura);
+para eso basta un &lt;p&gt;.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-productos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>data: catálogo de una ferretería</h2>
+            <p><code>&lt;data&gt;</code> une un texto legible por personas con un <code>value</code> legible por máquinas: un código de producto, un precio sin formato, un identificador…</p>
+            <div class="resultado">
+                <h3>Taladros en oferta</h3>
+                <p><data value="TL-4410">Taladro percutor 750 W</data>: <data value="59.90">59,90&nbsp;&euro;</data></p>
+                <p><data value="TL-5200">Taladro atornillador sin cable 18 V</data>: <data value="89.00">89&nbsp;&euro;</data></p>
+                <p><data value="TL-6001">Martillo perforador SDS</data>: <data value="129.50">129,50&nbsp;&euro;</data></p>
+                <p>Valoración media: <data value="4.6">cuatro estrellas y media</data>.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;&lt;data value="TL-4410"&gt;Taladro percutor 750 W&lt;/data&gt;:
+   &lt;data value="59.90"&gt;59,90&amp;nbsp;&amp;euro;&lt;/data&gt;&lt;/p&gt;
+&lt;p&gt;&lt;data value="TL-5200"&gt;Taladro atornillador sin cable 18 V&lt;/data&gt;:
+   &lt;data value="89.00"&gt;89&amp;nbsp;&amp;euro;&lt;/data&gt;&lt;/p&gt;
+...
+&lt;p&gt;Valoración media:
+   &lt;data value="4.6"&gt;cuatro estrellas y media&lt;/data&gt;.&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Para qué sirve</figcaption>
+<pre>La persona lee:   59,90 €
+El programa lee:  59.90
+
+Útil para comparadores de precios,
+buscadores y JavaScript (ordenar,
+filtrar, sumar).
+Para fechas y horas usa &lt;time&gt;.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-ruby" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>ruby: pronunciación en un menú japonés</h2>
+            <p><code>&lt;ruby&gt;</code> coloca una pequeña anotación sobre el texto, normalmente la pronunciación. <code>&lt;rt&gt;</code> contiene la anotación y <code>&lt;rp&gt;</code> los paréntesis que solo se ven en navegadores sin soporte.</p>
+            <div class="resultado">
+                <h3>Carta del restaurante Sakura</h3>
+                <p lang="ja"><ruby>寿司<rp>(</rp><rt>すし</rt><rp>)</rp></ruby> &mdash; <span lang="es">sushi variado, 18&nbsp;&euro;</span></p>
+                <p lang="ja"><ruby>天ぷら<rp>(</rp><rt>てんぷら</rt><rp>)</rp></ruby> &mdash; <span lang="es">tempura de verduras, 12&nbsp;&euro;</span></p>
+                <p lang="ja"><ruby>味噌汁<rp>(</rp><rt>みそしる</rt><rp>)</rp></ruby> &mdash; <span lang="es">sopa de miso, 4&nbsp;&euro;</span></p>
+                <p>También sirve con letras latinas: <ruby>寿司<rp>(</rp><rt>sushi</rt><rp>)</rp></ruby>, <ruby>東京<rp>(</rp><rt>Tōkyō</rt><rp>)</rp></ruby>.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p lang="ja"&gt;&lt;ruby&gt;寿司&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;すし&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+   &amp;mdash; &lt;span lang="es"&gt;sushi variado, 18&amp;nbsp;&amp;euro;&lt;/span&gt;&lt;/p&gt;
+...
+&lt;p&gt;También sirve con letras latinas:
+   &lt;ruby&gt;寿司&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;sushi&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;,
+   &lt;ruby&gt;東京&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;Tōkyō&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;.&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Partes</figcaption>
+<pre>&lt;ruby&gt;   contenedor
+  texto base
+  &lt;rp&gt;(&lt;/rp&gt;    paréntesis de reserva
+  &lt;rt&gt;...&lt;/rt&gt;  anotación encima
+  &lt;rp&gt;)&lt;/rp&gt;
+&lt;/ruby&gt;</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-comentarios" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>bdi: comentarios de usuarios de cualquier idioma</h2>
+            <p>Cuando un texto en árabe o hebreo (de derecha a izquierda) se mezcla con texto en español, los números y signos pueden desordenarse. <code>&lt;bdi&gt;</code> aísla el fragmento para que no afecte a lo que lo rodea. Compara la línea marcada con «sin bdi».</p>
+            <div class="resultado">
+                <h3>Clasificación del concurso de fotografía</h3>
+                <p>Usuario <bdi>marta_viajes</bdi>: 128 votos</p>
+                <p>Usuario <bdi>أحمد</bdi>: 97 votos</p>
+                <p>Usuario <bdi>דנה</bdi>: 85 votos</p>
+                <p>Sin bdi &rarr; Usuario أحمد: 97 votos</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;Usuario &lt;bdi&gt;marta_viajes&lt;/bdi&gt;: 128 votos&lt;/p&gt;
+&lt;p&gt;Usuario &lt;bdi&gt;أحمد&lt;/bdi&gt;: 97 votos&lt;/p&gt;
+&lt;p&gt;Usuario &lt;bdi&gt;דנה&lt;/bdi&gt;: 85 votos&lt;/p&gt;
+&lt;p&gt;Sin bdi &amp;rarr; Usuario أحمد: 97 votos&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Cuándo usarlo</figcaption>
+<pre>Siempre que muestres texto escrito
+por usuarios y no sepas en qué
+idioma está: nombres, comentarios,
+títulos de mensajes.
+
+Sin bdi, el número 97 puede saltar
+al lado equivocado del nombre.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-wbr" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>wbr y u: direcciones largas y errores ortográficos</h2>
+            <p><code>&lt;wbr&gt;</code> indica dónde se puede partir una palabra o una URL muy larga si no cabe (estrecha la ventana para verlo). <code>&lt;u&gt;</code> marca texto con una anotación no textual, como una falta de ortografía en un corrector.</p>
+            <div class="resultado">
+                <h3>Instrucciones para la matrícula</h3>
+                <p>Descarga el formulario en: https://<wbr>secretaria.<wbr>institutoejemplo.<wbr>example/<wbr>matricula/<wbr>2026-2027/<wbr>formulario-<wbr>de-<wbr>inscripcion-<wbr>alumnado-<wbr>nuevo.pdf</p>
+                <p>Una de las palabras más largas del español: electro<wbr>encefalo<wbr>grafista.</p>
+                <h3>Corrector ortográfico</h3>
+                <p>Mañana <u>aremos</u> el examen de <u>istoria</u> a las nueve.</p>
+                <p><small>Sugerencias: «haremos», «historia».</small></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p&gt;Descarga el formulario en: https://&lt;wbr&gt;secretaria.&lt;wbr&gt;
+   institutoejemplo.&lt;wbr&gt;example/&lt;wbr&gt;matricula/&lt;wbr&gt;...&lt;/p&gt;
+&lt;p&gt;Una de las palabras más largas del español:
+   electro&lt;wbr&gt;encefalo&lt;wbr&gt;grafista.&lt;/p&gt;
+
+&lt;p&gt;Mañana &lt;u&gt;aremos&lt;/u&gt; el examen de &lt;u&gt;istoria&lt;/u&gt;
+   a las nueve.&lt;/p&gt;
+&lt;p&gt;&lt;small&gt;Sugerencias: «haremos», «historia».&lt;/small&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>Ojo</figcaption>
+<pre>wbr  elemento vacío: sin cierre.
+     Solo parte la línea si hace
+     falta; no añade guion.
+
+u    NO lo uses para "subrayar
+     porque queda bonito": se
+     confunde con un enlace.</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="01-estructura.html">Anterior: estructura</a> |
+            <a href="index.html">Índice</a> |
+            <a href="03-enlaces-listas.html">Siguiente: enlaces y listas</a>
+        </nav>
+    </footer>
+</body>
+</html>
