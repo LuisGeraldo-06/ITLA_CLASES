@@ -1,0 +1,3598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>23. JavaScript: eventos</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <script src="js/consola.js" defer></script>
+    <link rel="stylesheet" href="css/23-js-eventos.css">
+    <script src="js/23-js-eventos.js" defer></script>
+</head>
+<body class="leccion-js">
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>23. JavaScript: eventos</h1>
+        <p>En la lección 22 aprendimos a cambiar la página; ahora decidimos <strong>cuándo</strong>. Un evento es algo que pasa: un clic, una tecla, el mouse que se mueve, la página que se desplaza, la ventana que cambia de tamaño. Con <code>addEventListener</code> le decimos al navegador “cuando pase esto, ejecuta esta función”. Con eso construimos los componentes que se ven en todos los sitios: menú hamburguesa, pestañas, modales, acordeones, carritos y listas de tareas.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-hamburguesa">Menú hamburguesa</a></li>
+            <li><a href="#ej-contador">Contador</a></li>
+            <li><a href="#ej-evento">El objeto evento</a></li>
+            <li><a href="#ej-me-gusta">Me gusta</a></li>
+            <li><a href="#ej-input">input y change</a></li>
+            <li><a href="#ej-atajos">Atajos de teclado</a></li>
+            <li><a href="#ej-tooltip">Tooltip con el mouse</a></li>
+            <li><a href="#ej-pestanas">Pestañas</a></li>
+            <li><a href="#ej-modal">Modal</a></li>
+            <li><a href="#ej-acordeon">Acordeón</a></li>
+            <li><a href="#ej-dropdown">Dropdown</a></li>
+            <li><a href="#ej-carrito">Carrito (delegación)</a></li>
+            <li><a href="#ej-tareas">Lista de tareas</a></li>
+            <li><a href="#ej-copiar">Copiar al portapapeles</a></li>
+            <li><a href="#ej-slider">Slider de imágenes</a></li>
+            <li><a href="#ej-scroll">Scroll</a></li>
+            <li><a href="#ej-resize">Tamaño de ventana</a></li>
+            <li><a href="#ej-una-vez">once y removeEventListener</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Escuchar eventos</h2>
+            <p>Se elige el elemento, el <strong>tipo de evento</strong> y la <strong>función</strong> que se ejecutará cada vez que ocurra. El navegador llama a esa función y le pasa un <strong>objeto evento</strong> con los detalles de lo que pasó.</p>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Anatomía de addEventListener</figcaption>
+<pre>const boton = document.querySelector("#comprar");
+
+boton.addEventListener("click", (evento) =&gt; {
+    console.log("Clic en", evento.target);
+});</pre>
+                </figure>
+                <figure>
+                    <figcaption>Burbujeo: el evento sube por el árbol</figcaption>
+<pre>clic en &lt;button&gt;
+    button          ← evento.target (donde se hizo clic)
+      ↑
+    article.tarjeta ← si escucha aquí, es evento.currentTarget
+      ↑
+    main
+      ↑
+    body
+      ↑
+    document</pre>
+                </figure>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Evento</th><th>Ocurre cuando…</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>click</code> / <code>dblclick</code></td><td>se hace clic / doble clic (también Enter o Espacio en un botón)</td></tr>
+                    <tr><td><code>input</code></td><td>cambia el valor de un campo, <strong>con cada tecla</strong></td></tr>
+                    <tr><td><code>change</code></td><td>el valor cambió y se confirmó (select, checkbox, o al salir del campo)</td></tr>
+                    <tr><td><code>submit</code></td><td>se envía un formulario (botón submit o Enter)</td></tr>
+                    <tr><td><code>keydown</code></td><td>se pulsa una tecla (<code>evento.key</code> dice cuál)</td></tr>
+                    <tr><td><code>mouseenter</code> / <code>mouseleave</code></td><td>el puntero entra / sale del elemento</td></tr>
+                    <tr><td><code>mousemove</code></td><td>el puntero se mueve encima (muchas veces por segundo)</td></tr>
+                    <tr><td><code>focus</code> / <code>blur</code></td><td>el elemento gana / pierde el foco</td></tr>
+                    <tr><td><code>scroll</code></td><td>se desplaza la ventana o un elemento con scroll</td></tr>
+                    <tr><td><code>resize</code></td><td>cambia el tamaño de la ventana (se escucha en <code>window</code>)</td></tr>
+                    <tr><td><code>DOMContentLoaded</code></td><td>el HTML terminó de leerse (se escucha en <code>document</code>)</td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Objeto evento</th><th>Qué contiene o hace</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>evento.type</code></td><td>el nombre del evento (<code>"click"</code>, <code>"keydown"</code>…)</td></tr>
+                    <tr><td><code>evento.target</code></td><td>el elemento exacto donde ocurrió</td></tr>
+                    <tr><td><code>evento.currentTarget</code></td><td>el elemento que tiene el listener</td></tr>
+                    <tr><td><code>evento.key</code></td><td>la tecla pulsada: <code>"a"</code>, <code>"Enter"</code>, <code>"Escape"</code>, <code>"ArrowLeft"</code>…</td></tr>
+                    <tr><td><code>evento.ctrlKey</code> / <code>shiftKey</code> / <code>altKey</code></td><td><code>true</code> si esa tecla estaba pulsada</td></tr>
+                    <tr><td><code>evento.clientX</code> / <code>clientY</code></td><td>posición del puntero en la ventana</td></tr>
+                    <tr><td><code>evento.preventDefault()</code></td><td>cancela lo que el navegador haría solo (enviar el formulario, seguir el enlace)</td></tr>
+                    <tr><td><code>evento.stopPropagation()</code></td><td>impide que el evento siga subiendo a los padres</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Delegación: un listener para muchos hijos</figcaption>
+<pre>lista.addEventListener("click", (evento) =&gt; {
+    const boton = evento.target.closest(".eliminar");
+
+    if (!boton) {
+        return;
+    }
+
+    boton.closest("li").remove();
+});</pre>
+                </figure>
+                <figure>
+                    <figcaption>Una sola vez y quitar un listener</figcaption>
+<pre>boton.addEventListener("click", saludar, { once: true });
+
+boton.removeEventListener("click", saludar);</pre>
+                </figure>
+                <figure>
+                    <figcaption>DOMContentLoaded vs defer</figcaption>
+<pre>&lt;script src="js/app.js" defer&gt;&lt;/script&gt;
+
+document.addEventListener("DOMContentLoaded", () =&gt; {
+    console.log("El HTML ya está listo");
+});</pre>
+                </figure>
+            </div>
+            <p>Si el script lleva <code>defer</code> (como en este curso), ya se ejecuta con el HTML completo y no necesitas <code>DOMContentLoaded</code>. Ese evento es útil cuando el script está en el <code>&lt;head&gt;</code> <em>sin</em> <code>defer</code>, algo que verás en código antiguo. Y nunca uses <code>onclick="…"</code> dentro del HTML: mezcla contenido y lógica, y solo admite una función por evento.</p>
+        </section>
+
+        <section id="ej-hamburguesa" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Menú hamburguesa con JavaScript</h2>
+            <p>En la lección 14 abrimos el menú con un checkbox oculto; esta es la forma habitual. El botón alterna la clase <code>abierto</code> en el menú y actualiza <code>aria-expanded</code> para los lectores de pantalla. Este recuadro hace de pantalla de celular.</p>
+            <div class="resultado">
+                <header class="barra-sitio">
+                    <a href="#inicio" class="logo-sitio">Kiwi Studio</a>
+                    <button type="button" class="boton-hamburguesa" id="boton-menu" aria-expanded="false" aria-controls="menu-sitio">
+                        <span class="oculto">Menú</span>
+                        <span class="linea"></span>
+                        <span class="linea"></span>
+                        <span class="linea"></span>
+                    </button>
+                    <nav class="menu-sitio" id="menu-sitio">
+                        <a href="#inicio">Inicio</a>
+                        <a href="#servicios">Servicios</a>
+                        <a href="#portafolio">Portafolio</a>
+                        <a href="#contacto">Contacto</a>
+                    </nav>
+                </header>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;header class="barra-sitio"&gt;
+    &lt;a href="#inicio" class="logo-sitio"&gt;Kiwi Studio&lt;/a&gt;
+    &lt;button type="button" class="boton-hamburguesa" id="boton-menu" aria-expanded="false" aria-controls="menu-sitio"&gt;
+        &lt;span class="oculto"&gt;Menú&lt;/span&gt;
+        &lt;span class="linea"&gt;&lt;/span&gt;
+        &lt;span class="linea"&gt;&lt;/span&gt;
+        &lt;span class="linea"&gt;&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;nav class="menu-sitio" id="menu-sitio"&gt;
+        &lt;a href="#inicio"&gt;Inicio&lt;/a&gt;
+        &lt;a href="#servicios"&gt;Servicios&lt;/a&gt;
+        &lt;a href="#portafolio"&gt;Portafolio&lt;/a&gt;
+        &lt;a href="#contacto"&gt;Contacto&lt;/a&gt;
+    &lt;/nav&gt;
+&lt;/header&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.barra-sitio {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 380px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: #1f2430;
+}
+
+.logo-sitio {
+    color: #f7df1e;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.boton-hamburguesa {
+    display: grid;
+    gap: 5px;
+    padding: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.linea {
+    width: 26px;
+    height: 3px;
+    border-radius: 2px;
+    background: #ffffff;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.boton-hamburguesa.activo .linea:nth-of-type(2) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.boton-hamburguesa.activo .linea:nth-of-type(3) {
+    opacity: 0;
+}
+
+.boton-hamburguesa.activo .linea:nth-of-type(4) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+.menu-sitio {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    margin-top: 12px;
+}
+
+.menu-sitio.abierto {
+    display: flex;
+}
+
+.menu-sitio a {
+    padding: 10px 0;
+    border-top: 1px solid #374151;
+    color: #e5e7eb;
+    text-decoration: none;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const botonMenu = document.querySelector("#boton-menu");
+const menuSitio = document.querySelector("#menu-sitio");
+
+botonMenu.addEventListener("click", () =&gt; {
+    const abierto = menuSitio.classList.toggle("abierto");
+    botonMenu.classList.toggle("activo", abierto);
+    botonMenu.setAttribute("aria-expanded", abierto);
+});</pre>
+                </figure>
+            </div>
+            <p><code>classList.toggle</code> devuelve <code>true</code> si dejó la clase puesta, así que la guardamos en <code>abierto</code> y la reutilizamos. Las líneas son <code>nth-of-type(2)</code> a <code>(4)</code> porque el primer <code>span</code> es el texto oculto “Menú”. En un sitio real, una <code>@media</code> (lección 14) esconde el botón y muestra el menú en pantallas grandes.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Menú hamburguesa con JavaScript&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .oculto {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
+        .barra-sitio {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 380px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #1f2430;
+        }
+
+        .logo-sitio {
+            color: #f7df1e;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .boton-hamburguesa {
+            display: grid;
+            gap: 5px;
+            padding: 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .linea {
+            width: 26px;
+            height: 3px;
+            border-radius: 2px;
+            background: #ffffff;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .boton-hamburguesa.activo .linea:nth-of-type(2) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .boton-hamburguesa.activo .linea:nth-of-type(3) {
+            opacity: 0;
+        }
+
+        .boton-hamburguesa.activo .linea:nth-of-type(4) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        .menu-sitio {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            margin-top: 12px;
+        }
+
+        .menu-sitio.abierto {
+            display: flex;
+        }
+
+        .menu-sitio a {
+            padding: 10px 0;
+            border-top: 1px solid #374151;
+            color: #e5e7eb;
+            text-decoration: none;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header class="barra-sitio"&gt;
+        &lt;a href="#inicio" class="logo-sitio"&gt;Kiwi Studio&lt;/a&gt;
+        &lt;button type="button" class="boton-hamburguesa" id="boton-menu" aria-expanded="false" aria-controls="menu-sitio"&gt;
+            &lt;span class="oculto"&gt;Menú&lt;/span&gt;
+            &lt;span class="linea"&gt;&lt;/span&gt;
+            &lt;span class="linea"&gt;&lt;/span&gt;
+            &lt;span class="linea"&gt;&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;nav class="menu-sitio" id="menu-sitio"&gt;
+            &lt;a href="#inicio"&gt;Inicio&lt;/a&gt;
+            &lt;a href="#servicios"&gt;Servicios&lt;/a&gt;
+            &lt;a href="#portafolio"&gt;Portafolio&lt;/a&gt;
+            &lt;a href="#contacto"&gt;Contacto&lt;/a&gt;
+        &lt;/nav&gt;
+    &lt;/header&gt;
+    &lt;script&gt;
+        const botonMenu = document.querySelector("#boton-menu");
+        const menuSitio = document.querySelector("#menu-sitio");
+
+        botonMenu.addEventListener("click", () =&gt; {
+            const abierto = menuSitio.classList.toggle("abierto");
+            botonMenu.classList.toggle("activo", abierto);
+            botonMenu.setAttribute("aria-expanded", abierto);
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-contador" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Contador con botones +, − y reiniciar</h2>
+            <p>Selector de entradas para un concierto: cada botón cambia la variable <code>cantidad</code> y una sola función <code>pintar</code> actualiza todo lo que se ve, incluidos los límites (0 y 6).</p>
+            <div class="resultado">
+                <div class="entradas">
+                    <p><strong>Concierto Luna Norte</strong> · $ 45 por entrada</p>
+                    <div class="contador">
+                        <button type="button" id="restar" aria-label="Quitar una entrada">−</button>
+                        <output id="contador-valor">0</output>
+                        <button type="button" id="sumar" aria-label="Agregar una entrada">+</button>
+                    </div>
+                    <p id="contador-total"></p>
+                    <button type="button" id="reiniciar" class="reiniciar">Reiniciar</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="entradas"&gt;
+    &lt;p&gt;&lt;strong&gt;Concierto Luna Norte&lt;/strong&gt; · $ 45 por entrada&lt;/p&gt;
+    &lt;div class="contador"&gt;
+        &lt;button type="button" id="restar" aria-label="Quitar una entrada"&gt;−&lt;/button&gt;
+        &lt;output id="contador-valor"&gt;0&lt;/output&gt;
+        &lt;button type="button" id="sumar" aria-label="Agregar una entrada"&gt;+&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p id="contador-total"&gt;&lt;/p&gt;
+    &lt;button type="button" id="reiniciar" class="reiniciar"&gt;Reiniciar&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const valor = document.querySelector("#contador-valor");
+const totalEntradas = document.querySelector("#contador-total");
+const botonRestar = document.querySelector("#restar");
+const botonSumar = document.querySelector("#sumar");
+const botonReiniciar = document.querySelector("#reiniciar");
+const precio = 45;
+const maximo = 6;
+let cantidad = 0;
+
+const pintar = () =&gt; {
+    valor.textContent = cantidad;
+    totalEntradas.textContent = `Total: $ ${cantidad * precio}`;
+    botonRestar.disabled = cantidad === 0;
+    botonSumar.disabled = cantidad === maximo;
+};
+
+botonSumar.addEventListener("click", () =&gt; {
+    cantidad++;
+    pintar();
+});
+
+botonRestar.addEventListener("click", () =&gt; {
+    cantidad--;
+    pintar();
+});
+
+botonReiniciar.addEventListener("click", () =&gt; {
+    cantidad = 0;
+    pintar();
+});
+
+pintar();</pre>
+                </figure>
+            </div>
+            <p>Patrón clave: <strong>los datos viven en variables</strong> y una función los pinta. Los listeners solo cambian datos y llaman a <code>pintar()</code>. Así nunca se desincroniza lo que se ve con lo que se guarda.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Contador con botones +, − y reiniciar&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .contador {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .contador button {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            background: #f7df1e;
+            color: #1f2430;
+            font-size: 1.4rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .contador button:disabled {
+            background: #e5e7eb;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .contador output {
+            min-width: 40px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .reiniciar {
+            padding: 6px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            cursor: pointer;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="entradas"&gt;
+        &lt;p&gt;&lt;strong&gt;Concierto Luna Norte&lt;/strong&gt; · $ 45 por entrada&lt;/p&gt;
+        &lt;div class="contador"&gt;
+            &lt;button type="button" id="restar" aria-label="Quitar una entrada"&gt;−&lt;/button&gt;
+            &lt;output id="contador-valor"&gt;0&lt;/output&gt;
+            &lt;button type="button" id="sumar" aria-label="Agregar una entrada"&gt;+&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;p id="contador-total"&gt;&lt;/p&gt;
+        &lt;button type="button" id="reiniciar" class="reiniciar"&gt;Reiniciar&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const valor = document.querySelector("#contador-valor");
+        const totalEntradas = document.querySelector("#contador-total");
+        const botonRestar = document.querySelector("#restar");
+        const botonSumar = document.querySelector("#sumar");
+        const botonReiniciar = document.querySelector("#reiniciar");
+        const precio = 45;
+        const maximo = 6;
+        let cantidad = 0;
+
+        const pintar = () =&gt; {
+            valor.textContent = cantidad;
+            totalEntradas.textContent = `Total: $ ${cantidad * precio}`;
+            botonRestar.disabled = cantidad === 0;
+            botonSumar.disabled = cantidad === maximo;
+        };
+
+        botonSumar.addEventListener("click", () =&gt; {
+            cantidad++;
+            pintar();
+        });
+
+        botonRestar.addEventListener("click", () =&gt; {
+            cantidad--;
+            pintar();
+        });
+
+        botonReiniciar.addEventListener("click", () =&gt; {
+            cantidad = 0;
+            pintar();
+        });
+
+        pintar();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-evento" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>El objeto evento: target, currentTarget, preventDefault y stopPropagation</h2>
+            <p>Una tarjeta de producto que se abre al hacer clic en cualquier parte, con un botón de favorito y un enlace dentro. Haz clic en la foto, en el título, en el botón y en el enlace, y mira qué informa el evento.</p>
+            <div class="resultado">
+                <article class="tarjeta-clic" id="tarjeta-clic">
+                    <img src="https://picsum.photos/id/431/260/150" alt="Café Altura" width="260" height="150">
+                    <h3>Café Altura <small>250 g</small></h3>
+                    <div class="tarjeta-clic-acciones">
+                        <button type="button" id="favorito-tarjeta">♡ Favorito</button>
+                        <a href="https://tienda.test/cafe-altura" id="enlace-ficha">Ver ficha</a>
+                    </div>
+                </article>
+                <p class="registro" id="registro-evento">Haz clic en distintas partes de la tarjeta.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;article class="tarjeta-clic" id="tarjeta-clic"&gt;
+    &lt;img src="https://picsum.photos/id/431/260/150" alt="Café Altura" width="260" height="150"&gt;
+    &lt;h3&gt;Café Altura &lt;small&gt;250 g&lt;/small&gt;&lt;/h3&gt;
+    &lt;div class="tarjeta-clic-acciones"&gt;
+        &lt;button type="button" id="favorito-tarjeta"&gt;♡ Favorito&lt;/button&gt;
+        &lt;a href="https://tienda.test/cafe-altura" id="enlace-ficha"&gt;Ver ficha&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/article&gt;
+&lt;p class="registro" id="registro-evento"&gt;Haz clic en distintas partes de la tarjeta.&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const tarjeta = document.querySelector("#tarjeta-clic");
+const favorito = document.querySelector("#favorito-tarjeta");
+const enlaceFicha = document.querySelector("#enlace-ficha");
+const registro = document.querySelector("#registro-evento");
+
+tarjeta.addEventListener("click", (evento) =&gt; {
+    registro.textContent = `Abriendo el producto · target: ${evento.target.tagName} · currentTarget: ${evento.currentTarget.tagName}`;
+});
+
+favorito.addEventListener("click", (evento) =&gt; {
+    evento.stopPropagation();
+    favorito.classList.toggle("marcado");
+    registro.textContent = "Favorito cambiado. stopPropagation() evitó que la tarjeta se abriera.";
+});
+
+enlaceFicha.addEventListener("click", (evento) =&gt; {
+    evento.preventDefault();
+    registro.textContent = "preventDefault() canceló la navegación del enlace.";
+});</pre>
+                </figure>
+            </div>
+            <p>Haz clic en la foto: <code>target</code> es <code>IMG</code> pero <code>currentTarget</code> sigue siendo <code>ARTICLE</code>, porque el clic <strong>burbujeó</strong> hasta la tarjeta. El clic en el enlace también llega a la tarjeta (no lo detuvimos), por eso el mensaje de la tarjeta lo pisa: prueba a añadir <code>evento.stopPropagation()</code> también ahí.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;El objeto evento: target, currentTarget, preventDefault y stopPropagation&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .tarjeta-clic {
+            max-width: 280px;
+            padding: 10px;
+            border: 1px solid #dfe3ec;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .tarjeta-clic:hover {
+            box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
+        }
+
+        .tarjeta-clic img {
+            display: block;
+            border-radius: 8px;
+        }
+
+        .tarjeta-clic h3 {
+            margin: 8px 0;
+        }
+
+        .tarjeta-clic-acciones {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tarjeta-clic button {
+            padding: 4px 10px;
+            border: 1px solid #f43f5e;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #f43f5e;
+            cursor: pointer;
+        }
+
+        .tarjeta-clic button.marcado {
+            background: #f43f5e;
+            color: #ffffff;
+        }
+
+        .registro {
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-family: "Courier New", monospace;
+            font-size: 0.85rem;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;article class="tarjeta-clic" id="tarjeta-clic"&gt;
+        &lt;img src="https://picsum.photos/id/431/260/150" alt="Café Altura" width="260" height="150"&gt;
+        &lt;h3&gt;Café Altura &lt;small&gt;250 g&lt;/small&gt;&lt;/h3&gt;
+        &lt;div class="tarjeta-clic-acciones"&gt;
+            &lt;button type="button" id="favorito-tarjeta"&gt;♡ Favorito&lt;/button&gt;
+            &lt;a href="https://tienda.test/cafe-altura" id="enlace-ficha"&gt;Ver ficha&lt;/a&gt;
+        &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;p class="registro" id="registro-evento"&gt;Haz clic en distintas partes de la tarjeta.&lt;/p&gt;
+    &lt;script&gt;
+        const tarjeta = document.querySelector("#tarjeta-clic");
+        const favorito = document.querySelector("#favorito-tarjeta");
+        const enlaceFicha = document.querySelector("#enlace-ficha");
+        const registro = document.querySelector("#registro-evento");
+
+        tarjeta.addEventListener("click", (evento) =&gt; {
+            registro.textContent = `Abriendo el producto · target: ${evento.target.tagName} · currentTarget: ${evento.currentTarget.tagName}`;
+        });
+
+        favorito.addEventListener("click", (evento) =&gt; {
+            evento.stopPropagation();
+            favorito.classList.toggle("marcado");
+            registro.textContent = "Favorito cambiado. stopPropagation() evitó que la tarjeta se abriera.";
+        });
+
+        enlaceFicha.addEventListener("click", (evento) =&gt; {
+            evento.preventDefault();
+            registro.textContent = "preventDefault() canceló la navegación del enlace.";
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-me-gusta" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Me gusta con clic y doble clic</h2>
+            <p>Como en las redes sociales: el corazón alterna con un clic, y un doble clic en la foto da “me gusta” (nunca lo quita) con una animación.</p>
+            <div class="resultado">
+                <article class="post">
+                    <header class="post-cabecera"><strong>@viajes.kiwi</strong> · Lago Turquesa</header>
+                    <div class="post-foto" id="post-foto">
+                        <img src="https://picsum.photos/id/1036/400/260" alt="Montañas nevadas junto a un lago" width="400" height="260">
+                        <span class="corazon-grande" id="corazon-grande" aria-hidden="true">♥</span>
+                    </div>
+                    <div class="post-acciones">
+                        <button type="button" id="boton-like" aria-pressed="false" aria-label="Me gusta">♡</button>
+                        <span id="likes">128 me gusta</span>
+                    </div>
+                </article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;article class="post"&gt;
+    &lt;header class="post-cabecera"&gt;&lt;strong&gt;@viajes.kiwi&lt;/strong&gt; · Lago Turquesa&lt;/header&gt;
+    &lt;div class="post-foto" id="post-foto"&gt;
+        &lt;img src="https://picsum.photos/id/1036/400/260" alt="Montañas nevadas junto a un lago" width="400" height="260"&gt;
+        &lt;span class="corazon-grande" id="corazon-grande" aria-hidden="true"&gt;♥&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="post-acciones"&gt;
+        &lt;button type="button" id="boton-like" aria-pressed="false" aria-label="Me gusta"&gt;♡&lt;/button&gt;
+        &lt;span id="likes"&gt;128 me gusta&lt;/span&gt;
+    &lt;/div&gt;
+&lt;/article&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const botonLike = document.querySelector("#boton-like");
+const likes = document.querySelector("#likes");
+const fotoPost = document.querySelector("#post-foto");
+const corazonGrande = document.querySelector("#corazon-grande");
+let cantidadLikes = 128;
+let meGusta = false;
+
+const cambiarLike = (nuevoValor) =&gt; {
+    meGusta = nuevoValor;
+    cantidadLikes += meGusta ? 1 : -1;
+    botonLike.textContent = meGusta ? "♥" : "♡";
+    botonLike.classList.toggle("activo", meGusta);
+    botonLike.setAttribute("aria-pressed", meGusta);
+    likes.textContent = `${cantidadLikes} me gusta`;
+};
+
+botonLike.addEventListener("click", () =&gt; {
+    cambiarLike(!meGusta);
+});
+
+fotoPost.addEventListener("dblclick", () =&gt; {
+    if (!meGusta) {
+        cambiarLike(true);
+    }
+    corazonGrande.classList.add("animar");
+});
+
+corazonGrande.addEventListener("animationend", () =&gt; {
+    corazonGrande.classList.remove("animar");
+});</pre>
+                </figure>
+            </div>
+            <p>El evento <code>animationend</code> avisa cuando termina la animación CSS (lección 15); ahí quitamos la clase para que el siguiente doble clic la vuelva a disparar. <code>user-select: none</code> evita que el doble clic seleccione texto.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Me gusta con clic y doble clic&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        @keyframes latido {
+            0% {
+                opacity: 0;
+                transform: scale(0.4);
+            }
+
+            30% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1);
+            }
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .post {
+            max-width: 400px;
+            overflow: hidden;
+            border: 1px solid #dfe3ec;
+            border-radius: 12px;
+        }
+
+        .post-cabecera {
+            padding: 10px 12px;
+        }
+
+        .post-foto {
+            position: relative;
+            user-select: none;
+        }
+
+        .post-foto img {
+            display: block;
+        }
+
+        .corazon-grande {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            color: #ffffff;
+            font-size: 6rem;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .corazon-grande.animar {
+            animation: latido 0.8s ease-out;
+        }
+
+        .post-acciones {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 8px 12px;
+        }
+
+        #boton-like {
+            border: none;
+            background: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+        }
+
+        #boton-like.activo {
+            color: #ef4444;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;article class="post"&gt;
+        &lt;header class="post-cabecera"&gt;&lt;strong&gt;@viajes.kiwi&lt;/strong&gt; · Lago Turquesa&lt;/header&gt;
+        &lt;div class="post-foto" id="post-foto"&gt;
+            &lt;img src="https://picsum.photos/id/1036/400/260" alt="Montañas nevadas junto a un lago" width="400" height="260"&gt;
+            &lt;span class="corazon-grande" id="corazon-grande" aria-hidden="true"&gt;♥&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class="post-acciones"&gt;
+            &lt;button type="button" id="boton-like" aria-pressed="false" aria-label="Me gusta"&gt;♡&lt;/button&gt;
+            &lt;span id="likes"&gt;128 me gusta&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;script&gt;
+        const botonLike = document.querySelector("#boton-like");
+        const likes = document.querySelector("#likes");
+        const fotoPost = document.querySelector("#post-foto");
+        const corazonGrande = document.querySelector("#corazon-grande");
+        let cantidadLikes = 128;
+        let meGusta = false;
+
+        const cambiarLike = (nuevoValor) =&gt; {
+            meGusta = nuevoValor;
+            cantidadLikes += meGusta ? 1 : -1;
+            botonLike.textContent = meGusta ? "♥" : "♡";
+            botonLike.classList.toggle("activo", meGusta);
+            botonLike.setAttribute("aria-pressed", meGusta);
+            likes.textContent = `${cantidadLikes} me gusta`;
+        };
+
+        botonLike.addEventListener("click", () =&gt; {
+            cambiarLike(!meGusta);
+        });
+
+        fotoPost.addEventListener("dblclick", () =&gt; {
+            if (!meGusta) {
+                cambiarLike(true);
+            }
+            corazonGrande.classList.add("animar");
+        });
+
+        corazonGrande.addEventListener("animationend", () =&gt; {
+            corazonGrande.classList.remove("animar");
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-input" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>input y change: publicación con contador de caracteres</h2>
+            <p><code>input</code> se dispara <strong>con cada tecla</strong>, perfecto para contadores y vistas previas en vivo. <code>change</code> se dispara cuando el valor queda confirmado, ideal para un <code>select</code>.</p>
+            <div class="resultado">
+                <div class="publicar">
+                    <label for="texto-post">¿Qué estás pensando?</label>
+                    <textarea id="texto-post" maxlength="140" rows="3"></textarea>
+                    <p class="contador-caracteres" id="contador-caracteres">0 / 140</p>
+                    <label for="visibilidad">Quién puede verlo</label>
+                    <select id="visibilidad">
+                        <option value="publico">🌎 Público</option>
+                        <option value="amigos">👥 Solo amigos</option>
+                        <option value="privado">🔒 Solo yo</option>
+                    </select>
+                    <div class="vista-previa">
+                        <small id="aviso-visibilidad">Cualquier persona podrá verlo.</small>
+                        <p id="vista-previa">Tu publicación aparecerá aquí.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="publicar"&gt;
+    &lt;label for="texto-post"&gt;¿Qué estás pensando?&lt;/label&gt;
+    &lt;textarea id="texto-post" maxlength="140" rows="3"&gt;&lt;/textarea&gt;
+    &lt;p class="contador-caracteres" id="contador-caracteres"&gt;0 / 140&lt;/p&gt;
+    &lt;label for="visibilidad"&gt;Quién puede verlo&lt;/label&gt;
+    &lt;select id="visibilidad"&gt;
+        &lt;option value="publico"&gt;🌎 Público&lt;/option&gt;
+        &lt;option value="amigos"&gt;👥 Solo amigos&lt;/option&gt;
+        &lt;option value="privado"&gt;🔒 Solo yo&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;div class="vista-previa"&gt;
+        &lt;small id="aviso-visibilidad"&gt;Cualquier persona podrá verlo.&lt;/small&gt;
+        &lt;p id="vista-previa"&gt;Tu publicación aparecerá aquí.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const textoPost = document.querySelector("#texto-post");
+const contadorCaracteres = document.querySelector("#contador-caracteres");
+const vistaPrevia = document.querySelector("#vista-previa");
+const visibilidad = document.querySelector("#visibilidad");
+const avisoVisibilidad = document.querySelector("#aviso-visibilidad");
+const avisos = {
+    publico: "Cualquier persona podrá verlo.",
+    amigos: "Solo tus amigos podrán verlo.",
+    privado: "Solo tú podrás verlo.",
+};
+
+textoPost.addEventListener("input", () =&gt; {
+    const largo = textoPost.value.length;
+    contadorCaracteres.textContent = `${largo} / 140`;
+    contadorCaracteres.classList.toggle("casi-lleno", largo &gt;= 120);
+    vistaPrevia.textContent = textoPost.value || "Tu publicación aparecerá aquí.";
+});
+
+visibilidad.addEventListener("change", () =&gt; {
+    avisoVisibilidad.textContent = avisos[visibilidad.value];
+});</pre>
+                </figure>
+            </div>
+            <p>Fíjate en que la vista previa usa <code>textContent</code>: si alguien escribe etiquetas HTML se verán como texto (lección 22, ejemplo 3). El atributo <code>maxlength</code> del HTML ya impide pasar de 140; JavaScript solo informa.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;input y change: publicación con contador de caracteres&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .publicar {
+            display: grid;
+            gap: 6px;
+            max-width: 420px;
+        }
+
+        .publicar label {
+            font-weight: 700;
+        }
+
+        .publicar textarea,
+        .publicar select {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        .contador-caracteres {
+            margin: 0;
+            color: #5b6275;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        .contador-caracteres.casi-lleno {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        .vista-previa {
+            padding: 10px 12px;
+            border-left: 4px solid #f7df1e;
+            background: #fffbea;
+            overflow-wrap: anywhere;
+        }
+
+        .vista-previa p {
+            margin: 4px 0 0;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="publicar"&gt;
+        &lt;label for="texto-post"&gt;¿Qué estás pensando?&lt;/label&gt;
+        &lt;textarea id="texto-post" maxlength="140" rows="3"&gt;&lt;/textarea&gt;
+        &lt;p class="contador-caracteres" id="contador-caracteres"&gt;0 / 140&lt;/p&gt;
+        &lt;label for="visibilidad"&gt;Quién puede verlo&lt;/label&gt;
+        &lt;select id="visibilidad"&gt;
+            &lt;option value="publico"&gt;🌎 Público&lt;/option&gt;
+            &lt;option value="amigos"&gt;👥 Solo amigos&lt;/option&gt;
+            &lt;option value="privado"&gt;🔒 Solo yo&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;div class="vista-previa"&gt;
+            &lt;small id="aviso-visibilidad"&gt;Cualquier persona podrá verlo.&lt;/small&gt;
+            &lt;p id="vista-previa"&gt;Tu publicación aparecerá aquí.&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const textoPost = document.querySelector("#texto-post");
+        const contadorCaracteres = document.querySelector("#contador-caracteres");
+        const vistaPrevia = document.querySelector("#vista-previa");
+        const visibilidad = document.querySelector("#visibilidad");
+        const avisoVisibilidad = document.querySelector("#aviso-visibilidad");
+        const avisos = {
+            publico: "Cualquier persona podrá verlo.",
+            amigos: "Solo tus amigos podrán verlo.",
+            privado: "Solo tú podrás verlo.",
+        };
+
+        textoPost.addEventListener("input", () =&gt; {
+            const largo = textoPost.value.length;
+            contadorCaracteres.textContent = `${largo} / 140`;
+            contadorCaracteres.classList.toggle("casi-lleno", largo &gt;= 120);
+            vistaPrevia.textContent = textoPost.value || "Tu publicación aparecerá aquí.";
+        });
+
+        visibilidad.addEventListener("change", () =&gt; {
+            avisoVisibilidad.textContent = avisos[visibilidad.value];
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-atajos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Atajos de teclado con keydown</h2>
+            <p>Como en los clientes de correo: <kbd>j</kbd> y <kbd>k</kbd> mueven la selección, <kbd>e</kbd> archiva y <kbd>/</kbd> lleva al buscador. El listener está en <code>document</code>, así que funciona en toda la página, pero se ignora mientras escribes en un campo.</p>
+            <div class="resultado">
+                <div class="bandeja-correo">
+                    <input type="search" id="buscar-correo" placeholder="Buscar correo (pulsa /)" aria-label="Buscar correo">
+                    <ul id="lista-correos">
+                        <li class="correo seleccionado">Factura de octubre · Luz Norte</li>
+                        <li class="correo">Tu pedido llegó · Tienda Nubo</li>
+                        <li class="correo">Reunión del lunes · Marta</li>
+                        <li class="correo">Nueva clase disponible · Academia Kiwi</li>
+                    </ul>
+                    <p class="ayuda-atajos"><kbd>j</kbd> bajar · <kbd>k</kbd> subir · <kbd>e</kbd> archivar · <kbd>/</kbd> buscar</p>
+                    <p id="ultima-tecla">Última tecla: —</p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="bandeja-correo"&gt;
+    &lt;input type="search" id="buscar-correo" placeholder="Buscar correo (pulsa /)" aria-label="Buscar correo"&gt;
+    &lt;ul id="lista-correos"&gt;
+        &lt;li class="correo seleccionado"&gt;Factura de octubre · Luz Norte&lt;/li&gt;
+        &lt;li class="correo"&gt;Tu pedido llegó · Tienda Nubo&lt;/li&gt;
+        &lt;li class="correo"&gt;Reunión del lunes · Marta&lt;/li&gt;
+        &lt;li class="correo"&gt;Nueva clase disponible · Academia Kiwi&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;p class="ayuda-atajos"&gt;&lt;kbd&gt;j&lt;/kbd&gt; bajar · &lt;kbd&gt;k&lt;/kbd&gt; subir · &lt;kbd&gt;e&lt;/kbd&gt; archivar · &lt;kbd&gt;/&lt;/kbd&gt; buscar&lt;/p&gt;
+    &lt;p id="ultima-tecla"&gt;Última tecla: —&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const buscarCorreo = document.querySelector("#buscar-correo");
+const ultimaTecla = document.querySelector("#ultima-tecla");
+let posicion = 0;
+
+const seleccionar = (nuevaPosicion) =&gt; {
+    const correos = document.querySelectorAll(".correo");
+    posicion = Math.min(Math.max(nuevaPosicion, 0), correos.length - 1);
+
+    correos.forEach((correo, indice) =&gt; {
+        correo.classList.toggle("seleccionado", indice === posicion);
+    });
+};
+
+document.addEventListener("keydown", (evento) =&gt; {
+    if (evento.target.matches("input, textarea, select") || evento.ctrlKey || evento.metaKey) {
+        return;
+    }
+
+    if (evento.key === "j") {
+        seleccionar(posicion + 1);
+    } else if (evento.key === "k") {
+        seleccionar(posicion - 1);
+    } else if (evento.key === "e") {
+        const correo = document.querySelectorAll(".correo")[posicion];
+        if (correo) {
+            correo.remove();
+            seleccionar(posicion);
+        }
+    } else if (evento.key === "/") {
+        evento.preventDefault();
+        buscarCorreo.focus();
+    } else {
+        return;
+    }
+
+    ultimaTecla.textContent = `Última tecla: ${evento.key}`;
+});</pre>
+                </figure>
+            </div>
+            <p>Sin la primera condición, escribir una “e” en el buscador archivaría un correo. <code>preventDefault()</code> con <kbd>/</kbd> evita que esa barra se escriba dentro del buscador al recibir el foco. Respetar <kbd>Ctrl</kbd>/<kbd>⌘</kbd> deja funcionar los atajos del navegador.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Atajos de teclado con keydown&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        kbd {
+            padding: 1px 6px;
+            border: 1px solid #cbd5e1;
+            border-bottom-width: 3px;
+            border-radius: 4px;
+            background: #f8fafc;
+            color: #1f2430;
+            font-family: inherit;
+        }
+
+        .bandeja-correo {
+            max-width: 440px;
+        }
+
+        .bandeja-correo input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        .bandeja-correo ul {
+            margin: 10px 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .correo {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            border-left: 4px solid transparent;
+        }
+
+        .correo.seleccionado {
+            border-left-color: #f7df1e;
+            background: #fffbea;
+            font-weight: 700;
+        }
+
+        .ayuda-atajos {
+            color: #5b6275;
+            font-size: 0.85rem;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="bandeja-correo"&gt;
+        &lt;input type="search" id="buscar-correo" placeholder="Buscar correo (pulsa /)" aria-label="Buscar correo"&gt;
+        &lt;ul id="lista-correos"&gt;
+            &lt;li class="correo seleccionado"&gt;Factura de octubre · Luz Norte&lt;/li&gt;
+            &lt;li class="correo"&gt;Tu pedido llegó · Tienda Nubo&lt;/li&gt;
+            &lt;li class="correo"&gt;Reunión del lunes · Marta&lt;/li&gt;
+            &lt;li class="correo"&gt;Nueva clase disponible · Academia Kiwi&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class="ayuda-atajos"&gt;&lt;kbd&gt;j&lt;/kbd&gt; bajar · &lt;kbd&gt;k&lt;/kbd&gt; subir · &lt;kbd&gt;e&lt;/kbd&gt; archivar · &lt;kbd&gt;/&lt;/kbd&gt; buscar&lt;/p&gt;
+        &lt;p id="ultima-tecla"&gt;Última tecla: —&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const buscarCorreo = document.querySelector("#buscar-correo");
+        const ultimaTecla = document.querySelector("#ultima-tecla");
+        let posicion = 0;
+
+        const seleccionar = (nuevaPosicion) =&gt; {
+            const correos = document.querySelectorAll(".correo");
+            posicion = Math.min(Math.max(nuevaPosicion, 0), correos.length - 1);
+
+            correos.forEach((correo, indice) =&gt; {
+                correo.classList.toggle("seleccionado", indice === posicion);
+            });
+        };
+
+        document.addEventListener("keydown", (evento) =&gt; {
+            if (evento.target.matches("input, textarea, select") || evento.ctrlKey || evento.metaKey) {
+                return;
+            }
+
+            if (evento.key === "j") {
+                seleccionar(posicion + 1);
+            } else if (evento.key === "k") {
+                seleccionar(posicion - 1);
+            } else if (evento.key === "e") {
+                const correo = document.querySelectorAll(".correo")[posicion];
+                if (correo) {
+                    correo.remove();
+                    seleccionar(posicion);
+                }
+            } else if (evento.key === "/") {
+                evento.preventDefault();
+                buscarCorreo.focus();
+            } else {
+                return;
+            }
+
+            ultimaTecla.textContent = `Última tecla: ${evento.key}`;
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-tooltip" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Tooltip que sigue al mouse: mouseenter, mouseleave y mousemove</h2>
+            <p>Un gráfico de ventas: al pasar por una barra aparece una etiqueta con el dato, que sigue al puntero. Los datos de cada barra están en atributos <code>data-*</code>.</p>
+            <div class="resultado">
+                <div class="grafico-ventas">
+                    <div class="barra-venta" data-mes="Enero" data-ventas="12 400" style="height: 45%">Ene</div>
+                    <div class="barra-venta" data-mes="Febrero" data-ventas="9 800" style="height: 36%">Feb</div>
+                    <div class="barra-venta" data-mes="Marzo" data-ventas="18 300" style="height: 68%">Mar</div>
+                    <div class="barra-venta" data-mes="Abril" data-ventas="24 900" style="height: 92%">Abr</div>
+                    <div class="barra-venta" data-mes="Mayo" data-ventas="15 100" style="height: 56%">May</div>
+                </div>
+                <div class="tooltip" id="tooltip" hidden></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="grafico-ventas"&gt;
+    &lt;div class="barra-venta" data-mes="Enero" data-ventas="12 400" style="height: 45%"&gt;Ene&lt;/div&gt;
+    &lt;div class="barra-venta" data-mes="Febrero" data-ventas="9 800" style="height: 36%"&gt;Feb&lt;/div&gt;
+    &lt;div class="barra-venta" data-mes="Marzo" data-ventas="18 300" style="height: 68%"&gt;Mar&lt;/div&gt;
+    &lt;div class="barra-venta" data-mes="Abril" data-ventas="24 900" style="height: 92%"&gt;Abr&lt;/div&gt;
+    &lt;div class="barra-venta" data-mes="Mayo" data-ventas="15 100" style="height: 56%"&gt;May&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="tooltip" id="tooltip" hidden&gt;&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const tooltip = document.querySelector("#tooltip");
+const barrasVenta = document.querySelectorAll(".barra-venta");
+
+barrasVenta.forEach((barra) =&gt; {
+    barra.addEventListener("mouseenter", () =&gt; {
+        tooltip.textContent = `${barra.dataset.mes}: $ ${barra.dataset.ventas}`;
+        tooltip.hidden = false;
+    });
+
+    barra.addEventListener("mousemove", (evento) =&gt; {
+        tooltip.style.left = `${evento.clientX + 14}px`;
+        tooltip.style.top = `${evento.clientY + 14}px`;
+    });
+
+    barra.addEventListener("mouseleave", () =&gt; {
+        tooltip.hidden = true;
+    });
+});</pre>
+                </figure>
+            </div>
+            <p><code>mouseenter</code> y <code>mouseleave</code> se disparan una vez al entrar y salir; <code>mousemove</code>, decenas de veces por segundo. Como el tooltip es <code>position: fixed</code>, <code>clientX</code>/<code>clientY</code> (relativos a la ventana) lo colocan justo al lado del puntero.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Tooltip que sigue al mouse: mouseenter, mouseleave y mousemove&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .grafico-ventas {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            height: 200px;
+            padding: 10px;
+            border-bottom: 2px solid #1f2430;
+        }
+
+        .barra-venta {
+            display: flex;
+            flex: 1;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 4px;
+            border-radius: 6px 6px 0 0;
+            background: #fde047;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: crosshair;
+            transition: background 0.2s;
+        }
+
+        .barra-venta:hover {
+            background: #eab308;
+        }
+
+        .tooltip {
+            position: fixed;
+            z-index: 10;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: #1f2430;
+            color: #ffffff;
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="grafico-ventas"&gt;
+        &lt;div class="barra-venta" data-mes="Enero" data-ventas="12 400" style="height: 45%"&gt;Ene&lt;/div&gt;
+        &lt;div class="barra-venta" data-mes="Febrero" data-ventas="9 800" style="height: 36%"&gt;Feb&lt;/div&gt;
+        &lt;div class="barra-venta" data-mes="Marzo" data-ventas="18 300" style="height: 68%"&gt;Mar&lt;/div&gt;
+        &lt;div class="barra-venta" data-mes="Abril" data-ventas="24 900" style="height: 92%"&gt;Abr&lt;/div&gt;
+        &lt;div class="barra-venta" data-mes="Mayo" data-ventas="15 100" style="height: 56%"&gt;May&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="tooltip" id="tooltip" hidden&gt;&lt;/div&gt;
+    &lt;script&gt;
+        const tooltip = document.querySelector("#tooltip");
+        const barrasVenta = document.querySelectorAll(".barra-venta");
+
+        barrasVenta.forEach((barra) =&gt; {
+            barra.addEventListener("mouseenter", () =&gt; {
+                tooltip.textContent = `${barra.dataset.mes}: $ ${barra.dataset.ventas}`;
+                tooltip.hidden = false;
+            });
+
+            barra.addEventListener("mousemove", (evento) =&gt; {
+                tooltip.style.left = `${evento.clientX + 14}px`;
+                tooltip.style.top = `${evento.clientY + 14}px`;
+            });
+
+            barra.addEventListener("mouseleave", () =&gt; {
+                tooltip.hidden = true;
+            });
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-pestanas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Pestañas (tabs) de la ficha de un producto</h2>
+            <p>Al hacer clic en una pestaña se desmarcan todas, se ocultan todos los paneles y se muestra solo el que indica su <code>aria-controls</code>.</p>
+            <div class="resultado">
+                <div class="pestanas">
+                    <div class="pestanas-lista" role="tablist" aria-label="Información del producto">
+                        <button type="button" role="tab" class="pestana" id="tab-descripcion" aria-selected="true" aria-controls="panel-descripcion">Descripción</button>
+                        <button type="button" role="tab" class="pestana" id="tab-medidas" aria-selected="false" aria-controls="panel-medidas">Medidas</button>
+                        <button type="button" role="tab" class="pestana" id="tab-envio" aria-selected="false" aria-controls="panel-envio">Envío</button>
+                    </div>
+                    <div class="panel-pestana" role="tabpanel" id="panel-descripcion" aria-labelledby="tab-descripcion">
+                        <p>Mochila Trekka de 28 litros, tela impermeable y bolsillo acolchado para laptop de hasta 15".</p>
+                    </div>
+                    <div class="panel-pestana" role="tabpanel" id="panel-medidas" aria-labelledby="tab-medidas" hidden>
+                        <p>Alto 48 cm · Ancho 30 cm · Fondo 18 cm · Peso 900 g.</p>
+                    </div>
+                    <div class="panel-pestana" role="tabpanel" id="panel-envio" aria-labelledby="tab-envio" hidden>
+                        <p>Gratis desde $ 99. Llega en 24 a 72 horas según tu ciudad.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="pestanas"&gt;
+    &lt;div class="pestanas-lista" role="tablist" aria-label="Información del producto"&gt;
+        &lt;button type="button" role="tab" class="pestana" id="tab-descripcion" aria-selected="true" aria-controls="panel-descripcion"&gt;Descripción&lt;/button&gt;
+        &lt;button type="button" role="tab" class="pestana" id="tab-medidas" aria-selected="false" aria-controls="panel-medidas"&gt;Medidas&lt;/button&gt;
+        &lt;button type="button" role="tab" class="pestana" id="tab-envio" aria-selected="false" aria-controls="panel-envio"&gt;Envío&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="panel-pestana" role="tabpanel" id="panel-descripcion" aria-labelledby="tab-descripcion"&gt;
+        &lt;p&gt;Mochila Trekka de 28 litros, tela impermeable y bolsillo acolchado para laptop de hasta 15".&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="panel-pestana" role="tabpanel" id="panel-medidas" aria-labelledby="tab-medidas" hidden&gt;
+        &lt;p&gt;Alto 48 cm · Ancho 30 cm · Fondo 18 cm · Peso 900 g.&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="panel-pestana" role="tabpanel" id="panel-envio" aria-labelledby="tab-envio" hidden&gt;
+        &lt;p&gt;Gratis desde $ 99. Llega en 24 a 72 horas según tu ciudad.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const pestanas = document.querySelectorAll(".pestana");
+const paneles = document.querySelectorAll(".panel-pestana");
+
+pestanas.forEach((pestana) =&gt; {
+    pestana.addEventListener("click", () =&gt; {
+        pestanas.forEach((otra) =&gt; {
+            otra.setAttribute("aria-selected", "false");
+        });
+        paneles.forEach((panel) =&gt; {
+            panel.hidden = true;
+        });
+
+        pestana.setAttribute("aria-selected", "true");
+        const panelElegido = document.getElementById(pestana.getAttribute("aria-controls"));
+        panelElegido.hidden = false;
+    });
+});</pre>
+                </figure>
+            </div>
+            <p>El atributo <code>hidden</code> se puede cambiar como propiedad (<code>panel.hidden = true</code>) y oculta el elemento sin CSS extra. Los atributos <code>role</code> y <code>aria-*</code> hacen que un lector de pantalla anuncie “pestaña 2 de 3, seleccionada”.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Pestañas (tabs) de la ficha de un producto&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .pestanas-lista {
+            display: flex;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .pestana {
+            margin-bottom: -2px;
+            padding: 10px 16px;
+            border: none;
+            border-bottom: 3px solid transparent;
+            background: none;
+            color: #5b6275;
+            cursor: pointer;
+        }
+
+        .pestana[aria-selected="true"] {
+            border-bottom-color: #f7df1e;
+            color: #1f2430;
+            font-weight: 700;
+        }
+
+        .panel-pestana {
+            padding: 4px 4px 0;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="pestanas"&gt;
+        &lt;div class="pestanas-lista" role="tablist" aria-label="Información del producto"&gt;
+            &lt;button type="button" role="tab" class="pestana" id="tab-descripcion" aria-selected="true" aria-controls="panel-descripcion"&gt;Descripción&lt;/button&gt;
+            &lt;button type="button" role="tab" class="pestana" id="tab-medidas" aria-selected="false" aria-controls="panel-medidas"&gt;Medidas&lt;/button&gt;
+            &lt;button type="button" role="tab" class="pestana" id="tab-envio" aria-selected="false" aria-controls="panel-envio"&gt;Envío&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;div class="panel-pestana" role="tabpanel" id="panel-descripcion" aria-labelledby="tab-descripcion"&gt;
+            &lt;p&gt;Mochila Trekka de 28 litros, tela impermeable y bolsillo acolchado para laptop de hasta 15".&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="panel-pestana" role="tabpanel" id="panel-medidas" aria-labelledby="tab-medidas" hidden&gt;
+            &lt;p&gt;Alto 48 cm · Ancho 30 cm · Fondo 18 cm · Peso 900 g.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="panel-pestana" role="tabpanel" id="panel-envio" aria-labelledby="tab-envio" hidden&gt;
+            &lt;p&gt;Gratis desde $ 99. Llega en 24 a 72 horas según tu ciudad.&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const pestanas = document.querySelectorAll(".pestana");
+        const paneles = document.querySelectorAll(".panel-pestana");
+
+        pestanas.forEach((pestana) =&gt; {
+            pestana.addEventListener("click", () =&gt; {
+                pestanas.forEach((otra) =&gt; {
+                    otra.setAttribute("aria-selected", "false");
+                });
+                paneles.forEach((panel) =&gt; {
+                    panel.hidden = true;
+                });
+
+                pestana.setAttribute("aria-selected", "true");
+                const panelElegido = document.getElementById(pestana.getAttribute("aria-controls"));
+                panelElegido.hidden = false;
+            });
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-modal" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Modal que se cierra con botón, clic en el fondo o Escape</h2>
+            <p>Tres formas de cerrar que la gente espera. El clic en el fondo usa <code>evento.target === fondo</code> para no cerrar cuando el clic es <em>dentro</em> de la caja.</p>
+            <div class="resultado">
+                <button type="button" id="abrir-modal" class="abrir-modal">Ver términos de la promoción</button>
+
+                <div class="modal-fondo" id="modal-fondo" hidden>
+                    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+                        <h3 id="modal-titulo">Promoción Verano Kiwi</h3>
+                        <p>15 % de descuento en compras desde $ 60, válido hasta el 31 de enero. No acumulable con otras ofertas.</p>
+                        <button type="button" id="cerrar-modal">Entendido</button>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;button type="button" id="abrir-modal" class="abrir-modal"&gt;Ver términos de la promoción&lt;/button&gt;
+
+&lt;div class="modal-fondo" id="modal-fondo" hidden&gt;
+    &lt;div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo"&gt;
+        &lt;h3 id="modal-titulo"&gt;Promoción Verano Kiwi&lt;/h3&gt;
+        &lt;p&gt;15 % de descuento en compras desde $ 60, válido hasta el 31 de enero. No acumulable con otras ofertas.&lt;/p&gt;
+        &lt;button type="button" id="cerrar-modal"&gt;Entendido&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.modal-fondo {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgb(15 23 42 / 0.6);
+}
+
+.modal-fondo[hidden] {
+    display: none;
+}
+
+.modal {
+    max-width: 380px;
+    padding: 24px;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 20px 50px rgb(0 0 0 / 0.3);
+}
+
+.modal h3 {
+    margin-top: 0;
+}
+
+.modal button,
+.abrir-modal {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #f7df1e;
+    color: #1f2430;
+    font-weight: 700;
+    cursor: pointer;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const botonAbrirModal = document.querySelector("#abrir-modal");
+const botonCerrarModal = document.querySelector("#cerrar-modal");
+const fondoModal = document.querySelector("#modal-fondo");
+
+const abrirModal = () =&gt; {
+    fondoModal.hidden = false;
+    botonCerrarModal.focus();
+};
+
+const cerrarModal = () =&gt; {
+    fondoModal.hidden = true;
+    botonAbrirModal.focus();
+};
+
+botonAbrirModal.addEventListener("click", abrirModal);
+botonCerrarModal.addEventListener("click", cerrarModal);
+
+fondoModal.addEventListener("click", (evento) =&gt; {
+    if (evento.target === fondoModal) {
+        cerrarModal();
+    }
+});
+
+document.addEventListener("keydown", (evento) =&gt; {
+    if (evento.key === "Escape" &amp;&amp; !fondoModal.hidden) {
+        cerrarModal();
+    }
+});</pre>
+                </figure>
+            </div>
+            <p>Ojo con <code>.modal-fondo[hidden]</code>: como le dimos <code>display: grid</code>, sin esa regla el atributo <code>hidden</code> no lo ocultaría. Mover el foco al abrir y devolverlo al cerrar es clave para quien navega con teclado. HTML también trae <code>&lt;dialog&gt;</code>, que hace parte de esto solo.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Modal que se cierra con botón, clic en el fondo o Escape&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .modal-fondo {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: grid;
+            place-items: center;
+            padding: 16px;
+            background: rgb(15 23 42 / 0.6);
+        }
+
+        .modal-fondo[hidden] {
+            display: none;
+        }
+
+        .modal {
+            max-width: 380px;
+            padding: 24px;
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 20px 50px rgb(0 0 0 / 0.3);
+        }
+
+        .modal h3 {
+            margin-top: 0;
+        }
+
+        .modal button,
+        .abrir-modal {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #f7df1e;
+            color: #1f2430;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;button type="button" id="abrir-modal" class="abrir-modal"&gt;Ver términos de la promoción&lt;/button&gt;
+
+    &lt;div class="modal-fondo" id="modal-fondo" hidden&gt;
+        &lt;div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo"&gt;
+            &lt;h3 id="modal-titulo"&gt;Promoción Verano Kiwi&lt;/h3&gt;
+            &lt;p&gt;15 % de descuento en compras desde $ 60, válido hasta el 31 de enero. No acumulable con otras ofertas.&lt;/p&gt;
+            &lt;button type="button" id="cerrar-modal"&gt;Entendido&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const botonAbrirModal = document.querySelector("#abrir-modal");
+        const botonCerrarModal = document.querySelector("#cerrar-modal");
+        const fondoModal = document.querySelector("#modal-fondo");
+
+        const abrirModal = () =&gt; {
+            fondoModal.hidden = false;
+            botonCerrarModal.focus();
+        };
+
+        const cerrarModal = () =&gt; {
+            fondoModal.hidden = true;
+            botonAbrirModal.focus();
+        };
+
+        botonAbrirModal.addEventListener("click", abrirModal);
+        botonCerrarModal.addEventListener("click", cerrarModal);
+
+        fondoModal.addEventListener("click", (evento) =&gt; {
+            if (evento.target === fondoModal) {
+                cerrarModal();
+            }
+        });
+
+        document.addEventListener("keydown", (evento) =&gt; {
+            if (evento.key === "Escape" &amp;&amp; !fondoModal.hidden) {
+                cerrarModal();
+            }
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-acordeon" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Acordeón de preguntas frecuentes (solo una abierta)</h2>
+            <p>Cada pregunta es un botón; su respuesta es el <strong>hermano siguiente</strong> (<code>nextElementSibling</code>, lección 22). Al abrir una, se cierran las demás.</p>
+            <div class="resultado">
+                <div class="acordeon">
+                    <h3>
+                        <button type="button" class="acordeon-pregunta" aria-expanded="false">¿Cuánto tarda el envío?</button>
+                    </h3>
+                    <div class="acordeon-respuesta" hidden>
+                        <p>Entre 24 y 72 horas hábiles en ciudades principales.</p>
+                    </div>
+                    <h3>
+                        <button type="button" class="acordeon-pregunta" aria-expanded="false">¿Puedo devolver un producto?</button>
+                    </h3>
+                    <div class="acordeon-respuesta" hidden>
+                        <p>Sí, tienes 30 días para devolverlo sin usar y en su caja original.</p>
+                    </div>
+                    <h3>
+                        <button type="button" class="acordeon-pregunta" aria-expanded="false">¿Qué medios de pago aceptan?</button>
+                    </h3>
+                    <div class="acordeon-respuesta" hidden>
+                        <p>Tarjetas de crédito y débito, transferencia y pago contra entrega.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="acordeon"&gt;
+    &lt;h3&gt;
+        &lt;button type="button" class="acordeon-pregunta" aria-expanded="false"&gt;¿Cuánto tarda el envío?&lt;/button&gt;
+    &lt;/h3&gt;
+    &lt;div class="acordeon-respuesta" hidden&gt;
+        &lt;p&gt;Entre 24 y 72 horas hábiles en ciudades principales.&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;h3&gt;
+        &lt;button type="button" class="acordeon-pregunta" aria-expanded="false"&gt;¿Puedo devolver un producto?&lt;/button&gt;
+    &lt;/h3&gt;
+    &lt;div class="acordeon-respuesta" hidden&gt;
+        &lt;p&gt;Sí, tienes 30 días para devolverlo sin usar y en su caja original.&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;h3&gt;
+        &lt;button type="button" class="acordeon-pregunta" aria-expanded="false"&gt;¿Qué medios de pago aceptan?&lt;/button&gt;
+    &lt;/h3&gt;
+    &lt;div class="acordeon-respuesta" hidden&gt;
+        &lt;p&gt;Tarjetas de crédito y débito, transferencia y pago contra entrega.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const preguntasAcordeon = document.querySelectorAll(".acordeon-pregunta");
+
+preguntasAcordeon.forEach((pregunta) =&gt; {
+    pregunta.addEventListener("click", () =&gt; {
+        const estabaAbierta = pregunta.getAttribute("aria-expanded") === "true";
+
+        preguntasAcordeon.forEach((otra) =&gt; {
+            otra.setAttribute("aria-expanded", "false");
+            otra.parentElement.nextElementSibling.hidden = true;
+        });
+
+        if (!estabaAbierta) {
+            pregunta.setAttribute("aria-expanded", "true");
+            pregunta.parentElement.nextElementSibling.hidden = false;
+        }
+    });
+});</pre>
+                </figure>
+            </div>
+            <p>El botón está dentro del <code>h3</code> (así lo recomienda la accesibilidad), por eso subimos con <code>parentElement</code> y luego vamos al hermano. Si no necesitas cerrar las demás, HTML tiene <code>&lt;details&gt;</code> y <code>&lt;summary&gt;</code>, sin JavaScript.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Acordeón de preguntas frecuentes (solo una abierta)&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .acordeon {
+            max-width: 480px;
+            border: 1px solid #dfe3ec;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .acordeon h3 {
+            margin: 0;
+            border-top: 1px solid #dfe3ec;
+        }
+
+        .acordeon h3:first-child {
+            border-top: none;
+        }
+
+        .acordeon-pregunta {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 14px 16px;
+            border: none;
+            background: #ffffff;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .acordeon-pregunta::after {
+            content: "+";
+        }
+
+        .acordeon-pregunta[aria-expanded="true"] {
+            background: #fffbea;
+        }
+
+        .acordeon-pregunta[aria-expanded="true"]::after {
+            content: "−";
+        }
+
+        .acordeon-respuesta {
+            padding: 0 16px;
+            background: #fffbea;
+        }
+
+        .acordeon-respuesta p {
+            margin: 0;
+            padding-bottom: 14px;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="acordeon"&gt;
+        &lt;h3&gt;
+            &lt;button type="button" class="acordeon-pregunta" aria-expanded="false"&gt;¿Cuánto tarda el envío?&lt;/button&gt;
+        &lt;/h3&gt;
+        &lt;div class="acordeon-respuesta" hidden&gt;
+            &lt;p&gt;Entre 24 y 72 horas hábiles en ciudades principales.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;h3&gt;
+            &lt;button type="button" class="acordeon-pregunta" aria-expanded="false"&gt;¿Puedo devolver un producto?&lt;/button&gt;
+        &lt;/h3&gt;
+        &lt;div class="acordeon-respuesta" hidden&gt;
+            &lt;p&gt;Sí, tienes 30 días para devolverlo sin usar y en su caja original.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;h3&gt;
+            &lt;button type="button" class="acordeon-pregunta" aria-expanded="false"&gt;¿Qué medios de pago aceptan?&lt;/button&gt;
+        &lt;/h3&gt;
+        &lt;div class="acordeon-respuesta" hidden&gt;
+            &lt;p&gt;Tarjetas de crédito y débito, transferencia y pago contra entrega.&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const preguntasAcordeon = document.querySelectorAll(".acordeon-pregunta");
+
+        preguntasAcordeon.forEach((pregunta) =&gt; {
+            pregunta.addEventListener("click", () =&gt; {
+                const estabaAbierta = pregunta.getAttribute("aria-expanded") === "true";
+
+                preguntasAcordeon.forEach((otra) =&gt; {
+                    otra.setAttribute("aria-expanded", "false");
+                    otra.parentElement.nextElementSibling.hidden = true;
+                });
+
+                if (!estabaAbierta) {
+                    pregunta.setAttribute("aria-expanded", "true");
+                    pregunta.parentElement.nextElementSibling.hidden = false;
+                }
+            });
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-dropdown" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Menú desplegable que se cierra al hacer clic fuera</h2>
+            <p>El menú de la cuenta: se abre con su botón y se cierra al hacer clic en cualquier otro lugar de la página. El truco es escuchar en <code>document</code> y preguntar si el clic fue fuera con <code>contains</code>.</p>
+            <div class="resultado">
+                <div class="desplegable" id="desplegable-cuenta">
+                    <button type="button" id="boton-cuenta" aria-expanded="false" aria-controls="menu-cuenta">Lucía ▾</button>
+                    <ul class="desplegable-menu" id="menu-cuenta" hidden>
+                        <li><a href="#perfil">Mi perfil</a></li>
+                        <li><a href="#pedidos">Mis pedidos</a></li>
+                        <li><a href="#ajustes">Ajustes</a></li>
+                        <li><a href="#salir">Cerrar sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="desplegable" id="desplegable-cuenta"&gt;
+    &lt;button type="button" id="boton-cuenta" aria-expanded="false" aria-controls="menu-cuenta"&gt;Lucía ▾&lt;/button&gt;
+    &lt;ul class="desplegable-menu" id="menu-cuenta" hidden&gt;
+        &lt;li&gt;&lt;a href="#perfil"&gt;Mi perfil&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#pedidos"&gt;Mis pedidos&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#ajustes"&gt;Ajustes&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#salir"&gt;Cerrar sesión&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const desplegable = document.querySelector("#desplegable-cuenta");
+const botonCuenta = document.querySelector("#boton-cuenta");
+const menuCuenta = document.querySelector("#menu-cuenta");
+
+botonCuenta.addEventListener("click", () =&gt; {
+    const abrir = menuCuenta.hidden;
+    menuCuenta.hidden = !abrir;
+    botonCuenta.setAttribute("aria-expanded", abrir);
+});
+
+document.addEventListener("click", (evento) =&gt; {
+    if (!desplegable.contains(evento.target)) {
+        menuCuenta.hidden = true;
+        botonCuenta.setAttribute("aria-expanded", "false");
+    }
+});</pre>
+                </figure>
+            </div>
+            <p><code>desplegable.contains(evento.target)</code> es <code>true</code> si el clic fue en el contenedor o en algo dentro de él. Es mejor que <code>stopPropagation()</code> en el botón: no rompe otros listeners de la página.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Menú desplegable que se cierra al hacer clic fuera&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .desplegable {
+            position: relative;
+            display: inline-block;
+        }
+
+        .desplegable &gt; button {
+            padding: 8px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            background: #ffffff;
+            cursor: pointer;
+        }
+
+        .desplegable-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            z-index: 5;
+            min-width: 180px;
+            margin: 0;
+            padding: 6px;
+            border: 1px solid #dfe3ec;
+            border-radius: 10px;
+            background: #ffffff;
+            box-shadow: 0 10px 24px rgb(0 0 0 / 0.12);
+            list-style: none;
+        }
+
+        .desplegable-menu a {
+            display: block;
+            padding: 8px 10px;
+            border-radius: 6px;
+            color: #1f2430;
+            text-decoration: none;
+        }
+
+        .desplegable-menu a:hover {
+            background: #fffbea;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="desplegable" id="desplegable-cuenta"&gt;
+        &lt;button type="button" id="boton-cuenta" aria-expanded="false" aria-controls="menu-cuenta"&gt;Lucía ▾&lt;/button&gt;
+        &lt;ul class="desplegable-menu" id="menu-cuenta" hidden&gt;
+            &lt;li&gt;&lt;a href="#perfil"&gt;Mi perfil&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#pedidos"&gt;Mis pedidos&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#ajustes"&gt;Ajustes&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href="#salir"&gt;Cerrar sesión&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const desplegable = document.querySelector("#desplegable-cuenta");
+        const botonCuenta = document.querySelector("#boton-cuenta");
+        const menuCuenta = document.querySelector("#menu-cuenta");
+
+        botonCuenta.addEventListener("click", () =&gt; {
+            const abrir = menuCuenta.hidden;
+            menuCuenta.hidden = !abrir;
+            botonCuenta.setAttribute("aria-expanded", abrir);
+        });
+
+        document.addEventListener("click", (evento) =&gt; {
+            if (!desplegable.contains(evento.target)) {
+                menuCuenta.hidden = true;
+                botonCuenta.setAttribute("aria-expanded", "false");
+            }
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-carrito" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Carrito de compras con delegación de eventos</h2>
+            <p>En lugar de un listener por cada botón “Agregar”, ponemos <strong>uno solo en la lista</strong>. Gracias al burbujeo, cualquier clic dentro llega ahí, y con <code>closest</code> averiguamos qué botón fue. Funciona incluso con botones creados después.</p>
+            <div class="resultado">
+                <div class="tienda">
+                    <ul class="catalogo-carrito" id="catalogo-carrito"></ul>
+                    <aside class="carrito">
+                        <h3>Carrito (<span id="carrito-cantidad">0</span>)</h3>
+                        <ul id="carrito-items"></ul>
+                        <p>Total: <strong id="carrito-total">$ 0.00</strong></p>
+                    </aside>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="tienda"&gt;
+    &lt;ul class="catalogo-carrito" id="catalogo-carrito"&gt;&lt;/ul&gt;
+    &lt;aside class="carrito"&gt;
+        &lt;h3&gt;Carrito (&lt;span id="carrito-cantidad"&gt;0&lt;/span&gt;)&lt;/h3&gt;
+        &lt;ul id="carrito-items"&gt;&lt;/ul&gt;
+        &lt;p&gt;Total: &lt;strong id="carrito-total"&gt;$ 0.00&lt;/strong&gt;&lt;/p&gt;
+    &lt;/aside&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const productos = [
+    { id: "p1", nombre: "Taza Nubo", precio: 18 },
+    { id: "p2", nombre: "Té Andino", precio: 12.5 },
+    { id: "p3", nombre: "Café Altura", precio: 24 },
+    { id: "p4", nombre: "Cafetera Gota", precio: 59.9 },
+];
+const carrito = [];
+const catalogo = document.querySelector("#catalogo-carrito");
+const carritoItems = document.querySelector("#carrito-items");
+const carritoCantidad = document.querySelector("#carrito-cantidad");
+const carritoTotal = document.querySelector("#carrito-total");
+
+catalogo.innerHTML = productos.map((producto) =&gt; `
+    &lt;li&gt;
+        &lt;span&gt;${producto.nombre} · $ ${producto.precio.toFixed(2)}&lt;/span&gt;
+        &lt;button type="button" class="agregar" data-id="${producto.id}"&gt;Agregar&lt;/button&gt;
+    &lt;/li&gt;
+`).join("");
+
+const pintarCarrito = () =&gt; {
+    carritoItems.innerHTML = carrito.map((item, indice) =&gt; `
+        &lt;li&gt;
+            ${item.nombre}
+            &lt;button type="button" class="quitar" data-indice="${indice}" aria-label="Quitar ${item.nombre}"&gt;×&lt;/button&gt;
+        &lt;/li&gt;
+    `).join("");
+
+    const total = carrito.reduce((suma, item) =&gt; suma + item.precio, 0);
+    carritoCantidad.textContent = carrito.length;
+    carritoTotal.textContent = `$ ${total.toFixed(2)}`;
+};
+
+catalogo.addEventListener("click", (evento) =&gt; {
+    const boton = evento.target.closest(".agregar");
+
+    if (!boton) {
+        return;
+    }
+
+    const producto = productos.find((p) =&gt; p.id === boton.dataset.id);
+    carrito.push(producto);
+    pintarCarrito();
+});
+
+carritoItems.addEventListener("click", (evento) =&gt; {
+    const boton = evento.target.closest(".quitar");
+
+    if (!boton) {
+        return;
+    }
+
+    carrito.splice(Number(boton.dataset.indice), 1);
+    pintarCarrito();
+});</pre>
+                </figure>
+            </div>
+            <p>Los botones <code>.quitar</code> se crean de nuevo cada vez que se pinta el carrito; si les pusiéramos listeners uno por uno, habría que volver a ponerlos siempre. Con delegación, el listener está en el <code>ul</code>, que nunca cambia.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Carrito de compras con delegación de eventos&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .tienda {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .tienda ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .catalogo-carrito li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .agregar {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 6px;
+            background: #f7df1e;
+            color: #1f2430;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .carrito {
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #1f2430;
+            color: #e5e7eb;
+        }
+
+        .carrito h3 {
+            margin-top: 0;
+            color: #f7df1e;
+        }
+
+        .carrito li {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+
+        .quitar {
+            border: none;
+            background: none;
+            color: #fca5a5;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="tienda"&gt;
+        &lt;ul class="catalogo-carrito" id="catalogo-carrito"&gt;&lt;/ul&gt;
+        &lt;aside class="carrito"&gt;
+            &lt;h3&gt;Carrito (&lt;span id="carrito-cantidad"&gt;0&lt;/span&gt;)&lt;/h3&gt;
+            &lt;ul id="carrito-items"&gt;&lt;/ul&gt;
+            &lt;p&gt;Total: &lt;strong id="carrito-total"&gt;$ 0.00&lt;/strong&gt;&lt;/p&gt;
+        &lt;/aside&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const productos = [
+            { id: "p1", nombre: "Taza Nubo", precio: 18 },
+            { id: "p2", nombre: "Té Andino", precio: 12.5 },
+            { id: "p3", nombre: "Café Altura", precio: 24 },
+            { id: "p4", nombre: "Cafetera Gota", precio: 59.9 },
+        ];
+        const carrito = [];
+        const catalogo = document.querySelector("#catalogo-carrito");
+        const carritoItems = document.querySelector("#carrito-items");
+        const carritoCantidad = document.querySelector("#carrito-cantidad");
+        const carritoTotal = document.querySelector("#carrito-total");
+
+        catalogo.innerHTML = productos.map((producto) =&gt; `
+            &lt;li&gt;
+                &lt;span&gt;${producto.nombre} · $ ${producto.precio.toFixed(2)}&lt;/span&gt;
+                &lt;button type="button" class="agregar" data-id="${producto.id}"&gt;Agregar&lt;/button&gt;
+            &lt;/li&gt;
+        `).join("");
+
+        const pintarCarrito = () =&gt; {
+            carritoItems.innerHTML = carrito.map((item, indice) =&gt; `
+                &lt;li&gt;
+                    ${item.nombre}
+                    &lt;button type="button" class="quitar" data-indice="${indice}" aria-label="Quitar ${item.nombre}"&gt;×&lt;/button&gt;
+                &lt;/li&gt;
+            `).join("");
+
+            const total = carrito.reduce((suma, item) =&gt; suma + item.precio, 0);
+            carritoCantidad.textContent = carrito.length;
+            carritoTotal.textContent = `$ ${total.toFixed(2)}`;
+        };
+
+        catalogo.addEventListener("click", (evento) =&gt; {
+            const boton = evento.target.closest(".agregar");
+
+            if (!boton) {
+                return;
+            }
+
+            const producto = productos.find((p) =&gt; p.id === boton.dataset.id);
+            carrito.push(producto);
+            pintarCarrito();
+        });
+
+        carritoItems.addEventListener("click", (evento) =&gt; {
+            const boton = evento.target.closest(".quitar");
+
+            if (!boton) {
+                return;
+            }
+
+            carrito.splice(Number(boton.dataset.indice), 1);
+            pintarCarrito();
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-tareas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Lista de tareas: agregar, tachar y eliminar</h2>
+            <p>El formulario usa <code>submit</code> con <code>preventDefault()</code> (así también funciona la tecla Enter), y la lista usa delegación con dos eventos: <code>change</code> para las casillas y <code>click</code> para borrar.</p>
+            <div class="resultado">
+                <div class="tareas">
+                    <form id="form-tarea" class="form-tarea">
+                        <label for="nueva-tarea" class="oculto">Nueva tarea</label>
+                        <input type="text" id="nueva-tarea" placeholder="Ej.: Comprar pan" required>
+                        <button type="submit">Agregar</button>
+                    </form>
+                    <ul id="lista-tareas" class="lista-tareas"></ul>
+                    <p id="tareas-pendientes"></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="tareas"&gt;
+    &lt;form id="form-tarea" class="form-tarea"&gt;
+        &lt;label for="nueva-tarea" class="oculto"&gt;Nueva tarea&lt;/label&gt;
+        &lt;input type="text" id="nueva-tarea" placeholder="Ej.: Comprar pan" required&gt;
+        &lt;button type="submit"&gt;Agregar&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;ul id="lista-tareas" class="lista-tareas"&gt;&lt;/ul&gt;
+    &lt;p id="tareas-pendientes"&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const formTarea = document.querySelector("#form-tarea");
+const campoTarea = document.querySelector("#nueva-tarea");
+const listaTareas = document.querySelector("#lista-tareas");
+const tareasPendientes = document.querySelector("#tareas-pendientes");
+
+const contarPendientes = () =&gt; {
+    const pendientes = listaTareas.querySelectorAll(".tarea:not(.hecha)").length;
+    tareasPendientes.textContent = `${pendientes} pendiente(s)`;
+};
+
+const agregarTarea = (texto) =&gt; {
+    const casilla = document.createElement("input");
+    casilla.type = "checkbox";
+
+    const etiqueta = document.createElement("label");
+    etiqueta.append(casilla, ` ${texto}`);
+
+    const borrar = document.createElement("button");
+    borrar.type = "button";
+    borrar.className = "tarea-borrar";
+    borrar.textContent = "Eliminar";
+
+    const item = document.createElement("li");
+    item.className = "tarea";
+    item.append(etiqueta, borrar);
+    listaTareas.append(item);
+    contarPendientes();
+};
+
+formTarea.addEventListener("submit", (evento) =&gt; {
+    evento.preventDefault();
+    const texto = campoTarea.value.trim();
+
+    if (texto === "") {
+        return;
+    }
+
+    agregarTarea(texto);
+    campoTarea.value = "";
+    campoTarea.focus();
+});
+
+listaTareas.addEventListener("change", (evento) =&gt; {
+    const tarea = evento.target.closest(".tarea");
+    tarea.classList.toggle("hecha", evento.target.checked);
+    contarPendientes();
+});
+
+listaTareas.addEventListener("click", (evento) =&gt; {
+    if (evento.target.matches(".tarea-borrar")) {
+        evento.target.closest(".tarea").remove();
+        contarPendientes();
+    }
+});
+
+agregarTarea("Repasar la lección del DOM");
+agregarTarea("Practicar eventos");</pre>
+                </figure>
+            </div>
+            <p>Sin <code>preventDefault()</code> el formulario recargaría la página y perderíamos las tareas. Validar, mostrar errores y leer todos los campos de un formulario lo vemos a fondo en la lección 24; guardar las tareas para que no se pierdan al recargar, en la 25.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Lista de tareas: agregar, tachar y eliminar&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .oculto {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
+        .tareas {
+            max-width: 440px;
+        }
+
+        .form-tarea {
+            display: flex;
+            gap: 8px;
+        }
+
+        .form-tarea input {
+            flex: 1;
+            min-width: 0;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        .form-tarea button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .lista-tareas {
+            padding: 0;
+            list-style: none;
+        }
+
+        .tarea {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .tarea input {
+            accent-color: #16a34a;
+        }
+
+        .tarea.hecha label {
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+
+        .tarea-borrar {
+            border: none;
+            background: none;
+            color: #dc2626;
+            cursor: pointer;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="tareas"&gt;
+        &lt;form id="form-tarea" class="form-tarea"&gt;
+            &lt;label for="nueva-tarea" class="oculto"&gt;Nueva tarea&lt;/label&gt;
+            &lt;input type="text" id="nueva-tarea" placeholder="Ej.: Comprar pan" required&gt;
+            &lt;button type="submit"&gt;Agregar&lt;/button&gt;
+        &lt;/form&gt;
+        &lt;ul id="lista-tareas" class="lista-tareas"&gt;&lt;/ul&gt;
+        &lt;p id="tareas-pendientes"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const formTarea = document.querySelector("#form-tarea");
+        const campoTarea = document.querySelector("#nueva-tarea");
+        const listaTareas = document.querySelector("#lista-tareas");
+        const tareasPendientes = document.querySelector("#tareas-pendientes");
+
+        const contarPendientes = () =&gt; {
+            const pendientes = listaTareas.querySelectorAll(".tarea:not(.hecha)").length;
+            tareasPendientes.textContent = `${pendientes} pendiente(s)`;
+        };
+
+        const agregarTarea = (texto) =&gt; {
+            const casilla = document.createElement("input");
+            casilla.type = "checkbox";
+
+            const etiqueta = document.createElement("label");
+            etiqueta.append(casilla, ` ${texto}`);
+
+            const borrar = document.createElement("button");
+            borrar.type = "button";
+            borrar.className = "tarea-borrar";
+            borrar.textContent = "Eliminar";
+
+            const item = document.createElement("li");
+            item.className = "tarea";
+            item.append(etiqueta, borrar);
+            listaTareas.append(item);
+            contarPendientes();
+        };
+
+        formTarea.addEventListener("submit", (evento) =&gt; {
+            evento.preventDefault();
+            const texto = campoTarea.value.trim();
+
+            if (texto === "") {
+                return;
+            }
+
+            agregarTarea(texto);
+            campoTarea.value = "";
+            campoTarea.focus();
+        });
+
+        listaTareas.addEventListener("change", (evento) =&gt; {
+            const tarea = evento.target.closest(".tarea");
+            tarea.classList.toggle("hecha", evento.target.checked);
+            contarPendientes();
+        });
+
+        listaTareas.addEventListener("click", (evento) =&gt; {
+            if (evento.target.matches(".tarea-borrar")) {
+                evento.target.closest(".tarea").remove();
+                contarPendientes();
+            }
+        });
+
+        agregarTarea("Repasar la lección del DOM");
+        agregarTarea("Practicar eventos");
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-copiar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Copiar un cupón al portapapeles</h2>
+            <p><code>navigator.clipboard.writeText</code> copia texto; el botón confirma con “¡Copiado!” y vuelve a la normalidad a los 2 segundos con <code>setTimeout</code>. El enlace de referidos se selecciona solo al recibir el foco (evento <code>focus</code>).</p>
+            <div class="resultado">
+                <div class="cupon">
+                    <p>Tu cupón de bienvenida</p>
+                    <div class="cupon-fila">
+                        <code id="codigo-cupon">KIWI-15-VERANO</code>
+                        <button type="button" id="copiar-cupon">Copiar</button>
+                    </div>
+                    <label for="enlace-referido">Invita a tus amigos</label>
+                    <input type="text" id="enlace-referido" value="https://kiwi.test/r/LUCIA24" readonly>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="cupon"&gt;
+    &lt;p&gt;Tu cupón de bienvenida&lt;/p&gt;
+    &lt;div class="cupon-fila"&gt;
+        &lt;code id="codigo-cupon"&gt;KIWI-15-VERANO&lt;/code&gt;
+        &lt;button type="button" id="copiar-cupon"&gt;Copiar&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;label for="enlace-referido"&gt;Invita a tus amigos&lt;/label&gt;
+    &lt;input type="text" id="enlace-referido" value="https://kiwi.test/r/LUCIA24" readonly&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const codigoCupon = document.querySelector("#codigo-cupon");
+const botonCupon = document.querySelector("#copiar-cupon");
+const enlaceReferido = document.querySelector("#enlace-referido");
+
+botonCupon.addEventListener("click", () =&gt; {
+    navigator.clipboard.writeText(codigoCupon.textContent);
+    botonCupon.textContent = "¡Copiado!";
+    botonCupon.classList.add("copiado");
+
+    setTimeout(() =&gt; {
+        botonCupon.textContent = "Copiar";
+        botonCupon.classList.remove("copiado");
+    }, 2000);
+});
+
+enlaceReferido.addEventListener("focus", () =&gt; {
+    enlaceReferido.select();
+});</pre>
+                </figure>
+            </div>
+            <p>El portapapeles solo funciona en páginas seguras (<code>https://</code>, <code>localhost</code> o un archivo abierto en tu computadora) y como respuesta a una acción del usuario, como un clic. Los botones “Copiar” de este curso usan exactamente esta función.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Copiar un cupón al portapapeles&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .cupon {
+            display: grid;
+            gap: 8px;
+            max-width: 340px;
+            padding: 18px;
+            border: 2px dashed #eab308;
+            border-radius: 14px;
+            background: #fffbea;
+        }
+
+        .cupon p {
+            margin: 0;
+            color: #5b6275;
+        }
+
+        .cupon-fila {
+            display: flex;
+            gap: 8px;
+        }
+
+        .cupon code {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        #copiar-cupon {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        #copiar-cupon.copiado {
+            background: #16a34a;
+        }
+
+        .cupon label {
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .cupon input {
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="cupon"&gt;
+        &lt;p&gt;Tu cupón de bienvenida&lt;/p&gt;
+        &lt;div class="cupon-fila"&gt;
+            &lt;code id="codigo-cupon"&gt;KIWI-15-VERANO&lt;/code&gt;
+            &lt;button type="button" id="copiar-cupon"&gt;Copiar&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;label for="enlace-referido"&gt;Invita a tus amigos&lt;/label&gt;
+        &lt;input type="text" id="enlace-referido" value="https://kiwi.test/r/LUCIA24" readonly&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const codigoCupon = document.querySelector("#codigo-cupon");
+        const botonCupon = document.querySelector("#copiar-cupon");
+        const enlaceReferido = document.querySelector("#enlace-referido");
+
+        botonCupon.addEventListener("click", () =&gt; {
+            navigator.clipboard.writeText(codigoCupon.textContent);
+            botonCupon.textContent = "¡Copiado!";
+            botonCupon.classList.add("copiado");
+
+            setTimeout(() =&gt; {
+                botonCupon.textContent = "Copiar";
+                botonCupon.classList.remove("copiado");
+            }, 2000);
+        });
+
+        enlaceReferido.addEventListener("focus", () =&gt; {
+            enlaceReferido.select();
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-slider" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Slider de imágenes con flechas, puntos y teclado</h2>
+            <p>Las flechas avanzan y retroceden, los puntos saltan a una foto y, si el slider tiene el foco (haz clic en él o llega con <kbd>Tab</kbd>), las teclas <kbd>←</kbd> y <kbd>→</kbd> también funcionan. El operador <code>%</code> hace que al pasar la última vuelva a la primera.</p>
+            <div class="resultado">
+                <div class="slider" id="slider" tabindex="0" aria-label="Destinos destacados">
+                    <img id="slider-imagen" src="https://picsum.photos/id/1043/480/260" alt="" width="480" height="260">
+                    <button type="button" class="slider-flecha anterior" id="slider-anterior" aria-label="Foto anterior">‹</button>
+                    <button type="button" class="slider-flecha siguiente" id="slider-siguiente" aria-label="Foto siguiente">›</button>
+                    <p id="slider-texto"></p>
+                    <div class="slider-puntos" id="slider-puntos"></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="slider" id="slider" tabindex="0" aria-label="Destinos destacados"&gt;
+    &lt;img id="slider-imagen" src="https://picsum.photos/id/1043/480/260" alt="" width="480" height="260"&gt;
+    &lt;button type="button" class="slider-flecha anterior" id="slider-anterior" aria-label="Foto anterior"&gt;‹&lt;/button&gt;
+    &lt;button type="button" class="slider-flecha siguiente" id="slider-siguiente" aria-label="Foto siguiente"&gt;›&lt;/button&gt;
+    &lt;p id="slider-texto"&gt;&lt;/p&gt;
+    &lt;div class="slider-puntos" id="slider-puntos"&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const destinos = [
+    { foto: 1043, nombre: "Lago Turquesa" },
+    { foto: 1044, nombre: "Costa Brava Sur" },
+    { foto: 1047, nombre: "Ciudad Vieja" },
+    { foto: 1050, nombre: "Playa Larga" },
+];
+const slider = document.querySelector("#slider");
+const sliderImagen = document.querySelector("#slider-imagen");
+const sliderTexto = document.querySelector("#slider-texto");
+const sliderPuntos = document.querySelector("#slider-puntos");
+let actual = 0;
+
+const mostrar = (indice) =&gt; {
+    actual = (indice + destinos.length) % destinos.length;
+    const destino = destinos[actual];
+
+    sliderImagen.src = `https://picsum.photos/id/${destino.foto}/480/260`;
+    sliderImagen.alt = destino.nombre;
+    sliderTexto.textContent = `${actual + 1} / ${destinos.length} · ${destino.nombre}`;
+
+    sliderPuntos.querySelectorAll("button").forEach((punto, i) =&gt; {
+        punto.classList.toggle("activo", i === actual);
+    });
+};
+
+destinos.forEach((destino, indice) =&gt; {
+    const punto = document.createElement("button");
+    punto.type = "button";
+    punto.setAttribute("aria-label", `Ir a ${destino.nombre}`);
+    punto.addEventListener("click", () =&gt; mostrar(indice));
+    sliderPuntos.append(punto);
+});
+
+document.querySelector("#slider-anterior").addEventListener("click", () =&gt; mostrar(actual - 1));
+document.querySelector("#slider-siguiente").addEventListener("click", () =&gt; mostrar(actual + 1));
+
+slider.addEventListener("keydown", (evento) =&gt; {
+    if (evento.key === "ArrowLeft") {
+        mostrar(actual - 1);
+    } else if (evento.key === "ArrowRight") {
+        mostrar(actual + 1);
+    }
+});
+
+mostrar(0);</pre>
+                </figure>
+            </div>
+            <p>El listener de teclado está en el propio slider y no en <code>document</code>: así las flechas siguen desplazando la página cuando el slider no tiene el foco. <code>(indice + destinos.length) % destinos.length</code> convierte −1 en 3 y 4 en 0.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Slider de imágenes con flechas, puntos y teclado&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .slider {
+            position: relative;
+            max-width: 480px;
+            border-radius: 12px;
+        }
+
+        .slider:focus-visible {
+            outline: 3px solid #f7df1e;
+            outline-offset: 4px;
+        }
+
+        .slider img {
+            display: block;
+            border-radius: 12px;
+        }
+
+        .slider-flecha {
+            position: absolute;
+            top: 105px;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: rgb(255 255 255 / 0.85);
+            font-size: 1.6rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .slider-flecha.anterior {
+            left: 10px;
+        }
+
+        .slider-flecha.siguiente {
+            right: 10px;
+        }
+
+        .slider p {
+            margin: 8px 0 4px;
+            text-align: center;
+        }
+
+        .slider-puntos {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .slider-puntos button {
+            width: 12px;
+            height: 12px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            background: #cbd5e1;
+            cursor: pointer;
+        }
+
+        .slider-puntos button.activo {
+            background: #eab308;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="slider" id="slider" tabindex="0" aria-label="Destinos destacados"&gt;
+        &lt;img id="slider-imagen" src="https://picsum.photos/id/1043/480/260" alt="" width="480" height="260"&gt;
+        &lt;button type="button" class="slider-flecha anterior" id="slider-anterior" aria-label="Foto anterior"&gt;‹&lt;/button&gt;
+        &lt;button type="button" class="slider-flecha siguiente" id="slider-siguiente" aria-label="Foto siguiente"&gt;›&lt;/button&gt;
+        &lt;p id="slider-texto"&gt;&lt;/p&gt;
+        &lt;div class="slider-puntos" id="slider-puntos"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const destinos = [
+            { foto: 1043, nombre: "Lago Turquesa" },
+            { foto: 1044, nombre: "Costa Brava Sur" },
+            { foto: 1047, nombre: "Ciudad Vieja" },
+            { foto: 1050, nombre: "Playa Larga" },
+        ];
+        const slider = document.querySelector("#slider");
+        const sliderImagen = document.querySelector("#slider-imagen");
+        const sliderTexto = document.querySelector("#slider-texto");
+        const sliderPuntos = document.querySelector("#slider-puntos");
+        let actual = 0;
+
+        const mostrar = (indice) =&gt; {
+            actual = (indice + destinos.length) % destinos.length;
+            const destino = destinos[actual];
+
+            sliderImagen.src = `https://picsum.photos/id/${destino.foto}/480/260`;
+            sliderImagen.alt = destino.nombre;
+            sliderTexto.textContent = `${actual + 1} / ${destinos.length} · ${destino.nombre}`;
+
+            sliderPuntos.querySelectorAll("button").forEach((punto, i) =&gt; {
+                punto.classList.toggle("activo", i === actual);
+            });
+        };
+
+        destinos.forEach((destino, indice) =&gt; {
+            const punto = document.createElement("button");
+            punto.type = "button";
+            punto.setAttribute("aria-label", `Ir a ${destino.nombre}`);
+            punto.addEventListener("click", () =&gt; mostrar(indice));
+            sliderPuntos.append(punto);
+        });
+
+        document.querySelector("#slider-anterior").addEventListener("click", () =&gt; mostrar(actual - 1));
+        document.querySelector("#slider-siguiente").addEventListener("click", () =&gt; mostrar(actual + 1));
+
+        slider.addEventListener("keydown", (evento) =&gt; {
+            if (evento.key === "ArrowLeft") {
+                mostrar(actual - 1);
+            } else if (evento.key === "ArrowRight") {
+                mostrar(actual + 1);
+            }
+        });
+
+        mostrar(0);
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-scroll" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>scroll: barra de lectura y botón “volver arriba”</h2>
+            <p>Dos usos del mismo evento. La barra amarilla mide cuánto has leído del artículo (scroll de un elemento). Y si bajas más de 600 px <em>en esta página</em>, aparece un botón “↑ Arriba” en la esquina inferior derecha (scroll de <code>window</code>).</p>
+            <div class="resultado">
+                <div class="lector">
+                    <div class="lectura-progreso">
+                        <div class="lectura-relleno" id="lectura-relleno"></div>
+                    </div>
+                    <article class="articulo-scroll" id="articulo-scroll">
+                        <h3>Cómo preparar café de filtro</h3>
+                        <p>Calienta el agua hasta unos 92 °C: si hierve, quemará el café y saldrá amargo.</p>
+                        <p>Muele 15 gramos de café en grano, con una molienda media parecida a la sal de mesa.</p>
+                        <p>Coloca el filtro de papel y mójalo con agua caliente para quitarle el sabor a papel.</p>
+                        <p>Agrega el café y vierte un poco de agua para que “florezca” durante 30 segundos.</p>
+                        <p>Vierte el resto del agua en círculos lentos, hasta llegar a 250 mililitros.</p>
+                        <p>Espera a que termine de filtrar, unos tres minutos en total.</p>
+                        <p>Sirve enseguida. El café de filtro pierde aroma si se recalienta.</p>
+                    </article>
+                </div>
+                <button type="button" class="volver-arriba" id="volver-arriba" hidden>↑ Arriba</button>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="lector"&gt;
+    &lt;div class="lectura-progreso"&gt;
+        &lt;div class="lectura-relleno" id="lectura-relleno"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;article class="articulo-scroll" id="articulo-scroll"&gt;
+        &lt;h3&gt;Cómo preparar café de filtro&lt;/h3&gt;
+        &lt;p&gt;Calienta el agua hasta unos 92 °C: si hierve, quemará el café y saldrá amargo.&lt;/p&gt;
+        &lt;p&gt;Muele 15 gramos de café en grano, con una molienda media parecida a la sal de mesa.&lt;/p&gt;
+        &lt;p&gt;Coloca el filtro de papel y mójalo con agua caliente para quitarle el sabor a papel.&lt;/p&gt;
+        &lt;p&gt;Agrega el café y vierte un poco de agua para que “florezca” durante 30 segundos.&lt;/p&gt;
+        &lt;p&gt;Vierte el resto del agua en círculos lentos, hasta llegar a 250 mililitros.&lt;/p&gt;
+        &lt;p&gt;Espera a que termine de filtrar, unos tres minutos en total.&lt;/p&gt;
+        &lt;p&gt;Sirve enseguida. El café de filtro pierde aroma si se recalienta.&lt;/p&gt;
+    &lt;/article&gt;
+&lt;/div&gt;
+&lt;button type="button" class="volver-arriba" id="volver-arriba" hidden&gt;↑ Arriba&lt;/button&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const articulo = document.querySelector("#articulo-scroll");
+const lecturaRelleno = document.querySelector("#lectura-relleno");
+const volverArriba = document.querySelector("#volver-arriba");
+
+articulo.addEventListener("scroll", () =&gt; {
+    const recorrido = articulo.scrollTop;
+    const maximo = articulo.scrollHeight - articulo.clientHeight;
+    lecturaRelleno.style.width = `${(recorrido / maximo) * 100}%`;
+});
+
+window.addEventListener("scroll", () =&gt; {
+    volverArriba.hidden = window.scrollY &lt; 600;
+});
+
+volverArriba.addEventListener("click", () =&gt; {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+});</pre>
+                </figure>
+            </div>
+            <p><code>scrollTop</code> es cuánto se ha bajado; <code>scrollHeight − clientHeight</code> es lo máximo que se puede bajar. Para la página completa se usan <code>window.scrollY</code> y <code>window.scrollTo</code>. Con <code>behavior: "smooth"</code> el desplazamiento es animado.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;scroll: barra de lectura y botón “volver arriba”&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .lector {
+            max-width: 440px;
+            overflow: hidden;
+            border: 1px solid #dfe3ec;
+            border-radius: 12px;
+        }
+
+        .lectura-progreso {
+            height: 6px;
+            background: #f1f5f9;
+        }
+
+        .lectura-relleno {
+            width: 0;
+            height: 100%;
+            background: #eab308;
+        }
+
+        .articulo-scroll {
+            height: 180px;
+            padding: 0 16px;
+            overflow-y: auto;
+        }
+
+        .volver-arriba {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 15;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 999px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            box-shadow: 0 6px 16px rgb(0 0 0 / 0.25);
+            cursor: pointer;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="lector"&gt;
+        &lt;div class="lectura-progreso"&gt;
+            &lt;div class="lectura-relleno" id="lectura-relleno"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;article class="articulo-scroll" id="articulo-scroll"&gt;
+            &lt;h3&gt;Cómo preparar café de filtro&lt;/h3&gt;
+            &lt;p&gt;Calienta el agua hasta unos 92 °C: si hierve, quemará el café y saldrá amargo.&lt;/p&gt;
+            &lt;p&gt;Muele 15 gramos de café en grano, con una molienda media parecida a la sal de mesa.&lt;/p&gt;
+            &lt;p&gt;Coloca el filtro de papel y mójalo con agua caliente para quitarle el sabor a papel.&lt;/p&gt;
+            &lt;p&gt;Agrega el café y vierte un poco de agua para que “florezca” durante 30 segundos.&lt;/p&gt;
+            &lt;p&gt;Vierte el resto del agua en círculos lentos, hasta llegar a 250 mililitros.&lt;/p&gt;
+            &lt;p&gt;Espera a que termine de filtrar, unos tres minutos en total.&lt;/p&gt;
+            &lt;p&gt;Sirve enseguida. El café de filtro pierde aroma si se recalienta.&lt;/p&gt;
+        &lt;/article&gt;
+    &lt;/div&gt;
+    &lt;button type="button" class="volver-arriba" id="volver-arriba" hidden&gt;↑ Arriba&lt;/button&gt;
+    &lt;script&gt;
+        const articulo = document.querySelector("#articulo-scroll");
+        const lecturaRelleno = document.querySelector("#lectura-relleno");
+        const volverArriba = document.querySelector("#volver-arriba");
+
+        articulo.addEventListener("scroll", () =&gt; {
+            const recorrido = articulo.scrollTop;
+            const maximo = articulo.scrollHeight - articulo.clientHeight;
+            lecturaRelleno.style.width = `${(recorrido / maximo) * 100}%`;
+        });
+
+        window.addEventListener("scroll", () =&gt; {
+            volverArriba.hidden = window.scrollY &lt; 600;
+        });
+
+        volverArriba.addEventListener("click", () =&gt; {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-resize" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>resize: tamaño de la ventana en vivo</h2>
+            <p>Cambia el ancho de la ventana del navegador (o abre las herramientas de desarrollo) y mira cómo se actualizan las medidas y el tipo de pantalla.</p>
+            <div class="resultado">
+                <div class="medidor">
+                    <p class="medidor-numeros"><span id="ancho-ventana">0</span> × <span id="alto-ventana">0</span> px</p>
+                    <p>Diseño actual: <strong id="tipo-pantalla"></strong></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="medidor"&gt;
+    &lt;p class="medidor-numeros"&gt;&lt;span id="ancho-ventana"&gt;0&lt;/span&gt; × &lt;span id="alto-ventana"&gt;0&lt;/span&gt; px&lt;/p&gt;
+    &lt;p&gt;Diseño actual: &lt;strong id="tipo-pantalla"&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const anchoVentana = document.querySelector("#ancho-ventana");
+const altoVentana = document.querySelector("#alto-ventana");
+const tipoPantalla = document.querySelector("#tipo-pantalla");
+
+const medir = () =&gt; {
+    const ancho = window.innerWidth;
+    anchoVentana.textContent = ancho;
+    altoVentana.textContent = window.innerHeight;
+
+    if (ancho &lt; 600) {
+        tipoPantalla.textContent = "📱 móvil";
+    } else if (ancho &lt; 1024) {
+        tipoPantalla.textContent = "📟 tablet";
+    } else {
+        tipoPantalla.textContent = "🖥️ escritorio";
+    }
+};
+
+medir();
+window.addEventListener("resize", medir);</pre>
+                </figure>
+            </div>
+            <p>Pasamos <code>medir</code> sin paréntesis: le damos la función al navegador para que la llame él. Con <code>medir()</code> la estaríamos ejecutando una sola vez en ese momento. Para cambiar <em>estilos</em> según el tamaño, sigue usando <code>@media</code> (lección 14); <code>resize</code> es para cuando JavaScript necesita el dato.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;resize: tamaño de la ventana en vivo&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .medidor {
+            padding: 20px;
+            border-radius: 12px;
+            background: #1f2430;
+            color: #e5e7eb;
+            text-align: center;
+        }
+
+        .medidor p {
+            margin: 4px 0;
+        }
+
+        .medidor-numeros {
+            color: #f7df1e;
+            font-family: "Courier New", monospace;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="medidor"&gt;
+        &lt;p class="medidor-numeros"&gt;&lt;span id="ancho-ventana"&gt;0&lt;/span&gt; × &lt;span id="alto-ventana"&gt;0&lt;/span&gt; px&lt;/p&gt;
+        &lt;p&gt;Diseño actual: &lt;strong id="tipo-pantalla"&gt;&lt;/strong&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const anchoVentana = document.querySelector("#ancho-ventana");
+        const altoVentana = document.querySelector("#alto-ventana");
+        const tipoPantalla = document.querySelector("#tipo-pantalla");
+
+        const medir = () =&gt; {
+            const ancho = window.innerWidth;
+            anchoVentana.textContent = ancho;
+            altoVentana.textContent = window.innerHeight;
+
+            if (ancho &lt; 600) {
+                tipoPantalla.textContent = "📱 móvil";
+            } else if (ancho &lt; 1024) {
+                tipoPantalla.textContent = "📟 tablet";
+            } else {
+                tipoPantalla.textContent = "🖥️ escritorio";
+            }
+        };
+
+        medir();
+        window.addEventListener("resize", medir);
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-una-vez" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Una sola vez: { once: true } y removeEventListener</h2>
+            <p>El regalo de bienvenida se puede reclamar una vez: con <code>{ once: true }</code> el listener se borra solo tras el primer clic (pulsa varias veces y los puntos no suben). La tarjeta “raspa y gana” da tres intentos y luego quita su listener con <code>removeEventListener</code>.</p>
+            <div class="resultado">
+                <div class="premios">
+                    <div class="premio">
+                        <button type="button" id="reclamar-regalo">🎁 Reclamar regalo</button>
+                        <p id="mensaje-regalo">Tienes 0 puntos.</p>
+                    </div>
+                    <div class="premio">
+                        <button type="button" id="raspar">🎟️ Raspar tarjeta</button>
+                        <p id="mensaje-raspar">Te quedan 3 intentos.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="premios"&gt;
+    &lt;div class="premio"&gt;
+        &lt;button type="button" id="reclamar-regalo"&gt;🎁 Reclamar regalo&lt;/button&gt;
+        &lt;p id="mensaje-regalo"&gt;Tienes 0 puntos.&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="premio"&gt;
+        &lt;button type="button" id="raspar"&gt;🎟️ Raspar tarjeta&lt;/button&gt;
+        &lt;p id="mensaje-raspar"&gt;Te quedan 3 intentos.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const botonRegalo = document.querySelector("#reclamar-regalo");
+const mensajeRegalo = document.querySelector("#mensaje-regalo");
+const botonRaspar = document.querySelector("#raspar");
+const mensajeRaspar = document.querySelector("#mensaje-raspar");
+const resultados = ["Sigue intentando", "Envío gratis", "Sigue intentando"];
+let puntos = 0;
+let intentos = 0;
+
+botonRegalo.addEventListener("click", () =&gt; {
+    puntos += 50;
+    mensajeRegalo.textContent = `Tienes ${puntos} puntos.`;
+}, { once: true });
+
+const raspar = () =&gt; {
+    mensajeRaspar.textContent = `Intento ${intentos + 1}: ${resultados[intentos]}`;
+    intentos++;
+
+    if (intentos === resultados.length) {
+        botonRaspar.removeEventListener("click", raspar);
+        botonRaspar.textContent = "Sin intentos";
+        botonRaspar.classList.add("agotado");
+    }
+};
+
+botonRaspar.addEventListener("click", raspar);</pre>
+                </figure>
+            </div>
+            <p>Para quitar un listener hay que pasar <strong>la misma función</strong> que se usó al ponerlo; por eso <code>raspar</code> tiene nombre. Con una función flecha escrita directamente dentro de <code>addEventListener</code> no habría forma de referirse a ella después.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Una sola vez: { once: true } y removeEventListener&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .premios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .premio {
+            padding: 16px;
+            border: 1px solid #dfe3ec;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .premio button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 10px;
+            background: #f7df1e;
+            color: #1f2430;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .premio button.agotado {
+            background: #e5e7eb;
+            color: #94a3b8;
+            cursor: default;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="premios"&gt;
+        &lt;div class="premio"&gt;
+            &lt;button type="button" id="reclamar-regalo"&gt;🎁 Reclamar regalo&lt;/button&gt;
+            &lt;p id="mensaje-regalo"&gt;Tienes 0 puntos.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="premio"&gt;
+            &lt;button type="button" id="raspar"&gt;🎟️ Raspar tarjeta&lt;/button&gt;
+            &lt;p id="mensaje-raspar"&gt;Te quedan 3 intentos.&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const botonRegalo = document.querySelector("#reclamar-regalo");
+        const mensajeRegalo = document.querySelector("#mensaje-regalo");
+        const botonRaspar = document.querySelector("#raspar");
+        const mensajeRaspar = document.querySelector("#mensaje-raspar");
+        const resultados = ["Sigue intentando", "Envío gratis", "Sigue intentando"];
+        let puntos = 0;
+        let intentos = 0;
+
+        botonRegalo.addEventListener("click", () =&gt; {
+            puntos += 50;
+            mensajeRegalo.textContent = `Tienes ${puntos} puntos.`;
+        }, { once: true });
+
+        const raspar = () =&gt; {
+            mensajeRaspar.textContent = `Intento ${intentos + 1}: ${resultados[intentos]}`;
+            intentos++;
+
+            if (intentos === resultados.length) {
+                botonRaspar.removeEventListener("click", raspar);
+                botonRaspar.textContent = "Sin intentos";
+                botonRaspar.classList.add("agotado");
+            }
+        };
+
+        botonRaspar.addEventListener("click", raspar);
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="22-js-dom.html">Anterior: el DOM</a> |
+            <a href="index.html">Índice</a> |
+            <a href="24-js-formularios.html">Siguiente: formularios con JavaScript</a>
+        </nav>
+    </footer>
+</body>
+</html>

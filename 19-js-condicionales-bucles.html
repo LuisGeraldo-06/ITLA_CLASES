@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>19. JavaScript: condicionales y bucles</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <script src="js/consola.js" defer></script>
+    <link rel="stylesheet" href="css/19-js-condicionales-bucles.css">
+    <script src="js/19-js-condicionales-bucles.js" defer></script>
+</head>
+<body class="leccion-js">
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>19. JavaScript: condicionales y bucles</h1>
+        <p>Ahora el programa <strong>decide</strong> y <strong>repite</strong>. Con <code>if</code>, <code>switch</code> y el ternario elige qué hacer según los datos; con <code>for</code>, <code>while</code> y <code>do…while</code> repite tareas sin copiar código. Todo con casos reales: tarifas, envíos, notas, contraseñas, ahorros y promociones.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-semaforo">Semáforo</a></li>
+            <li><a href="#ej-calificaciones">Calificaciones A–F</a></li>
+            <li><a href="#ej-cine">Tarifa de cine</a></li>
+            <li><a href="#ej-envio">Envío gratis</a></li>
+            <li><a href="#ej-bisiesto">Año bisiesto</a></li>
+            <li><a href="#ej-por-defecto">Truthy, ?? y ?.</a></li>
+            <li><a href="#ej-dia-semana">switch: día de la semana</a></li>
+            <li><a href="#ej-tabla">Tabla de multiplicar</a></li>
+            <li><a href="#ej-cuenta-regresiva">Cuenta regresiva</a></li>
+            <li><a href="#ej-ventas">Sumatoria y promedio</a></li>
+            <li><a href="#ej-bip-bop">Bip Bop</a></li>
+            <li><a href="#ej-ahorro">Plan de ahorro</a></li>
+            <li><a href="#ej-adivina">Adivina el número</a></li>
+            <li><a href="#ej-vocales">Contar vocales</a></li>
+            <li><a href="#ej-palindromo">Palíndromos</a></li>
+            <li><a href="#ej-contrasena">Validar contraseña</a></li>
+            <li><a href="#ej-piramide">Pirámide</a></li>
+            <li><a href="#ej-break-continue">break y continue</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Tomar decisiones: if, else if, else</h2>
+            <p>Hasta ahora el código se ejecutaba completo, de arriba abajo. Con <code>if</code> el programa <strong>elige</strong> qué parte ejecutar según una condición que da <code>true</code> o <code>false</code>. Con los <strong>bucles</strong> repite una parte las veces que haga falta.</p>
+            <table>
+                <thead>
+                    <tr><th>Operador</th><th>Significado</th><th>Ejemplo → resultado</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>===</code> / <code>!==</code></td><td>igual / distinto</td><td><code>luz === "rojo"</code></td></tr>
+                    <tr><td><code>&gt; &lt; &gt;= &lt;=</code></td><td>mayor, menor, mayor o igual, menor o igual</td><td><code>edad &gt;= 18</code></td></tr>
+                    <tr><td><code>&amp;&amp;</code></td><td>Y: las dos condiciones deben cumplirse</td><td><code>edad &gt;= 18 &amp;&amp; tieneEntrada</code></td></tr>
+                    <tr><td><code>||</code></td><td>O: basta con una</td><td><code>dia === "sábado" || dia === "domingo"</code></td></tr>
+                    <tr><td><code>!</code></td><td>NO: invierte el valor</td><td><code>!carritoVacio</code></td></tr>
+                    <tr><td><code>condición ? a : b</code></td><td>ternario: un if de una línea que devuelve un valor</td><td><code>total &gt;= 50 ? "gratis" : "$4.99"</code></td></tr>
+                    <tr><td><code>a ?? b</code></td><td>usa b solo si a es <code>null</code> o <code>undefined</code></td><td><code>telefono ?? "sin registrar"</code></td></tr>
+                    <tr><td><code>a?.metodo()</code></td><td>si a es <code>null</code>/<code>undefined</code> da <code>undefined</code> en vez de error</td><td><code>cupon?.toUpperCase()</code></td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>if / else if / else</figcaption>
+<pre>if (condición) {
+    se ejecuta si es true
+} else if (otraCondición) {
+    si la primera fue false y esta es true
+} else {
+    si ninguna se cumplió
+}
+
+Se revisan en orden y solo entra en UNA.</pre>
+                </figure>
+                <figure>
+                    <figcaption>switch</figcaption>
+<pre>switch (valor) {
+    case 1:
+        si valor === 1
+        break;
+    case 6:
+    case 0:
+        si es 6 o 0 (casos juntos)
+        break;
+    default:
+        si no coincidió ninguno
+}
+
+Sin break sigue de largo al siguiente case.</pre>
+                </figure>
+            </div>
+            <h2>Truthy y falsy</h2>
+            <p>En un <code>if</code> cualquier valor se convierte a booleano. Solo estos valores cuentan como <strong>falsos</strong>; todo lo demás (incluidos <code>"0"</code>, <code>" "</code> y <code>-5</code>) es verdadero.</p>
+            <table>
+                <thead>
+                    <tr><th>Valor falsy</th><th>Cuándo aparece</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>false</code></td><td>una condición que no se cumple</td></tr>
+                    <tr><td><code>0</code>, <code>-0</code>, <code>0n</code></td><td>un contador o un total en cero</td></tr>
+                    <tr><td><code>""</code></td><td>un campo de texto vacío</td></tr>
+                    <tr><td><code>null</code></td><td>un valor vacío a propósito</td></tr>
+                    <tr><td><code>undefined</code></td><td>una variable sin valor</td></tr>
+                    <tr><td><code>NaN</code></td><td>una conversión a número que falló</td></tr>
+                </tbody>
+            </table>
+            <h2>Bucles: repetir</h2>
+            <table>
+                <thead>
+                    <tr><th>Bucle</th><th>Cuándo usarlo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>for (let i = 1; i &lt;= 10; i++)</code></td><td>sabes cuántas vueltas: del 1 al 10, 12 meses, 7 días</td></tr>
+                    <tr><td><code>while (condición)</code></td><td>no sabes cuántas: «hasta llegar a la meta»</td></tr>
+                    <tr><td><code>do { } while (condición)</code></td><td>igual que while, pero la primera vuelta siempre se ejecuta</td></tr>
+                    <tr><td><code>for (const letra of texto)</code></td><td>recorrer cada carácter de un texto (y luego de una lista)</td></tr>
+                    <tr><td><code>break</code></td><td>sale del bucle de inmediato</td></tr>
+                    <tr><td><code>continue</code></td><td>salta a la siguiente vuelta</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Las tres partes del for</figcaption>
+<pre>for (let i = 1; i &lt;= 5; i++) {
+    console.log(i);
+}
+
+let i = 1   → inicio: se ejecuta una vez
+i &lt;= 5      → condición: se revisa antes de cada vuelta
+i++         → paso: se ejecuta al final de cada vuelta
+
+Imprime 1, 2, 3, 4, 5</pre>
+                </figure>
+                <figure>
+                    <figcaption>while y do…while</figcaption>
+<pre>let ahorro = 0;
+while (ahorro &lt; 100) {
+    ahorro += 30;
+}
+
+let intentos = 0;
+do {
+    intentos++;
+} while (intentos &lt; 3);
+
+Si la condición nunca se vuelve false,
+el bucle es infinito y la pestaña se cuelga.</pre>
+                </figure>
+                <figure>
+                    <figcaption>|| vs ??</figcaption>
+<pre>const propina = 0;
+
+propina || 10   → 10
+(0 es falsy, || lo descarta)
+
+propina ?? 10   → 0
+(?? solo descarta null y undefined)
+
+Usa ?? cuando 0 o "" son valores válidos.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-semaforo" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Semáforo: if, else if y else</h2>
+            <p>El primer <code>if</code>: según el color se muestra una sola instrucción. Cambia el valor de <code>luz</code> a <code>"verde"</code>, <code>"rojo"</code> o <code>"azul"</code> y vuelve a ejecutar.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const luz = "amarillo";
+const segundosRestantes = 2;
+
+if (luz === "verde") {
+    console.log("🟢 Avanza");
+} else if (luz === "amarillo") {
+    console.log("🟡 Precaución: el semáforo va a cambiar");
+} else if (luz === "rojo") {
+    console.log("🔴 Detente");
+} else {
+    console.log("⚠️ Semáforo averiado: cruza con cuidado");
+}
+
+if (luz === "amarillo" &amp;&amp; segundosRestantes &lt; 3) {
+    console.log(`Quedan ${segundosRestantes} s: mejor frena`);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-calificaciones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Calificaciones de la A a la F</h2>
+            <p>Un puntaje al azar del 0 al 100 se convierte en letra. Como las condiciones se revisan en orden, basta con poner el límite inferior de cada rango.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const estudiante = "Sofía Herrera";
+const puntaje = Math.floor(Math.random() * 101);
+let letra;
+
+if (puntaje &gt;= 90) {
+    letra = "A";
+} else if (puntaje &gt;= 80) {
+    letra = "B";
+} else if (puntaje &gt;= 70) {
+    letra = "C";
+} else if (puntaje &gt;= 60) {
+    letra = "D";
+} else {
+    letra = "F";
+}
+
+console.log(`${estudiante}: ${puntaje} puntos → ${letra}`);
+
+if (puntaje &gt;= 60) {
+    console.log("✅ Aprobado");
+} else {
+    console.log(`🚫 Reprobado: le faltaron ${60 - puntaje} puntos`);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-cine" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Tarifa de cine por edad y día</h2>
+            <p>El precio depende de varias cosas a la vez. <code>||</code> agrupa a niños y adultos mayores; <code>&amp;&amp;</code> exige que sea miércoles <em>y</em> que la entrada no sea gratis.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const edad = 67;
+const dia = "miércoles";
+const esEstudiante = false;
+let precio = 8;
+
+if (edad &lt; 3) {
+    precio = 0;
+} else if (edad &lt; 12 || edad &gt;= 65) {
+    precio = 5;
+} else if (esEstudiante) {
+    precio = 6;
+}
+
+if (dia === "miércoles" &amp;&amp; precio &gt; 0) {
+    precio /= 2;
+    console.log("🎬 Miércoles de cine: 50% de descuento");
+}
+
+console.log(`Entrada para ${edad} años el ${dia}: $${precio.toFixed(2)}`);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-envio" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Envío gratis desde $50: el operador ternario</h2>
+            <p>El ternario <code>condición ? siEsVerdad : siEsFalso</code> elige entre dos valores en una sola línea. Es perfecto para textos como «artículo/artículos».</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const totalCarrito = 42.5;
+const articulos = 3;
+const minimoEnvioGratis = 50;
+
+const costoEnvio = totalCarrito &gt;= minimoEnvioGratis ? 0 : 4.99;
+const textoEnvio = costoEnvio === 0 ? "GRATIS" : `$${costoEnvio.toFixed(2)}`;
+
+console.log(`Tienes ${articulos} ${articulos === 1 ? "artículo" : "artículos"} en el carrito`);
+console.log(`Subtotal: $${totalCarrito.toFixed(2)}`);
+console.log(`Envío: ${textoEnvio}`);
+console.log(`Total: $${(totalCarrito + costoEnvio).toFixed(2)}`);
+
+const falta = minimoEnvioGratis - totalCarrito;
+if (falta &gt; 0) {
+    console.log(`🚚 Agrega $${falta.toFixed(2)} más y el envío es gratis`);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-bisiesto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>¿Es año bisiesto?</h2>
+            <p>Es bisiesto si es divisible por 4 <strong>y no</strong> por 100, <strong>o</strong> si es divisible por 400. Los operadores lógicos traducen la regla tal cual. Prueba con 2024, 2100 y 2000.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const anio = 2100;
+const divisiblePor4 = anio % 4 === 0;
+const divisiblePor100 = anio % 100 === 0;
+const divisiblePor400 = anio % 400 === 0;
+
+const esBisiesto = (divisiblePor4 &amp;&amp; !divisiblePor100) || divisiblePor400;
+
+if (esBisiesto) {
+    console.log(`${anio} es bisiesto: febrero tiene 29 días`);
+} else {
+    console.log(`${anio} no es bisiesto: febrero tiene 28 días`);
+}
+
+console.log(`${anio} tiene ${esBisiesto ? 366 : 365} días`);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-por-defecto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Valores por defecto: truthy, falsy, ?? y ?.</h2>
+            <p>Un perfil de usuario con datos que pueden venir vacíos. <code>||</code> reemplaza cualquier valor falsy; <code>??</code> solo <code>null</code> y <code>undefined</code>; <code>?.</code> evita el error al llamar un método sobre <code>null</code>.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const nombreIngresado = "";
+console.log(`Hola, ${nombreIngresado || "invitado"}`);
+
+const propinaElegida = 0;
+console.log("Propina con ||:", propinaElegida || 10);
+console.log("Propina con ??:", propinaElegida ?? 10);
+
+const telefono = null;
+console.log("Teléfono:", telefono ?? "sin registrar");
+
+let cupon = null;
+console.log("Cupón:", cupon?.toUpperCase());
+cupon = "verano25";
+console.log("Cupón:", cupon?.toUpperCase());
+
+const productosEnCarrito = 0;
+if (!productosEnCarrito) {
+    console.log("🛒 Tu carrito está vacío");
+}
+
+console.log("Falsy:", Boolean(""), Boolean(0), Boolean(null), Boolean(undefined), Boolean(NaN));
+console.log("Truthy:", Boolean("0"), Boolean(" "), Boolean(-5), Boolean("false"));</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-dia-semana" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Horario de la tienda según el día (switch)</h2>
+            <p><code>getDay()</code> devuelve 0 para domingo hasta 6 para sábado. <code>switch</code> compara un valor con varios casos; poner dos <code>case</code> seguidos los agrupa.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const numeroDia = new Date().getDay();
+let nombreDia;
+
+switch (numeroDia) {
+    case 0:
+        nombreDia = "domingo";
+        break;
+    case 1:
+        nombreDia = "lunes";
+        break;
+    case 2:
+        nombreDia = "martes";
+        break;
+    case 3:
+        nombreDia = "miércoles";
+        break;
+    case 4:
+        nombreDia = "jueves";
+        break;
+    case 5:
+        nombreDia = "viernes";
+        break;
+    case 6:
+        nombreDia = "sábado";
+        break;
+}
+
+console.log(`Hoy es ${nombreDia}`);
+
+switch (numeroDia) {
+    case 0:
+    case 6:
+        console.log("Fin de semana: abrimos de 10:00 a 14:00");
+        break;
+    case 5:
+        console.log("Viernes: abrimos hasta las 21:00 🎉");
+        break;
+    default:
+        console.log("Horario normal: de 8:00 a 18:00");
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tabla" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Tabla de multiplicar y lista de precios (for)</h2>
+            <p>El <code>for</code> repite el bloque mientras <code>i</code> no pase de 10. Con <code>padStart</code> las columnas quedan alineadas. El segundo bucle arma la lista de precios por cantidad de una panadería.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const numero = 7;
+console.log(`Tabla del ${numero}`);
+for (let i = 1; i &lt;= 10; i++) {
+    console.log(`${numero} x ${String(i).padStart(2)} = ${String(numero * i).padStart(2)}`);
+}
+
+const precioPan = 0.35;
+console.log("");
+console.log("Panes | Precio");
+for (let cantidad = 5; cantidad &lt;= 25; cantidad += 5) {
+    console.log(`${String(cantidad).padStart(5)} | $${(cantidad * precioPan).toFixed(2)}`);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-cuenta-regresiva" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Cuenta regresiva de la oferta relámpago</h2>
+            <p>Un <code>for</code> también puede ir hacia atrás con <code>--</code> o de a varios pasos con <code>-=</code>.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>for (let segundos = 5; segundos &gt; 0; segundos--) {
+    console.log(`⏳ La oferta empieza en ${segundos}…`);
+}
+console.log("🔥 ¡Oferta activa! 50% en toda la tienda");
+
+console.log("");
+for (let bateria = 100; bateria &gt;= 0; bateria -= 25) {
+    const aviso = bateria &lt;= 25 ? " ⚠️ conecta el cargador" : "";
+    console.log(`🔋 Batería: ${bateria}%${aviso}`);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-ventas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Ventas de la semana: sumatoria, promedio y mejor día</h2>
+            <p>Un <strong>acumulador</strong> (<code>total += venta</code>) suma en cada vuelta. Con un <code>if</code> dentro del bucle recordamos el mejor día. Las ventas son al azar: cada clic es una semana nueva.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const dias = 7;
+let total = 0;
+let mejorDia = 0;
+let mejorVenta = 0;
+
+for (let dia = 1; dia &lt;= dias; dia++) {
+    const venta = Math.floor(Math.random() * 500) + 100;
+    total += venta;
+    if (venta &gt; mejorVenta) {
+        mejorVenta = venta;
+        mejorDia = dia;
+    }
+    console.log(`Día ${dia}: $${venta}`);
+}
+
+console.log("-----------------");
+console.log(`Total de la semana: $${total}`);
+console.log(`Promedio diario: $${(total / dias).toFixed(2)}`);
+console.log(`Mejor día: el ${mejorDia}, con $${mejorVenta}`);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-bip-bop" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>«Bip Bop»: premios por número de cliente</h2>
+            <p>El clásico FizzBuzz convertido en promoción: el cliente múltiplo de 3 gana un descuento (Bip), el de 5 una galleta (Bop) y el de ambos un café gratis. La condición más específica va primero.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>for (let cliente = 1; cliente &lt;= 20; cliente++) {
+    if (cliente % 3 === 0 &amp;&amp; cliente % 5 === 0) {
+        console.log(`Cliente ${cliente}: BipBop ☕ café gratis`);
+    } else if (cliente % 3 === 0) {
+        console.log(`Cliente ${cliente}: Bip 10% de descuento`);
+    } else if (cliente % 5 === 0) {
+        console.log(`Cliente ${cliente}: Bop 🍪 galleta de regalo`);
+    } else {
+        console.log(`Cliente ${cliente}`);
+    }
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-ahorro" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Plan de ahorro mes a mes (while)</h2>
+            <p>No sabemos cuántos meses tomará llegar a la meta, así que usamos <code>while</code>: repite mientras el ahorro sea menor que la meta.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const meta = 1200;
+const aporteMensual = 150;
+const interesMensual = 0.005;
+let ahorro = 0;
+let mes = 0;
+
+while (ahorro &lt; meta) {
+    mes++;
+    ahorro += aporteMensual;
+    ahorro += ahorro * interesMensual;
+    console.log(`Mes ${String(mes).padStart(2)}: $${ahorro.toFixed(2)}`);
+}
+
+console.log(`🎯 Meta de $${meta} alcanzada en ${mes} meses`);
+console.log(`Pusiste $${aporteMensual * mes} y el banco te dio $${(ahorro - aporteMensual * mes).toFixed(2)} de intereses`);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-adivina" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Adivina el número (do…while y prompt)</h2>
+            <p><code>do…while</code> pregunta al menos una vez y repite hasta acertar. <code>prompt()</code> devuelve texto (o <code>null</code> si pulsas Cancelar), por eso lo convertimos con <code>Number</code> y salimos con <code>break</code> si la persona se rinde.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const secreto = Math.floor(Math.random() * 20) + 1;
+let intentos = 0;
+let respuesta;
+
+do {
+    const texto = prompt("Adivina el número del 1 al 20");
+    if (texto === null) {
+        console.log(`Te rendiste. El número era ${secreto}`);
+        break;
+    }
+    respuesta = Number(texto);
+    intentos++;
+    if (Number.isNaN(respuesta)) {
+        console.log(`"${texto}" no es un número`);
+    } else if (respuesta &lt; secreto) {
+        console.log(`${respuesta}: más alto ⬆️`);
+    } else if (respuesta &gt; secreto) {
+        console.log(`${respuesta}: más bajo ⬇️`);
+    } else {
+        console.log(`🎉 ¡Correcto! Era ${secreto}. Lo lograste en ${intentos} intentos`);
+    }
+} while (respuesta !== secreto);</pre>
+                </figure>
+            </div>
+            <p>Mientras la ventana de <code>prompt</code> está abierta la página se congela; por eso el historial de intentos aparece en el panel al terminar el juego.</p>
+        </section>
+
+        <section id="ej-vocales" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Contar vocales, espacios y consonantes (for…of)</h2>
+            <p><code>for…of</code> recorre un texto letra por letra. Para saber si una letra es vocal le preguntamos a un texto con todas las vocales si la incluye.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const frase = "Murciélago es una palabra con las cinco vocales";
+let vocales = 0;
+let espacios = 0;
+
+for (const letra of frase.toLowerCase()) {
+    if ("aeiouáéíóúü".includes(letra)) {
+        vocales++;
+    } else if (letra === " ") {
+        espacios++;
+    }
+}
+
+console.log(`"${frase}"`);
+console.log("Vocales:", vocales);
+console.log("Espacios:", espacios);
+console.log("Consonantes:", frase.length - vocales - espacios);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-palindromo" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Invertir una palabra y detectar palíndromos</h2>
+            <p>Para invertir un texto vamos poniendo cada letra <strong>delante</strong> de las anteriores. Si la frase limpia se lee igual al revés, es un palíndromo.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const palabra = "Aurora";
+let invertida = "";
+for (const letra of palabra) {
+    invertida = letra + invertida;
+}
+console.log(`${palabra} al revés: ${invertida}`);
+
+const frase = "Anita lava la tina";
+const limpia = frase.toLowerCase().replaceAll(" ", "");
+let alReves = "";
+for (const letra of limpia) {
+    alReves = letra + alReves;
+}
+
+if (limpia === alReves) {
+    console.log(`✅ "${frase}" es un palíndromo`);
+} else {
+    console.log(`🚫 "${frase}" no es un palíndromo`);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-contrasena" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Validación de contraseña con reglas</h2>
+            <p>Cada regla es un booleano. Para saber si hay un número recorremos la contraseña con <code>for…of</code>; para mayúsculas comparamos con su versión en minúsculas. Prueba con <code>"girasol"</code> o <code>"Gira sol 24"</code>.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const contrasena = "Girasol2024";
+
+let tieneNumero = false;
+for (const caracter of contrasena) {
+    if ("0123456789".includes(caracter)) {
+        tieneNumero = true;
+    }
+}
+
+const largoSuficiente = contrasena.length &gt;= 8;
+const tieneMayuscula = contrasena !== contrasena.toLowerCase();
+const tieneMinuscula = contrasena !== contrasena.toUpperCase();
+const sinEspacios = !contrasena.includes(" ");
+
+console.log(largoSuficiente ? "✅" : "🚫", "Al menos 8 caracteres");
+console.log(tieneMayuscula ? "✅" : "🚫", "Una mayúscula");
+console.log(tieneMinuscula ? "✅" : "🚫", "Una minúscula");
+console.log(tieneNumero ? "✅" : "🚫", "Un número");
+console.log(sinEspacios ? "✅" : "🚫", "Sin espacios");
+
+if (largoSuficiente &amp;&amp; tieneMayuscula &amp;&amp; tieneMinuscula &amp;&amp; tieneNumero &amp;&amp; sinEspacios) {
+    console.log("🔒 Contraseña segura");
+} else {
+    console.log("⚠️ Corrige las reglas marcadas con 🚫");
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-piramide" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Pirámide de asteriscos y gráfico de barras</h2>
+            <p>Cada fila tiene algunos espacios y un número impar de asteriscos. Debajo, un bucle <strong>dentro de otro</strong> dibuja un gráfico de barras de ventas por hora.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const altura = 5;
+for (let fila = 1; fila &lt;= altura; fila++) {
+    const espacios = " ".repeat(altura - fila);
+    const asteriscos = "*".repeat(fila * 2 - 1);
+    console.log(espacios + asteriscos);
+}
+console.log(" ".repeat(altura - 1) + "|");
+
+console.log("");
+for (let hora = 8; hora &lt;= 12; hora++) {
+    const ventas = Math.floor(Math.random() * 10) + 1;
+    let barra = "";
+    for (let i = 1; i &lt;= ventas; i++) {
+        barra += "█";
+    }
+    console.log(`${String(hora).padStart(2, "0")}:00 ${barra} ${ventas}`);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-break-continue" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>break y continue: el ascensor y el ticket ganador</h2>
+            <p><code>continue</code> salta una vuelta (el edificio no tiene piso 13) y <code>break</code> termina el bucle en cuanto encontramos lo que buscábamos, sin revisar el resto.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>let botones = "";
+for (let piso = 1; piso &lt;= 15; piso++) {
+    if (piso === 13) {
+        continue;
+    }
+    botones += `[${piso}] `;
+}
+console.log("Botones del ascensor:", botones);
+
+let revisados = 0;
+for (let ticket = 501; ticket &lt;= 1000; ticket++) {
+    revisados++;
+    if (ticket % 37 === 0) {
+        console.log(`🎟️ Primer ticket ganador después del 500: ${ticket}`);
+        break;
+    }
+}
+console.log(`Se revisaron ${revisados} tickets de 500 posibles`);</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="18-js-variables-tipos.html">Anterior: variables y tipos</a> |
+            <a href="index.html">Índice</a> |
+            <a href="20-js-funciones.html">Siguiente: funciones</a>
+        </nav>
+    </footer>
+</body>
+</html>

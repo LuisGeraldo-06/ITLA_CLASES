@@ -1,0 +1,4480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>24. JavaScript: formularios con JavaScript</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <script src="js/consola.js" defer></script>
+    <link rel="stylesheet" href="css/24-js-formularios.css">
+    <script src="js/24-js-formularios.js" defer></script>
+</head>
+<body class="leccion-js">
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>24. JavaScript: formularios con JavaScript</h1>
+        <p>En la lección 17 dejamos los formularios bonitos solo con CSS, y varias veces apareció la frase «esto necesita JavaScript». Aquí está: leer lo que se escribe, enviar sin recargar, validar con mensajes propios y accesibles, y los componentes que ves en cualquier app real: mostrar contraseña, contador de caracteres, código OTP, arrastrar archivos, calculadoras en vivo, pagos, buscadores y encuestas por pasos.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-leer-valores">Leer valores</a></li>
+            <li><a href="#ej-enviar">submit y FormData</a></li>
+            <li><a href="#ej-validity">checkValidity y validity</a></li>
+            <li><a href="#ej-mensaje-propio">setCustomValidity</a></li>
+            <li><a href="#ej-errores">Errores accesibles</a></li>
+            <li><a href="#ej-boton-activo">Botón desactivado y reset</a></li>
+            <li><a href="#ej-ver-clave">Mostrar contraseña</a></li>
+            <li><a href="#ej-fuerza">Fuerza de contraseña</a></li>
+            <li><a href="#ej-contador">Contador de caracteres</a></li>
+            <li><a href="#ej-otp">Código OTP</a></li>
+            <li><a href="#ej-arrastre">Arrastrar archivos</a></li>
+            <li><a href="#ej-vista-previa">Vista previa de imagen</a></li>
+            <li><a href="#ej-prestamo">Calculadora de préstamo</a></li>
+            <li><a href="#ej-cotizador">Cotizador</a></li>
+            <li><a href="#ej-tarjeta">Formulario de pago</a></li>
+            <li><a href="#ej-pais-ciudad">Select dependiente</a></li>
+            <li><a href="#ej-buscador">Buscador en vivo</a></li>
+            <li><a href="#ej-encuesta">Encuesta por pasos</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Formularios: leer, validar y reaccionar</h2>
+            <p>HTML ya sabe validar (<code>required</code>, <code>type="email"</code>, <code>min</code>, <code>pattern</code>…) y CSS ya sabe pintar los estados. JavaScript agrega lo que falta: <strong>leer</strong> lo que la persona escribió, <strong>reaccionar mientras escribe</strong>, <strong>mostrar mensajes propios</strong> y <strong>decidir qué pasa al enviar</strong> sin recargar la página.</p>
+            <table>
+                <thead>
+                    <tr><th>Leer y escribir valores</th><th>Qué devuelve</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>campo.value</code></td><td>el texto del campo. <strong>Siempre es string</strong>, incluso en <code>type="number"</code></td></tr>
+                    <tr><td><code>campo.valueAsNumber</code></td><td>el valor como número (en number, range y fechas). Vacío → <code>NaN</code></td></tr>
+                    <tr><td><code>campo.checked</code></td><td><code>true</code> / <code>false</code> en checkbox y radio</td></tr>
+                    <tr><td><code>campo.files</code></td><td>la lista de archivos de un <code>input type="file"</code></td></tr>
+                    <tr><td><code>select.value</code> / <code>select.selectedIndex</code></td><td>el <code>value</code> de la opción elegida / su posición</td></tr>
+                    <tr><td><code>form.elements.nombre</code></td><td>el campo cuyo <code>name</code> es <code>"nombre"</code></td></tr>
+                    <tr><td><code>new FormData(form)</code></td><td>todos los campos con <code>name</code>, listos para recorrer o enviar</td></tr>
+                    <tr><td><code>datos.get("x")</code> / <code>datos.getAll("x")</code></td><td>un valor / todos los valores con ese name (checkbox múltiples)</td></tr>
+                    <tr><td><code>Object.fromEntries(datos)</code></td><td>un objeto <code>{ nombre: "…", correo: "…" }</code></td></tr>
+                    <tr><td><code>form.reset()</code></td><td>vuelve todos los campos a su valor inicial</td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Evento</th><th>Cuándo ocurre</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>input</code></td><td>con cada tecla, cada movimiento del range, cada clic en un checkbox</td></tr>
+                    <tr><td><code>change</code></td><td>cuando el valor queda confirmado (al salir del campo, al elegir en un select o un archivo)</td></tr>
+                    <tr><td><code>submit</code></td><td>al enviar el formulario (botón submit o Enter). Solo si pasa la validación HTML</td></tr>
+                    <tr><td><code>reset</code></td><td>al pulsar un <code>button type="reset"</code> o llamar a <code>form.reset()</code></td></tr>
+                    <tr><td><code>invalid</code></td><td>en cada campo que no pasa la validación al intentar enviar</td></tr>
+                    <tr><td><code>paste</code> / <code>keydown</code></td><td>al pegar / al pulsar una tecla (antes de que se escriba)</td></tr>
+                    <tr><td><code>dragover</code> / <code>drop</code></td><td>mientras se arrastra algo encima / al soltarlo</td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Constraint Validation API</th><th>Para qué sirve</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>form.checkValidity()</code></td><td><code>true</code> si todos los campos cumplen sus reglas (no muestra nada)</td></tr>
+                    <tr><td><code>campo.reportValidity()</code></td><td>igual, pero además muestra el globito de error del navegador</td></tr>
+                    <tr><td><code>campo.validity</code></td><td>objeto con banderas: <code>valueMissing</code>, <code>typeMismatch</code>, <code>patternMismatch</code>, <code>tooShort</code>, <code>rangeUnderflow</code>, <code>rangeOverflow</code>, <code>customError</code>, <code>valid</code>…</td></tr>
+                    <tr><td><code>campo.validationMessage</code></td><td>el texto de error que mostraría el navegador</td></tr>
+                    <tr><td><code>campo.setCustomValidity("texto")</code></td><td>marca el campo como inválido con tu mensaje. Con <code>""</code> vuelve a ser válido</td></tr>
+                    <tr><td><code>novalidate</code> (atributo del form)</td><td>apaga los globitos del navegador para mostrar errores propios</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>El esqueleto de casi todo formulario</figcaption>
+<pre>const formulario = document.querySelector("#formulario");
+
+formulario.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    const datos = Object.fromEntries(new FormData(formulario));
+    console.log(datos);
+    formulario.reset();
+});
+
+Sin preventDefault() el navegador recarga
+la página (o navega al action) y se pierde
+todo lo que hiciste con JavaScript.</pre>
+                </figure>
+                <figure>
+                    <figcaption>value siempre es texto</figcaption>
+<pre>&lt;input type="number" id="cantidad" value="3"&gt;
+
+cantidad.value + 1          → "31"
+Number(cantidad.value) + 1  → 4
+cantidad.valueAsNumber + 1  → 4
+
+FormData también devuelve strings:
+convierte con Number() antes de sumar.</pre>
+                </figure>
+                <figure>
+                    <figcaption>Errores accesibles</figcaption>
+<pre>&lt;input id="correo" aria-describedby="correo-error"&gt;
+&lt;p id="correo-error"&gt;&lt;/p&gt;
+
+aria-describedby: el lector de pantalla lee
+el mensaje de error junto con la etiqueta.
+
+aria-invalid="true": avisa que el campo
+tiene un error (y sirve para pintarlo en CSS).
+
+No uses solo el color rojo: escribe
+siempre el mensaje en texto.</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-leer-valores" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Leer valores: <code>.value</code>, <code>.checked</code> y <code>.valueAsNumber</code></h2>
+            <p>Cambia lo que quieras en el perfil y pulsa <strong>Ejecutar</strong>. Fíjate en que <code>.value</code> de un campo numérico es texto, y <code>.valueAsNumber</code> ya es número. Si borras la edad, <code>valueAsNumber</code> da <code>NaN</code>.</p>
+            <div class="resultado">
+                <form id="perfil" class="formulario">
+                    <label for="perfil-nombre">Nombre</label>
+                    <input type="text" id="perfil-nombre" name="nombre" value="Ana Ríos">
+                    <label for="perfil-edad">Edad</label>
+                    <input type="number" id="perfil-edad" name="edad" value="29">
+                    <label for="perfil-nacimiento">Fecha de nacimiento</label>
+                    <input type="date" id="perfil-nacimiento" name="nacimiento" value="1996-04-12">
+                    <label for="perfil-pais">País</label>
+                    <select id="perfil-pais" name="pais">
+                        <option value="pe">Perú</option>
+                        <option value="mx" selected>México</option>
+                        <option value="co">Colombia</option>
+                    </select>
+                    <label class="opcion"><input type="checkbox" id="perfil-boletin" name="boletin" checked> Quiero recibir el boletín</label>
+                    <fieldset>
+                        <legend>Plan</legend>
+                        <label class="opcion"><input type="radio" name="plan" value="basico"> Básico</label>
+                        <label class="opcion"><input type="radio" name="plan" value="pro" checked> Pro</label>
+                    </fieldset>
+                </form>
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="perfil" class="formulario"&gt;
+    &lt;label for="perfil-nombre"&gt;Nombre&lt;/label&gt;
+    &lt;input type="text" id="perfil-nombre" name="nombre" value="Ana Ríos"&gt;
+    &lt;label for="perfil-edad"&gt;Edad&lt;/label&gt;
+    &lt;input type="number" id="perfil-edad" name="edad" value="29"&gt;
+    &lt;label for="perfil-nacimiento"&gt;Fecha de nacimiento&lt;/label&gt;
+    &lt;input type="date" id="perfil-nacimiento" name="nacimiento" value="1996-04-12"&gt;
+    &lt;label for="perfil-pais"&gt;País&lt;/label&gt;
+    &lt;select id="perfil-pais" name="pais"&gt;
+        &lt;option value="pe"&gt;Perú&lt;/option&gt;
+        &lt;option value="mx" selected&gt;México&lt;/option&gt;
+        &lt;option value="co"&gt;Colombia&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;label class="opcion"&gt;&lt;input type="checkbox" id="perfil-boletin" name="boletin" checked&gt; Quiero recibir el boletín&lt;/label&gt;
+    &lt;fieldset&gt;
+        &lt;legend&gt;Plan&lt;/legend&gt;
+        &lt;label class="opcion"&gt;&lt;input type="radio" name="plan" value="basico"&gt; Básico&lt;/label&gt;
+        &lt;label class="opcion"&gt;&lt;input type="radio" name="plan" value="pro" checked&gt; Pro&lt;/label&gt;
+    &lt;/fieldset&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const nombre = document.querySelector("#perfil-nombre");
+const edad = document.querySelector("#perfil-edad");
+const nacimiento = document.querySelector("#perfil-nacimiento");
+const pais = document.querySelector("#perfil-pais");
+const boletin = document.querySelector("#perfil-boletin");
+const plan = document.querySelector("input[name='plan']:checked");
+
+console.log("nombre:", nombre.value);
+console.log("edad (.value):", edad.value, typeof edad.value);
+console.log("edad (.valueAsNumber):", edad.valueAsNumber, typeof edad.valueAsNumber);
+console.log("edad el próximo año:", edad.valueAsNumber + 1);
+console.log("nacimiento:", nacimiento.value);
+console.log("país (value):", pais.value);
+console.log("país (texto):", pais.options[pais.selectedIndex].text);
+console.log("¿boletín?:", boletin.checked);
+console.log("plan:", plan.value);</pre>
+                </figure>
+            </div>
+            <p>Para los radio no se lee cada botón: se busca el marcado del grupo con el selector <code>input[name='plan']:checked</code>. Un checkbox se lee con <code>.checked</code>, no con <code>.value</code> (su value es siempre el mismo).</p>
+        </section>
+
+        <section id="ej-enviar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Enviar sin recargar: <code>submit</code>, <code>FormData</code> y <code>Object.fromEntries</code></h2>
+            <p>Un formulario de contacto. Al enviarlo, <code>preventDefault()</code> evita que la página se recargue; <code>FormData</code> junta todos los campos que tienen <code>name</code> y <code>Object.fromEntries</code> los convierte en un objeto normal.</p>
+            <div class="resultado">
+                <form id="contacto" class="formulario">
+                    <label for="contacto-nombre">Nombre</label>
+                    <input type="text" id="contacto-nombre" name="nombre" required>
+                    <label for="contacto-correo">Correo</label>
+                    <input type="email" id="contacto-correo" name="correo" required>
+                    <label for="contacto-asunto">Asunto</label>
+                    <select id="contacto-asunto" name="asunto">
+                        <option value="consulta">Consulta</option>
+                        <option value="reclamo">Reclamo</option>
+                        <option value="sugerencia">Sugerencia</option>
+                    </select>
+                    <label for="contacto-mensaje">Mensaje</label>
+                    <textarea id="contacto-mensaje" name="mensaje" rows="3" required></textarea>
+                    <button type="submit">Enviar</button>
+                </form>
+                <p id="contacto-gracias" class="aviso" role="status"></p>
+                <output id="contacto-datos" class="salida">Aún no se envió nada.</output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="contacto" class="formulario"&gt;
+    &lt;label for="contacto-nombre"&gt;Nombre&lt;/label&gt;
+    &lt;input type="text" id="contacto-nombre" name="nombre" required&gt;
+    &lt;label for="contacto-correo"&gt;Correo&lt;/label&gt;
+    &lt;input type="email" id="contacto-correo" name="correo" required&gt;
+    &lt;label for="contacto-asunto"&gt;Asunto&lt;/label&gt;
+    &lt;select id="contacto-asunto" name="asunto"&gt;
+        &lt;option value="consulta"&gt;Consulta&lt;/option&gt;
+        &lt;option value="reclamo"&gt;Reclamo&lt;/option&gt;
+        &lt;option value="sugerencia"&gt;Sugerencia&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;label for="contacto-mensaje"&gt;Mensaje&lt;/label&gt;
+    &lt;textarea id="contacto-mensaje" name="mensaje" rows="3" required&gt;&lt;/textarea&gt;
+    &lt;button type="submit"&gt;Enviar&lt;/button&gt;
+&lt;/form&gt;
+&lt;p id="contacto-gracias" class="aviso" role="status"&gt;&lt;/p&gt;
+&lt;output id="contacto-datos" class="salida"&gt;Aún no se envió nada.&lt;/output&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const contacto = document.querySelector("#contacto");
+const contactoGracias = document.querySelector("#contacto-gracias");
+const contactoDatos = document.querySelector("#contacto-datos");
+
+contacto.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    const datos = new FormData(contacto);
+
+    contactoDatos.textContent = "";
+    for (const [campo, valor] of datos) {
+        contactoDatos.textContent += `${campo}: ${valor}\n`;
+    }
+
+    const mensaje = Object.fromEntries(datos);
+    contactoGracias.textContent = `Gracias, ${mensaje.nombre}. Te responderemos a ${mensaje.correo}.`;
+    contacto.reset();
+});</pre>
+                </figure>
+            </div>
+            <p>El evento <code>submit</code> se escucha en el <strong>formulario</strong>, no en el botón: así también funciona al pulsar Enter. Como los campos son <code>required</code>, el navegador no deja enviar (y no se dispara <code>submit</code>) mientras falte algo.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Enviar sin recargar: submit, FormData y Object.fromEntries&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label,
+        .campo label {
+            font-weight: 600;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .campo {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .salida {
+            display: block;
+            min-height: 48px;
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background: #0f172a;
+            color: #a6e3a1;
+            font-family: "Courier New", monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="contacto" class="formulario"&gt;
+        &lt;label for="contacto-nombre"&gt;Nombre&lt;/label&gt;
+        &lt;input type="text" id="contacto-nombre" name="nombre" required&gt;
+        &lt;label for="contacto-correo"&gt;Correo&lt;/label&gt;
+        &lt;input type="email" id="contacto-correo" name="correo" required&gt;
+        &lt;label for="contacto-asunto"&gt;Asunto&lt;/label&gt;
+        &lt;select id="contacto-asunto" name="asunto"&gt;
+            &lt;option value="consulta"&gt;Consulta&lt;/option&gt;
+            &lt;option value="reclamo"&gt;Reclamo&lt;/option&gt;
+            &lt;option value="sugerencia"&gt;Sugerencia&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;label for="contacto-mensaje"&gt;Mensaje&lt;/label&gt;
+        &lt;textarea id="contacto-mensaje" name="mensaje" rows="3" required&gt;&lt;/textarea&gt;
+        &lt;button type="submit"&gt;Enviar&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;p id="contacto-gracias" class="aviso" role="status"&gt;&lt;/p&gt;
+    &lt;output id="contacto-datos" class="salida"&gt;Aún no se envió nada.&lt;/output&gt;
+    &lt;script&gt;
+        const contacto = document.querySelector("#contacto");
+        const contactoGracias = document.querySelector("#contacto-gracias");
+        const contactoDatos = document.querySelector("#contacto-datos");
+
+        contacto.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            const datos = new FormData(contacto);
+
+            contactoDatos.textContent = "";
+            for (const [campo, valor] of datos) {
+                contactoDatos.textContent += `${campo}: ${valor}\n`;
+            }
+
+            const mensaje = Object.fromEntries(datos);
+            contactoGracias.textContent = `Gracias, ${mensaje.nombre}. Te responderemos a ${mensaje.correo}.`;
+            contacto.reset();
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-validity" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Preguntar por la validez: <code>checkValidity()</code> y <code>validity</code></h2>
+            <p>Con <code>novalidate</code> el navegador ya no bloquea el envío: ahora JavaScript decide. Escribe datos incorrectos (usuario con mayúsculas, edad 15, correo sin @) y pulsa <strong>Comprobar</strong> para ver qué bandera de <code>validity</code> se enciende en cada campo.</p>
+            <div class="resultado">
+                <form id="registro-validez" class="formulario" novalidate>
+                    <label for="rv-usuario">Usuario (4 o más letras minúsculas o números)</label>
+                    <input type="text" id="rv-usuario" name="usuario" required minlength="4" pattern="[a-z0-9]+">
+                    <label for="rv-edad">Edad (18 a 99)</label>
+                    <input type="number" id="rv-edad" name="edad" required min="18" max="99">
+                    <label for="rv-correo">Correo</label>
+                    <input type="email" id="rv-correo" name="correo" required>
+                    <button type="submit">Comprobar</button>
+                </form>
+                <output id="rv-informe" class="salida">Pulsa Comprobar.</output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="registro-validez" class="formulario" novalidate&gt;
+    &lt;label for="rv-usuario"&gt;Usuario (4 o más letras minúsculas o números)&lt;/label&gt;
+    &lt;input type="text" id="rv-usuario" name="usuario" required minlength="4" pattern="[a-z0-9]+"&gt;
+    &lt;label for="rv-edad"&gt;Edad (18 a 99)&lt;/label&gt;
+    &lt;input type="number" id="rv-edad" name="edad" required min="18" max="99"&gt;
+    &lt;label for="rv-correo"&gt;Correo&lt;/label&gt;
+    &lt;input type="email" id="rv-correo" name="correo" required&gt;
+    &lt;button type="submit"&gt;Comprobar&lt;/button&gt;
+&lt;/form&gt;
+&lt;output id="rv-informe" class="salida"&gt;Pulsa Comprobar.&lt;/output&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const registroValidez = document.querySelector("#registro-validez");
+const rvInforme = document.querySelector("#rv-informe");
+const banderas = ["valueMissing", "typeMismatch", "patternMismatch", "tooShort", "rangeUnderflow", "rangeOverflow"];
+
+registroValidez.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    rvInforme.textContent = `¿Todo el formulario es válido? ${registroValidez.checkValidity()}\n\n`;
+
+    for (const campo of registroValidez.querySelectorAll("input")) {
+        const fallos = banderas.filter((bandera) =&gt; campo.validity[bandera]);
+        rvInforme.textContent += `${campo.name}: valid = ${campo.validity.valid}\n`;
+        if (fallos.length &gt; 0) {
+            rvInforme.textContent += `    banderas: ${fallos.join(", ")}\n`;
+            rvInforme.textContent += `    mensaje: ${campo.validationMessage}\n`;
+        }
+    }
+});</pre>
+                </figure>
+            </div>
+            <p><code>validationMessage</code> viene en el idioma del navegador. <code>tooShort</code> solo se enciende cuando la persona escribió en el campo, no cuando el valor lo puso JavaScript.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Preguntar por la validez: checkValidity() y validity&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label,
+        .campo label {
+            font-weight: 600;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .campo {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .salida {
+            display: block;
+            min-height: 48px;
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background: #0f172a;
+            color: #a6e3a1;
+            font-family: "Courier New", monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="registro-validez" class="formulario" novalidate&gt;
+        &lt;label for="rv-usuario"&gt;Usuario (4 o más letras minúsculas o números)&lt;/label&gt;
+        &lt;input type="text" id="rv-usuario" name="usuario" required minlength="4" pattern="[a-z0-9]+"&gt;
+        &lt;label for="rv-edad"&gt;Edad (18 a 99)&lt;/label&gt;
+        &lt;input type="number" id="rv-edad" name="edad" required min="18" max="99"&gt;
+        &lt;label for="rv-correo"&gt;Correo&lt;/label&gt;
+        &lt;input type="email" id="rv-correo" name="correo" required&gt;
+        &lt;button type="submit"&gt;Comprobar&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;output id="rv-informe" class="salida"&gt;Pulsa Comprobar.&lt;/output&gt;
+    &lt;script&gt;
+        const registroValidez = document.querySelector("#registro-validez");
+        const rvInforme = document.querySelector("#rv-informe");
+        const banderas = ["valueMissing", "typeMismatch", "patternMismatch", "tooShort", "rangeUnderflow", "rangeOverflow"];
+
+        registroValidez.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            rvInforme.textContent = `¿Todo el formulario es válido? ${registroValidez.checkValidity()}\n\n`;
+
+            for (const campo of registroValidez.querySelectorAll("input")) {
+                const fallos = banderas.filter((bandera) =&gt; campo.validity[bandera]);
+                rvInforme.textContent += `${campo.name}: valid = ${campo.validity.valid}\n`;
+                if (fallos.length &gt; 0) {
+                    rvInforme.textContent += `    banderas: ${fallos.join(", ")}\n`;
+                    rvInforme.textContent += `    mensaje: ${campo.validationMessage}\n`;
+                }
+            }
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-mensaje-propio" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Reglas propias: <code>setCustomValidity()</code> y <code>reportValidity()</code></h2>
+            <p>HTML no sabe si un nombre de usuario ya está ocupado. Con <code>setCustomValidity</code> marcamos el campo como inválido con nuestro propio mensaje, y <code>reportValidity</code> lo muestra en el globito del navegador. Prueba con «admin», «ana» o «soporte».</p>
+            <div class="resultado">
+                <form id="alta-usuario" class="formulario">
+                    <label for="au-usuario">Elige tu nombre de usuario</label>
+                    <input type="text" id="au-usuario" name="usuario" required autocomplete="username">
+                    <p class="ayuda">«admin», «ana» y «soporte» ya están ocupados.</p>
+                    <button type="submit">Crear cuenta</button>
+                </form>
+                <p id="au-mensaje" class="aviso" role="status"></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="alta-usuario" class="formulario"&gt;
+    &lt;label for="au-usuario"&gt;Elige tu nombre de usuario&lt;/label&gt;
+    &lt;input type="text" id="au-usuario" name="usuario" required autocomplete="username"&gt;
+    &lt;p class="ayuda"&gt;«admin», «ana» y «soporte» ya están ocupados.&lt;/p&gt;
+    &lt;button type="submit"&gt;Crear cuenta&lt;/button&gt;
+&lt;/form&gt;
+&lt;p id="au-mensaje" class="aviso" role="status"&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const altaUsuario = document.querySelector("#alta-usuario");
+const usuarioNuevo = document.querySelector("#au-usuario");
+const auMensaje = document.querySelector("#au-mensaje");
+const ocupados = ["admin", "ana", "soporte"];
+
+usuarioNuevo.addEventListener("input", () =&gt; {
+    const elegido = usuarioNuevo.value.trim().toLowerCase();
+    if (ocupados.includes(elegido)) {
+        usuarioNuevo.setCustomValidity(`«${elegido}» ya está en uso. Prueba con otro.`);
+        usuarioNuevo.reportValidity();
+    } else {
+        usuarioNuevo.setCustomValidity("");
+    }
+});
+
+altaUsuario.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    auMensaje.textContent = `Cuenta «${usuarioNuevo.value}» creada.`;
+    altaUsuario.reset();
+});</pre>
+                </figure>
+            </div>
+            <p>Mientras el mensaje propio no sea <code>""</code>, el campo cuenta como inválido: el navegador bloquea el envío y aplica <code>:invalid</code> en CSS. Por eso hay que limpiarlo con <code>setCustomValidity("")</code> cuando el valor vuelve a estar bien.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Reglas propias: setCustomValidity() y reportValidity()&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label {
+            font-weight: 600;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .ayuda {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="alta-usuario" class="formulario"&gt;
+        &lt;label for="au-usuario"&gt;Elige tu nombre de usuario&lt;/label&gt;
+        &lt;input type="text" id="au-usuario" name="usuario" required autocomplete="username"&gt;
+        &lt;p class="ayuda"&gt;«admin», «ana» y «soporte» ya están ocupados.&lt;/p&gt;
+        &lt;button type="submit"&gt;Crear cuenta&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;p id="au-mensaje" class="aviso" role="status"&gt;&lt;/p&gt;
+    &lt;script&gt;
+        const altaUsuario = document.querySelector("#alta-usuario");
+        const usuarioNuevo = document.querySelector("#au-usuario");
+        const auMensaje = document.querySelector("#au-mensaje");
+        const ocupados = ["admin", "ana", "soporte"];
+
+        usuarioNuevo.addEventListener("input", () =&gt; {
+            const elegido = usuarioNuevo.value.trim().toLowerCase();
+            if (ocupados.includes(elegido)) {
+                usuarioNuevo.setCustomValidity(`«${elegido}» ya está en uso. Prueba con otro.`);
+                usuarioNuevo.reportValidity();
+            } else {
+                usuarioNuevo.setCustomValidity("");
+            }
+        });
+
+        altaUsuario.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            auMensaje.textContent = `Cuenta «${usuarioNuevo.value}» creada.`;
+            altaUsuario.reset();
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-errores" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Validación en vivo con errores accesibles</h2>
+            <p>El estilo de los sitios reales: el mensaje aparece debajo de cada campo mientras escribes (evento <code>input</code>) y al enviar se revisan todos. <code>aria-invalid</code> marca el error y <code>aria-describedby</code> une el campo con su mensaje para los lectores de pantalla.</p>
+            <div class="resultado">
+                <form id="suscripcion" class="formulario" novalidate>
+                    <div class="campo">
+                        <label for="sus-nombre">Nombre completo</label>
+                        <input type="text" id="sus-nombre" name="nombre" required minlength="3" aria-describedby="sus-nombre-error">
+                        <p id="sus-nombre-error" class="error"></p>
+                    </div>
+                    <div class="campo">
+                        <label for="sus-correo">Correo</label>
+                        <input type="email" id="sus-correo" name="correo" required aria-describedby="sus-correo-error">
+                        <p id="sus-correo-error" class="error"></p>
+                    </div>
+                    <div class="campo">
+                        <label for="sus-telefono">Celular (9 dígitos)</label>
+                        <input type="tel" id="sus-telefono" name="telefono" required pattern="[0-9]{9}" aria-describedby="sus-telefono-error">
+                        <p id="sus-telefono-error" class="error"></p>
+                    </div>
+                    <button type="submit">Suscribirme</button>
+                    <p id="sus-estado" class="aviso" role="status"></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="suscripcion" class="formulario" novalidate&gt;
+    &lt;div class="campo"&gt;
+        &lt;label for="sus-nombre"&gt;Nombre completo&lt;/label&gt;
+        &lt;input type="text" id="sus-nombre" name="nombre" required minlength="3" aria-describedby="sus-nombre-error"&gt;
+        &lt;p id="sus-nombre-error" class="error"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="campo"&gt;
+        &lt;label for="sus-correo"&gt;Correo&lt;/label&gt;
+        &lt;input type="email" id="sus-correo" name="correo" required aria-describedby="sus-correo-error"&gt;
+        &lt;p id="sus-correo-error" class="error"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="campo"&gt;
+        &lt;label for="sus-telefono"&gt;Celular (9 dígitos)&lt;/label&gt;
+        &lt;input type="tel" id="sus-telefono" name="telefono" required pattern="[0-9]{9}" aria-describedby="sus-telefono-error"&gt;
+        &lt;p id="sus-telefono-error" class="error"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;button type="submit"&gt;Suscribirme&lt;/button&gt;
+    &lt;p id="sus-estado" class="aviso" role="status"&gt;&lt;/p&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>input[aria-invalid="true"] {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+.error {
+    min-height: 1.4em;
+    margin: 0;
+    color: #b91c1c;
+    font-size: 0.9rem;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const suscripcion = document.querySelector("#suscripcion");
+const susEstado = document.querySelector("#sus-estado");
+
+const mensajeDeError = (campo) =&gt; {
+    if (campo.validity.valueMissing) {
+        return "Este campo es obligatorio.";
+    }
+    if (campo.validity.typeMismatch) {
+        return "Escribe un correo como nombre@dominio.com.";
+    }
+    if (campo.validity.tooShort) {
+        return `Escribe al menos ${campo.minLength} caracteres.`;
+    }
+    if (campo.validity.patternMismatch) {
+        return "Deben ser 9 dígitos, sin espacios.";
+    }
+    return "";
+};
+
+const validarCampo = (campo) =&gt; {
+    const mensaje = mensajeDeError(campo);
+    const error = document.getElementById(campo.getAttribute("aria-describedby"));
+    error.textContent = mensaje;
+    campo.setAttribute("aria-invalid", mensaje !== "");
+    return mensaje === "";
+};
+
+suscripcion.addEventListener("input", (event) =&gt; {
+    validarCampo(event.target);
+});
+
+suscripcion.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    const campos = [...suscripcion.querySelectorAll("input")];
+    const invalidos = campos.filter((campo) =&gt; !validarCampo(campo));
+
+    if (invalidos.length &gt; 0) {
+        invalidos[0].focus();
+        susEstado.textContent = `Revisa ${invalidos.length} campo(s) marcados en rojo.`;
+        return;
+    }
+    susEstado.textContent = "¡Listo! Ya estás suscrito.";
+    suscripcion.reset();
+});</pre>
+                </figure>
+            </div>
+            <p>El evento <code>input</code> se escucha una sola vez en el formulario y <code>event.target</code> dice qué campo cambió (delegación, como en la lección de eventos). Al fallar, el foco va al primer campo con error.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Validación en vivo con errores accesibles&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label,
+        .campo label {
+            font-weight: 600;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .campo {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .error {
+            min-height: 1.4em;
+            margin: 0;
+            color: #b91c1c;
+            font-size: 0.9rem;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="suscripcion" class="formulario" novalidate&gt;
+        &lt;div class="campo"&gt;
+            &lt;label for="sus-nombre"&gt;Nombre completo&lt;/label&gt;
+            &lt;input type="text" id="sus-nombre" name="nombre" required minlength="3" aria-describedby="sus-nombre-error"&gt;
+            &lt;p id="sus-nombre-error" class="error"&gt;&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="campo"&gt;
+            &lt;label for="sus-correo"&gt;Correo&lt;/label&gt;
+            &lt;input type="email" id="sus-correo" name="correo" required aria-describedby="sus-correo-error"&gt;
+            &lt;p id="sus-correo-error" class="error"&gt;&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="campo"&gt;
+            &lt;label for="sus-telefono"&gt;Celular (9 dígitos)&lt;/label&gt;
+            &lt;input type="tel" id="sus-telefono" name="telefono" required pattern="[0-9]{9}" aria-describedby="sus-telefono-error"&gt;
+            &lt;p id="sus-telefono-error" class="error"&gt;&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;button type="submit"&gt;Suscribirme&lt;/button&gt;
+        &lt;p id="sus-estado" class="aviso" role="status"&gt;&lt;/p&gt;
+    &lt;/form&gt;
+    &lt;script&gt;
+        const suscripcion = document.querySelector("#suscripcion");
+        const susEstado = document.querySelector("#sus-estado");
+
+        const mensajeDeError = (campo) =&gt; {
+            if (campo.validity.valueMissing) {
+                return "Este campo es obligatorio.";
+            }
+            if (campo.validity.typeMismatch) {
+                return "Escribe un correo como nombre@dominio.com.";
+            }
+            if (campo.validity.tooShort) {
+                return `Escribe al menos ${campo.minLength} caracteres.`;
+            }
+            if (campo.validity.patternMismatch) {
+                return "Deben ser 9 dígitos, sin espacios.";
+            }
+            return "";
+        };
+
+        const validarCampo = (campo) =&gt; {
+            const mensaje = mensajeDeError(campo);
+            const error = document.getElementById(campo.getAttribute("aria-describedby"));
+            error.textContent = mensaje;
+            campo.setAttribute("aria-invalid", mensaje !== "");
+            return mensaje === "";
+        };
+
+        suscripcion.addEventListener("input", (event) =&gt; {
+            validarCampo(event.target);
+        });
+
+        suscripcion.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            const campos = [...suscripcion.querySelectorAll("input")];
+            const invalidos = campos.filter((campo) =&gt; !validarCampo(campo));
+
+            if (invalidos.length &gt; 0) {
+                invalidos[0].focus();
+                susEstado.textContent = `Revisa ${invalidos.length} campo(s) marcados en rojo.`;
+                return;
+            }
+            susEstado.textContent = "¡Listo! Ya estás suscrito.";
+            suscripcion.reset();
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-boton-activo" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Botón desactivado hasta que todo esté bien, y <code>reset</code></h2>
+            <p>Una reserva de mesa: el botón <strong>Reservar</strong> empieza desactivado y se activa solo cuando <code>checkValidity()</code> da <code>true</code>. El botón <strong>Limpiar</strong> dispara el evento <code>reset</code>, que vuelve a desactivarlo.</p>
+            <div class="resultado">
+                <form id="reserva" class="formulario">
+                    <label for="reserva-nombre">Nombre</label>
+                    <input type="text" id="reserva-nombre" name="nombre" required>
+                    <label for="reserva-fecha">Fecha</label>
+                    <input type="date" id="reserva-fecha" name="fecha" required>
+                    <label for="reserva-personas">Personas (1 a 12)</label>
+                    <input type="number" id="reserva-personas" name="personas" min="1" max="12" required>
+                    <label class="opcion"><input type="checkbox" name="acepto" required> Acepto la política de cancelación</label>
+                    <div class="botones">
+                        <button type="submit" id="reserva-enviar" disabled>Reservar mesa</button>
+                        <button type="reset">Limpiar</button>
+                    </div>
+                    <p id="reserva-estado" class="aviso" role="status"></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="reserva" class="formulario"&gt;
+    &lt;label for="reserva-nombre"&gt;Nombre&lt;/label&gt;
+    &lt;input type="text" id="reserva-nombre" name="nombre" required&gt;
+    &lt;label for="reserva-fecha"&gt;Fecha&lt;/label&gt;
+    &lt;input type="date" id="reserva-fecha" name="fecha" required&gt;
+    &lt;label for="reserva-personas"&gt;Personas (1 a 12)&lt;/label&gt;
+    &lt;input type="number" id="reserva-personas" name="personas" min="1" max="12" required&gt;
+    &lt;label class="opcion"&gt;&lt;input type="checkbox" name="acepto" required&gt; Acepto la política de cancelación&lt;/label&gt;
+    &lt;div class="botones"&gt;
+        &lt;button type="submit" id="reserva-enviar" disabled&gt;Reservar mesa&lt;/button&gt;
+        &lt;button type="reset"&gt;Limpiar&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p id="reserva-estado" class="aviso" role="status"&gt;&lt;/p&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const reserva = document.querySelector("#reserva");
+const reservaEnviar = document.querySelector("#reserva-enviar");
+const reservaEstado = document.querySelector("#reserva-estado");
+
+reserva.addEventListener("input", () =&gt; {
+    reservaEnviar.disabled = !reserva.checkValidity();
+});
+
+reserva.addEventListener("reset", () =&gt; {
+    reservaEnviar.disabled = true;
+    reservaEstado.textContent = "Formulario limpio.";
+});
+
+reserva.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    const datos = Object.fromEntries(new FormData(reserva));
+    reserva.reset();
+    reservaEstado.textContent = `Mesa para ${datos.personas} a nombre de ${datos.nombre} el ${datos.fecha}.`;
+});</pre>
+                </figure>
+            </div>
+            <p>Ojo con el orden en <code>submit</code>: primero se leen los datos, después <code>reset()</code> (que dispara el evento <code>reset</code> y escribe «Formulario limpio») y al final el mensaje de confirmación. Desactivar el botón es una ayuda visual, no una protección: valida siempre también al enviar.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Botón desactivado hasta que todo esté bien, y reset&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label {
+            font-weight: 600;
+        }
+
+        .formulario .opcion {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 400;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .botones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="reserva" class="formulario"&gt;
+        &lt;label for="reserva-nombre"&gt;Nombre&lt;/label&gt;
+        &lt;input type="text" id="reserva-nombre" name="nombre" required&gt;
+        &lt;label for="reserva-fecha"&gt;Fecha&lt;/label&gt;
+        &lt;input type="date" id="reserva-fecha" name="fecha" required&gt;
+        &lt;label for="reserva-personas"&gt;Personas (1 a 12)&lt;/label&gt;
+        &lt;input type="number" id="reserva-personas" name="personas" min="1" max="12" required&gt;
+        &lt;label class="opcion"&gt;&lt;input type="checkbox" name="acepto" required&gt; Acepto la política de cancelación&lt;/label&gt;
+        &lt;div class="botones"&gt;
+            &lt;button type="submit" id="reserva-enviar" disabled&gt;Reservar mesa&lt;/button&gt;
+            &lt;button type="reset"&gt;Limpiar&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;p id="reserva-estado" class="aviso" role="status"&gt;&lt;/p&gt;
+    &lt;/form&gt;
+    &lt;script&gt;
+        const reserva = document.querySelector("#reserva");
+        const reservaEnviar = document.querySelector("#reserva-enviar");
+        const reservaEstado = document.querySelector("#reserva-estado");
+
+        reserva.addEventListener("input", () =&gt; {
+            reservaEnviar.disabled = !reserva.checkValidity();
+        });
+
+        reserva.addEventListener("reset", () =&gt; {
+            reservaEnviar.disabled = true;
+            reservaEstado.textContent = "Formulario limpio.";
+        });
+
+        reserva.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            const datos = Object.fromEntries(new FormData(reserva));
+            reserva.reset();
+            reservaEstado.textContent = `Mesa para ${datos.personas} a nombre de ${datos.nombre} el ${datos.fecha}.`;
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-ver-clave" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Mostrar y ocultar la contraseña</h2>
+            <p>El botón del ojo que en la lección 17 era solo decorativo. Basta con cambiar <code>type="password"</code> por <code>type="text"</code> y viceversa. El <code>aria-label</code> también cambia para que el lector de pantalla diga qué hará el botón.</p>
+            <div class="resultado">
+                <label for="acceso-clave">Contraseña</label>
+                <div class="con-boton">
+                    <input type="password" id="acceso-clave" autocomplete="current-password" value="Gato-Volador-27">
+                    <button type="button" id="acceso-ojo" aria-label="Mostrar contraseña">👁️</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label for="acceso-clave"&gt;Contraseña&lt;/label&gt;
+&lt;div class="con-boton"&gt;
+    &lt;input type="password" id="acceso-clave" autocomplete="current-password" value="Gato-Volador-27"&gt;
+    &lt;button type="button" id="acceso-ojo" aria-label="Mostrar contraseña"&gt;👁️&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const clave = document.querySelector("#acceso-clave");
+const ojo = document.querySelector("#acceso-ojo");
+
+ojo.addEventListener("click", () =&gt; {
+    const estaOculta = clave.type === "password";
+    clave.type = estaOculta ? "text" : "password";
+    ojo.textContent = estaOculta ? "🙈" : "👁️";
+    ojo.setAttribute("aria-label", estaOculta ? "Ocultar contraseña" : "Mostrar contraseña");
+    clave.focus();
+});</pre>
+                </figure>
+            </div>
+            <p>El botón es <code>type="button"</code>: dentro de un formulario, un botón sin type es de envío y mandaría el formulario al pulsarlo.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Mostrar y ocultar la contraseña&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .con-boton {
+            display: flex;
+            gap: 6px;
+            max-width: 360px;
+        }
+
+        .con-boton button {
+            padding: 0 14px;
+            background: #e2e8f0;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;label for="acceso-clave"&gt;Contraseña&lt;/label&gt;
+    &lt;div class="con-boton"&gt;
+        &lt;input type="password" id="acceso-clave" autocomplete="current-password" value="Gato-Volador-27"&gt;
+        &lt;button type="button" id="acceso-ojo" aria-label="Mostrar contraseña"&gt;👁️&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const clave = document.querySelector("#acceso-clave");
+        const ojo = document.querySelector("#acceso-ojo");
+
+        ojo.addEventListener("click", () =&gt; {
+            const estaOculta = clave.type === "password";
+            clave.type = estaOculta ? "text" : "password";
+            ojo.textContent = estaOculta ? "🙈" : "👁️";
+            ojo.setAttribute("aria-label", estaOculta ? "Ocultar contraseña" : "Mostrar contraseña");
+            clave.focus();
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-fuerza" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Fuerza de la contraseña y confirmación</h2>
+            <p>Mientras escribes, cada regla cumplida se tacha, la barra crece y cambia de color. El segundo campo usa <code>setCustomValidity</code> para que el formulario no se pueda enviar si las contraseñas no coinciden. Las reglas usan expresiones regulares cortas: <code>/[A-Z]/.test(texto)</code> responde «¿hay alguna mayúscula?».</p>
+            <div class="resultado">
+                <form id="nueva-clave" class="formulario">
+                    <label for="nc-clave">Nueva contraseña</label>
+                    <input type="password" id="nc-clave" name="clave" required minlength="8" autocomplete="new-password">
+                    <div class="medidor"><div id="nc-barra" class="medidor-barra"></div></div>
+                    <p id="nc-nivel" class="ayuda" aria-live="polite">Escribe una contraseña.</p>
+                    <ul class="reglas">
+                        <li data-regla="largo">8 caracteres o más</li>
+                        <li data-regla="mayuscula">Una mayúscula</li>
+                        <li data-regla="numero">Un número</li>
+                        <li data-regla="simbolo">Un símbolo (!, #, $…)</li>
+                    </ul>
+                    <label for="nc-repetir">Repite la contraseña</label>
+                    <input type="password" id="nc-repetir" name="repetir" required autocomplete="new-password">
+                    <p id="nc-coincide" class="ayuda" aria-live="polite"></p>
+                    <button type="submit">Guardar contraseña</button>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="nueva-clave" class="formulario"&gt;
+    &lt;label for="nc-clave"&gt;Nueva contraseña&lt;/label&gt;
+    &lt;input type="password" id="nc-clave" name="clave" required minlength="8" autocomplete="new-password"&gt;
+    &lt;div class="medidor"&gt;&lt;div id="nc-barra" class="medidor-barra"&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;p id="nc-nivel" class="ayuda" aria-live="polite"&gt;Escribe una contraseña.&lt;/p&gt;
+    &lt;ul class="reglas"&gt;
+        &lt;li data-regla="largo"&gt;8 caracteres o más&lt;/li&gt;
+        &lt;li data-regla="mayuscula"&gt;Una mayúscula&lt;/li&gt;
+        &lt;li data-regla="numero"&gt;Un número&lt;/li&gt;
+        &lt;li data-regla="simbolo"&gt;Un símbolo (!, #, $…)&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;label for="nc-repetir"&gt;Repite la contraseña&lt;/label&gt;
+    &lt;input type="password" id="nc-repetir" name="repetir" required autocomplete="new-password"&gt;
+    &lt;p id="nc-coincide" class="ayuda" aria-live="polite"&gt;&lt;/p&gt;
+    &lt;button type="submit"&gt;Guardar contraseña&lt;/button&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.medidor {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.medidor-barra {
+    width: 0;
+    height: 100%;
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.reglas li.cumple {
+    color: #16a34a;
+    text-decoration: line-through;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const nuevaClave = document.querySelector("#nueva-clave");
+const ncClave = document.querySelector("#nc-clave");
+const ncRepetir = document.querySelector("#nc-repetir");
+const ncBarra = document.querySelector("#nc-barra");
+const ncNivel = document.querySelector("#nc-nivel");
+const ncCoincide = document.querySelector("#nc-coincide");
+const reglasClave = document.querySelectorAll(".reglas li");
+const niveles = [
+    { texto: "Muy débil", color: "#dc2626" },
+    { texto: "Débil", color: "#f97316" },
+    { texto: "Aceptable", color: "#eab308" },
+    { texto: "Buena", color: "#84cc16" },
+    { texto: "Muy fuerte", color: "#16a34a" },
+];
+
+const revisarReglas = (texto) =&gt; ({
+    largo: texto.length &gt;= 8,
+    mayuscula: /[A-Z]/.test(texto),
+    numero: /[0-9]/.test(texto),
+    simbolo: /[^A-Za-z0-9]/.test(texto),
+});
+
+const comprobarIguales = () =&gt; {
+    const iguales = ncRepetir.value === ncClave.value;
+    ncRepetir.setCustomValidity(iguales ? "" : "Las contraseñas no coinciden.");
+    if (ncRepetir.value === "") {
+        ncCoincide.textContent = "";
+    } else {
+        ncCoincide.textContent = iguales ? "✓ Coinciden" : "✗ No coinciden";
+    }
+};
+
+ncClave.addEventListener("input", () =&gt; {
+    const reglas = revisarReglas(ncClave.value);
+    let puntos = 0;
+    for (const regla of reglasClave) {
+        const cumple = reglas[regla.dataset.regla];
+        regla.classList.toggle("cumple", cumple);
+        if (cumple) {
+            puntos++;
+        }
+    }
+    ncBarra.style.width = `${puntos * 25}%`;
+    ncBarra.style.backgroundColor = niveles[puntos].color;
+    ncNivel.textContent = ncClave.value === "" ? "Escribe una contraseña." : `Seguridad: ${niveles[puntos].texto}`;
+    comprobarIguales();
+});
+
+ncRepetir.addEventListener("input", comprobarIguales);
+
+nuevaClave.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    ncCoincide.textContent = "✓ Contraseña guardada.";
+});</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Fuerza de la contraseña y confirmación&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label {
+            font-weight: 600;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .ayuda {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .medidor {
+            height: 8px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .medidor-barra {
+            width: 0;
+            height: 100%;
+            transition: width 0.3s, background-color 0.3s;
+        }
+
+        .reglas li.cumple {
+            color: #16a34a;
+            text-decoration: line-through;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="nueva-clave" class="formulario"&gt;
+        &lt;label for="nc-clave"&gt;Nueva contraseña&lt;/label&gt;
+        &lt;input type="password" id="nc-clave" name="clave" required minlength="8" autocomplete="new-password"&gt;
+        &lt;div class="medidor"&gt;&lt;div id="nc-barra" class="medidor-barra"&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;p id="nc-nivel" class="ayuda" aria-live="polite"&gt;Escribe una contraseña.&lt;/p&gt;
+        &lt;ul class="reglas"&gt;
+            &lt;li data-regla="largo"&gt;8 caracteres o más&lt;/li&gt;
+            &lt;li data-regla="mayuscula"&gt;Una mayúscula&lt;/li&gt;
+            &lt;li data-regla="numero"&gt;Un número&lt;/li&gt;
+            &lt;li data-regla="simbolo"&gt;Un símbolo (!, #, $…)&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;label for="nc-repetir"&gt;Repite la contraseña&lt;/label&gt;
+        &lt;input type="password" id="nc-repetir" name="repetir" required autocomplete="new-password"&gt;
+        &lt;p id="nc-coincide" class="ayuda" aria-live="polite"&gt;&lt;/p&gt;
+        &lt;button type="submit"&gt;Guardar contraseña&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;script&gt;
+        const nuevaClave = document.querySelector("#nueva-clave");
+        const ncClave = document.querySelector("#nc-clave");
+        const ncRepetir = document.querySelector("#nc-repetir");
+        const ncBarra = document.querySelector("#nc-barra");
+        const ncNivel = document.querySelector("#nc-nivel");
+        const ncCoincide = document.querySelector("#nc-coincide");
+        const reglasClave = document.querySelectorAll(".reglas li");
+        const niveles = [
+            { texto: "Muy débil", color: "#dc2626" },
+            { texto: "Débil", color: "#f97316" },
+            { texto: "Aceptable", color: "#eab308" },
+            { texto: "Buena", color: "#84cc16" },
+            { texto: "Muy fuerte", color: "#16a34a" },
+        ];
+
+        const revisarReglas = (texto) =&gt; ({
+            largo: texto.length &gt;= 8,
+            mayuscula: /[A-Z]/.test(texto),
+            numero: /[0-9]/.test(texto),
+            simbolo: /[^A-Za-z0-9]/.test(texto),
+        });
+
+        const comprobarIguales = () =&gt; {
+            const iguales = ncRepetir.value === ncClave.value;
+            ncRepetir.setCustomValidity(iguales ? "" : "Las contraseñas no coinciden.");
+            if (ncRepetir.value === "") {
+                ncCoincide.textContent = "";
+            } else {
+                ncCoincide.textContent = iguales ? "✓ Coinciden" : "✗ No coinciden";
+            }
+        };
+
+        ncClave.addEventListener("input", () =&gt; {
+            const reglas = revisarReglas(ncClave.value);
+            let puntos = 0;
+            for (const regla of reglasClave) {
+                const cumple = reglas[regla.dataset.regla];
+                regla.classList.toggle("cumple", cumple);
+                if (cumple) {
+                    puntos++;
+                }
+            }
+            ncBarra.style.width = `${puntos * 25}%`;
+            ncBarra.style.backgroundColor = niveles[puntos].color;
+            ncNivel.textContent = ncClave.value === "" ? "Escribe una contraseña." : `Seguridad: ${niveles[puntos].texto}`;
+            comprobarIguales();
+        });
+
+        ncRepetir.addEventListener("input", comprobarIguales);
+
+        nuevaClave.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            ncCoincide.textContent = "✓ Contraseña guardada.";
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-contador" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Contador de caracteres en vivo</h2>
+            <p>El «37 / 280» que en CSS no se podía hacer. <code>maxlength</code> pone el límite real; JavaScript cuenta con cada tecla y agrega clases para avisar con color cuando quedan pocos caracteres.</p>
+            <div class="resultado">
+                <div class="campo">
+                    <label for="resena-texto">Tu reseña</label>
+                    <textarea id="resena-texto" rows="4" maxlength="280" aria-describedby="resena-contador" placeholder="¿Qué te pareció el producto?"></textarea>
+                    <p id="resena-contador" class="contador">0 / 280</p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="campo"&gt;
+    &lt;label for="resena-texto"&gt;Tu reseña&lt;/label&gt;
+    &lt;textarea id="resena-texto" rows="4" maxlength="280" aria-describedby="resena-contador" placeholder="¿Qué te pareció el producto?"&gt;&lt;/textarea&gt;
+    &lt;p id="resena-contador" class="contador"&gt;0 / 280&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.contador {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.9rem;
+    text-align: right;
+}
+
+.contador.cerca {
+    color: #d97706;
+}
+
+.contador.lleno {
+    color: #dc2626;
+    font-weight: 700;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const resena = document.querySelector("#resena-texto");
+const resenaContador = document.querySelector("#resena-contador");
+
+resena.addEventListener("input", () =&gt; {
+    const usados = resena.value.length;
+    const limite = resena.maxLength;
+    resenaContador.textContent = `${usados} / ${limite}`;
+    resenaContador.classList.toggle("cerca", usados &gt;= limite * 0.8);
+    resenaContador.classList.toggle("lleno", usados === limite);
+});</pre>
+                </figure>
+            </div>
+            <p><code>resena.maxLength</code> lee el atributo <code>maxlength</code> del HTML: si mañana el límite cambia a 500, solo se toca el HTML.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Contador de caracteres en vivo&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .campo label {
+            font-weight: 600;
+        }
+
+        .campo {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .contador {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+            text-align: right;
+        }
+
+        .contador.cerca {
+            color: #d97706;
+        }
+
+        .contador.lleno {
+            color: #dc2626;
+            font-weight: 700;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="campo"&gt;
+        &lt;label for="resena-texto"&gt;Tu reseña&lt;/label&gt;
+        &lt;textarea id="resena-texto" rows="4" maxlength="280" aria-describedby="resena-contador" placeholder="¿Qué te pareció el producto?"&gt;&lt;/textarea&gt;
+        &lt;p id="resena-contador" class="contador"&gt;0 / 280&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const resena = document.querySelector("#resena-texto");
+        const resenaContador = document.querySelector("#resena-contador");
+
+        resena.addEventListener("input", () =&gt; {
+            const usados = resena.value.length;
+            const limite = resena.maxLength;
+            resenaContador.textContent = `${usados} / ${limite}`;
+            resenaContador.classList.toggle("cerca", usados &gt;= limite * 0.8);
+            resenaContador.classList.toggle("lleno", usados === limite);
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-otp" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Código de verificación de 6 casillas</h2>
+            <p>Al escribir un dígito, el foco salta a la siguiente casilla; con <kbd>Backspace</kbd> en una casilla vacía vuelve a la anterior; y si pegas «123456» se reparte en las seis. El botón se activa cuando el código está completo. El código correcto es <strong>123456</strong>.</p>
+            <div class="resultado">
+                <form id="verificacion" class="formulario">
+                    <p id="otp-instrucciones">Escribe el código de 6 dígitos que enviamos a tu celular.</p>
+                    <div class="otp" role="group" aria-labelledby="otp-instrucciones">
+                        <input type="text" class="otp-digito" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Dígito 1">
+                        <input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 2">
+                        <input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 3">
+                        <input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 4">
+                        <input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 5">
+                        <input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 6">
+                    </div>
+                    <button type="submit" id="otp-verificar" disabled>Verificar</button>
+                    <p id="otp-estado" class="aviso" role="status"></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="verificacion" class="formulario"&gt;
+    &lt;p id="otp-instrucciones"&gt;Escribe el código de 6 dígitos que enviamos a tu celular.&lt;/p&gt;
+    &lt;div class="otp" role="group" aria-labelledby="otp-instrucciones"&gt;
+        &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Dígito 1"&gt;
+        &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 2"&gt;
+        &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 3"&gt;
+        &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 4"&gt;
+        &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 5"&gt;
+        &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 6"&gt;
+    &lt;/div&gt;
+    &lt;button type="submit" id="otp-verificar" disabled&gt;Verificar&lt;/button&gt;
+    &lt;p id="otp-estado" class="aviso" role="status"&gt;&lt;/p&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.otp {
+    display: flex;
+    gap: 8px;
+}
+
+.otp .otp-digito {
+    width: 48px;
+    height: 56px;
+    padding: 0;
+    font-size: 1.5rem;
+    text-align: center;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const verificacion = document.querySelector("#verificacion");
+const digitos = [...document.querySelectorAll(".otp-digito")];
+const otpVerificar = document.querySelector("#otp-verificar");
+const otpEstado = document.querySelector("#otp-estado");
+
+const leerCodigo = () =&gt; digitos.map((caja) =&gt; caja.value).join("");
+
+const actualizarVerificar = () =&gt; {
+    otpVerificar.disabled = leerCodigo().length &lt; digitos.length;
+};
+
+digitos.forEach((caja, posicion) =&gt; {
+    caja.addEventListener("focus", () =&gt; {
+        caja.select();
+    });
+
+    caja.addEventListener("input", () =&gt; {
+        caja.value = caja.value.replace(/[^0-9]/g, "");
+        if (caja.value !== "" &amp;&amp; posicion &lt; digitos.length - 1) {
+            digitos[posicion + 1].focus();
+        }
+        actualizarVerificar();
+    });
+
+    caja.addEventListener("keydown", (event) =&gt; {
+        if (event.key === "Backspace" &amp;&amp; caja.value === "" &amp;&amp; posicion &gt; 0) {
+            event.preventDefault();
+            digitos[posicion - 1].value = "";
+            digitos[posicion - 1].focus();
+            actualizarVerificar();
+        }
+    });
+
+    caja.addEventListener("paste", (event) =&gt; {
+        event.preventDefault();
+        const pegado = event.clipboardData.getData("text").replace(/[^0-9]/g, "").slice(0, digitos.length);
+        [...pegado].forEach((numero, i) =&gt; {
+            digitos[i].value = numero;
+        });
+        digitos[Math.min(pegado.length, digitos.length - 1)].focus();
+        actualizarVerificar();
+    });
+});
+
+verificacion.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    if (leerCodigo() === "123456") {
+        otpEstado.textContent = "✓ Código correcto. ¡Bienvenida!";
+    } else {
+        otpEstado.textContent = "✗ Código incorrecto. Revisa el SMS.";
+    }
+});</pre>
+                </figure>
+            </div>
+            <p><code>replace(/[^0-9]/g, "")</code> borra todo lo que no sea un dígito: si alguien escribe una letra, desaparece. Al enfocar una casilla, <code>select()</code> marca su contenido para que el siguiente dígito lo reemplace.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Código de verificación de 6 casillas&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label {
+            font-weight: 600;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .otp {
+            display: flex;
+            gap: 8px;
+        }
+
+        .otp .otp-digito {
+            width: 48px;
+            height: 56px;
+            padding: 0;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="verificacion" class="formulario"&gt;
+        &lt;p id="otp-instrucciones"&gt;Escribe el código de 6 dígitos que enviamos a tu celular.&lt;/p&gt;
+        &lt;div class="otp" role="group" aria-labelledby="otp-instrucciones"&gt;
+            &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Dígito 1"&gt;
+            &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 2"&gt;
+            &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 3"&gt;
+            &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 4"&gt;
+            &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 5"&gt;
+            &lt;input type="text" class="otp-digito" inputmode="numeric" maxlength="1" aria-label="Dígito 6"&gt;
+        &lt;/div&gt;
+        &lt;button type="submit" id="otp-verificar" disabled&gt;Verificar&lt;/button&gt;
+        &lt;p id="otp-estado" class="aviso" role="status"&gt;&lt;/p&gt;
+    &lt;/form&gt;
+    &lt;script&gt;
+        const verificacion = document.querySelector("#verificacion");
+        const digitos = [...document.querySelectorAll(".otp-digito")];
+        const otpVerificar = document.querySelector("#otp-verificar");
+        const otpEstado = document.querySelector("#otp-estado");
+
+        const leerCodigo = () =&gt; digitos.map((caja) =&gt; caja.value).join("");
+
+        const actualizarVerificar = () =&gt; {
+            otpVerificar.disabled = leerCodigo().length &lt; digitos.length;
+        };
+
+        digitos.forEach((caja, posicion) =&gt; {
+            caja.addEventListener("focus", () =&gt; {
+                caja.select();
+            });
+
+            caja.addEventListener("input", () =&gt; {
+                caja.value = caja.value.replace(/[^0-9]/g, "");
+                if (caja.value !== "" &amp;&amp; posicion &lt; digitos.length - 1) {
+                    digitos[posicion + 1].focus();
+                }
+                actualizarVerificar();
+            });
+
+            caja.addEventListener("keydown", (event) =&gt; {
+                if (event.key === "Backspace" &amp;&amp; caja.value === "" &amp;&amp; posicion &gt; 0) {
+                    event.preventDefault();
+                    digitos[posicion - 1].value = "";
+                    digitos[posicion - 1].focus();
+                    actualizarVerificar();
+                }
+            });
+
+            caja.addEventListener("paste", (event) =&gt; {
+                event.preventDefault();
+                const pegado = event.clipboardData.getData("text").replace(/[^0-9]/g, "").slice(0, digitos.length);
+                [...pegado].forEach((numero, i) =&gt; {
+                    digitos[i].value = numero;
+                });
+                digitos[Math.min(pegado.length, digitos.length - 1)].focus();
+                actualizarVerificar();
+            });
+        });
+
+        verificacion.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            if (leerCodigo() === "123456") {
+                otpEstado.textContent = "✓ Código correcto. ¡Bienvenida!";
+            } else {
+                otpEstado.textContent = "✗ Código incorrecto. Revisa el SMS.";
+            }
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-arrastre" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Zona para arrastrar archivos</h2>
+            <p>Arrastra uno o varios archivos desde tu escritorio hasta la zona, o usa el botón. Mientras arrastras, la zona se resalta (<code>dragover</code>); al soltar (<code>drop</code>) se listan el nombre y el tamaño de cada archivo.</p>
+            <div class="resultado">
+                <div id="zona-archivos" class="zona-archivos">
+                    <p><strong>Arrastra tus archivos aquí</strong></p>
+                    <p>o</p>
+                    <button type="button" id="archivos-boton" class="boton-secundario">Elegir archivos</button>
+                    <input type="file" id="archivos-input" multiple hidden>
+                </div>
+                <ul id="archivos-lista" class="archivos-lista"></ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div id="zona-archivos" class="zona-archivos"&gt;
+    &lt;p&gt;&lt;strong&gt;Arrastra tus archivos aquí&lt;/strong&gt;&lt;/p&gt;
+    &lt;p&gt;o&lt;/p&gt;
+    &lt;button type="button" id="archivos-boton" class="boton-secundario"&gt;Elegir archivos&lt;/button&gt;
+    &lt;input type="file" id="archivos-input" multiple hidden&gt;
+&lt;/div&gt;
+&lt;ul id="archivos-lista" class="archivos-lista"&gt;&lt;/ul&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.zona-archivos {
+    display: grid;
+    justify-items: center;
+    padding: 24px 16px;
+    border: 2px dashed #94a3b8;
+    border-radius: 14px;
+    text-align: center;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.zona-archivos p {
+    margin: 0 0 8px;
+}
+
+.zona-archivos.arrastrando {
+    border-color: #ca8a04;
+    background: #fef9c3;
+}
+
+.zona-archivos.arrastrando * {
+    pointer-events: none;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const zonaArchivos = document.querySelector("#zona-archivos");
+const archivosInput = document.querySelector("#archivos-input");
+const archivosBoton = document.querySelector("#archivos-boton");
+const archivosLista = document.querySelector("#archivos-lista");
+
+const formatearTamano = (bytes) =&gt; {
+    if (bytes &lt; 1024 * 1024) {
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+};
+
+const mostrarArchivos = (archivos) =&gt; {
+    archivosLista.innerHTML = "";
+    for (const archivo of archivos) {
+        const item = document.createElement("li");
+        item.textContent = `📄 ${archivo.name} — ${formatearTamano(archivo.size)}`;
+        archivosLista.append(item);
+    }
+};
+
+archivosBoton.addEventListener("click", () =&gt; {
+    archivosInput.click();
+});
+
+archivosInput.addEventListener("change", () =&gt; {
+    mostrarArchivos(archivosInput.files);
+});
+
+zonaArchivos.addEventListener("dragover", (event) =&gt; {
+    event.preventDefault();
+    zonaArchivos.classList.add("arrastrando");
+});
+
+zonaArchivos.addEventListener("dragleave", () =&gt; {
+    zonaArchivos.classList.remove("arrastrando");
+});
+
+zonaArchivos.addEventListener("drop", (event) =&gt; {
+    event.preventDefault();
+    zonaArchivos.classList.remove("arrastrando");
+    archivosInput.files = event.dataTransfer.files;
+    mostrarArchivos(archivosInput.files);
+});</pre>
+                </figure>
+            </div>
+            <p>Sin <code>preventDefault()</code> en <code>dragover</code> el navegador no permite soltar, y sin él en <code>drop</code> abre el archivo en la pestaña. Copiar los archivos al input (<code>archivosInput.files = …</code>) hace que viajen con el formulario. <code>pointer-events: none</code> en los hijos evita que <code>dragleave</code> parpadee al pasar sobre el texto.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Zona para arrastrar archivos&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .archivos-lista {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .archivos-lista li {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .zona-archivos {
+            display: grid;
+            justify-items: center;
+            padding: 24px 16px;
+            border: 2px dashed #94a3b8;
+            border-radius: 14px;
+            text-align: center;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .zona-archivos p {
+            margin: 0 0 8px;
+        }
+
+        .zona-archivos.arrastrando {
+            border-color: #ca8a04;
+            background: #fef9c3;
+        }
+
+        .zona-archivos.arrastrando * {
+            pointer-events: none;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="zona-archivos" class="zona-archivos"&gt;
+        &lt;p&gt;&lt;strong&gt;Arrastra tus archivos aquí&lt;/strong&gt;&lt;/p&gt;
+        &lt;p&gt;o&lt;/p&gt;
+        &lt;button type="button" id="archivos-boton" class="boton-secundario"&gt;Elegir archivos&lt;/button&gt;
+        &lt;input type="file" id="archivos-input" multiple hidden&gt;
+    &lt;/div&gt;
+    &lt;ul id="archivos-lista" class="archivos-lista"&gt;&lt;/ul&gt;
+    &lt;script&gt;
+        const zonaArchivos = document.querySelector("#zona-archivos");
+        const archivosInput = document.querySelector("#archivos-input");
+        const archivosBoton = document.querySelector("#archivos-boton");
+        const archivosLista = document.querySelector("#archivos-lista");
+
+        const formatearTamano = (bytes) =&gt; {
+            if (bytes &lt; 1024 * 1024) {
+                return `${(bytes / 1024).toFixed(1)} KB`;
+            }
+            return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+        };
+
+        const mostrarArchivos = (archivos) =&gt; {
+            archivosLista.innerHTML = "";
+            for (const archivo of archivos) {
+                const item = document.createElement("li");
+                item.textContent = `📄 ${archivo.name} — ${formatearTamano(archivo.size)}`;
+                archivosLista.append(item);
+            }
+        };
+
+        archivosBoton.addEventListener("click", () =&gt; {
+            archivosInput.click();
+        });
+
+        archivosInput.addEventListener("change", () =&gt; {
+            mostrarArchivos(archivosInput.files);
+        });
+
+        zonaArchivos.addEventListener("dragover", (event) =&gt; {
+            event.preventDefault();
+            zonaArchivos.classList.add("arrastrando");
+        });
+
+        zonaArchivos.addEventListener("dragleave", () =&gt; {
+            zonaArchivos.classList.remove("arrastrando");
+        });
+
+        zonaArchivos.addEventListener("drop", (event) =&gt; {
+            event.preventDefault();
+            zonaArchivos.classList.remove("arrastrando");
+            archivosInput.files = event.dataTransfer.files;
+            mostrarArchivos(archivosInput.files);
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-vista-previa" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Vista previa de la foto de perfil</h2>
+            <p>Elige una imagen y aparece al instante, antes de subirla a ningún servidor. <code>URL.createObjectURL(archivo)</code> crea una dirección temporal que apunta al archivo de tu computadora.</p>
+            <div class="resultado">
+                <div class="avatar-editor">
+                    <img id="avatar-imagen" src="https://picsum.photos/id/64/160/160" alt="Foto de perfil actual" width="160" height="160">
+                    <div class="campo">
+                        <label for="avatar-archivo">Cambiar foto de perfil</label>
+                        <input type="file" id="avatar-archivo" accept="image/*">
+                        <p id="avatar-info" class="ayuda">JPG, PNG o WebP, hasta 2 MB.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="avatar-editor"&gt;
+    &lt;img id="avatar-imagen" src="https://picsum.photos/id/64/160/160" alt="Foto de perfil actual" width="160" height="160"&gt;
+    &lt;div class="campo"&gt;
+        &lt;label for="avatar-archivo"&gt;Cambiar foto de perfil&lt;/label&gt;
+        &lt;input type="file" id="avatar-archivo" accept="image/*"&gt;
+        &lt;p id="avatar-info" class="ayuda"&gt;JPG, PNG o WebP, hasta 2 MB.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const avatarImagen = document.querySelector("#avatar-imagen");
+const avatarArchivo = document.querySelector("#avatar-archivo");
+const avatarInfo = document.querySelector("#avatar-info");
+
+avatarArchivo.addEventListener("change", () =&gt; {
+    const archivo = avatarArchivo.files[0];
+    if (!archivo) {
+        return;
+    }
+    if (archivo.size &gt; 2 * 1024 * 1024) {
+        avatarInfo.textContent = "La imagen pesa más de 2 MB. Elige otra.";
+        avatarArchivo.value = "";
+        return;
+    }
+    URL.revokeObjectURL(avatarImagen.src);
+    avatarImagen.src = URL.createObjectURL(archivo);
+    avatarImagen.alt = `Vista previa de ${archivo.name}`;
+    avatarInfo.textContent = `${archivo.name} (${Math.round(archivo.size / 1024)} KB)`;
+});</pre>
+                </figure>
+            </div>
+            <p><code>files[0]</code> es el primer (y aquí único) archivo elegido. <code>revokeObjectURL</code> libera la dirección temporal anterior para no gastar memoria si la persona cambia de foto muchas veces.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Vista previa de la foto de perfil&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .campo label {
+            font-weight: 600;
+        }
+
+        .campo {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .ayuda {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .avatar-editor {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+        }
+
+        img {
+            border: 4px solid #f7df1e;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="avatar-editor"&gt;
+        &lt;img id="avatar-imagen" src="https://picsum.photos/id/64/160/160" alt="Foto de perfil actual" width="160" height="160"&gt;
+        &lt;div class="campo"&gt;
+            &lt;label for="avatar-archivo"&gt;Cambiar foto de perfil&lt;/label&gt;
+            &lt;input type="file" id="avatar-archivo" accept="image/*"&gt;
+            &lt;p id="avatar-info" class="ayuda"&gt;JPG, PNG o WebP, hasta 2 MB.&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const avatarImagen = document.querySelector("#avatar-imagen");
+        const avatarArchivo = document.querySelector("#avatar-archivo");
+        const avatarInfo = document.querySelector("#avatar-info");
+
+        avatarArchivo.addEventListener("change", () =&gt; {
+            const archivo = avatarArchivo.files[0];
+            if (!archivo) {
+                return;
+            }
+            if (archivo.size &gt; 2 * 1024 * 1024) {
+                avatarInfo.textContent = "La imagen pesa más de 2 MB. Elige otra.";
+                avatarArchivo.value = "";
+                return;
+            }
+            URL.revokeObjectURL(avatarImagen.src);
+            avatarImagen.src = URL.createObjectURL(archivo);
+            avatarImagen.alt = `Vista previa de ${archivo.name}`;
+            avatarInfo.textContent = `${archivo.name} (${Math.round(archivo.size / 1024)} KB)`;
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-prestamo" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Calculadora de préstamo en vivo</h2>
+            <p>Mueve el monto, cambia el plazo o la tasa: la cuota se recalcula con cada cambio gracias al evento <code>input</code> del formulario. Los campos se leen con <code>form.elements.nombre</code>.</p>
+            <div class="resultado">
+                <form id="prestamo" class="formulario">
+                    <label for="prestamo-monto">Monto: <span id="prestamo-monto-texto"></span></label>
+                    <input type="range" id="prestamo-monto" name="monto" min="1000" max="50000" step="500" value="10000">
+                    <label for="prestamo-meses">Plazo</label>
+                    <select id="prestamo-meses" name="meses">
+                        <option value="12">12 meses</option>
+                        <option value="24" selected>24 meses</option>
+                        <option value="36">36 meses</option>
+                        <option value="48">48 meses</option>
+                    </select>
+                    <label for="prestamo-tasa">Tasa anual (%)</label>
+                    <input type="number" id="prestamo-tasa" name="tasa" min="0" max="60" step="0.1" value="18">
+                </form>
+                <dl class="resumen">
+                    <dt>Cuota mensual</dt>
+                    <dd id="prestamo-cuota"></dd>
+                    <dt>Total a pagar</dt>
+                    <dd id="prestamo-total"></dd>
+                    <dt>Intereses</dt>
+                    <dd id="prestamo-intereses"></dd>
+                </dl>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="prestamo" class="formulario"&gt;
+    &lt;label for="prestamo-monto"&gt;Monto: &lt;span id="prestamo-monto-texto"&gt;&lt;/span&gt;&lt;/label&gt;
+    &lt;input type="range" id="prestamo-monto" name="monto" min="1000" max="50000" step="500" value="10000"&gt;
+    &lt;label for="prestamo-meses"&gt;Plazo&lt;/label&gt;
+    &lt;select id="prestamo-meses" name="meses"&gt;
+        &lt;option value="12"&gt;12 meses&lt;/option&gt;
+        &lt;option value="24" selected&gt;24 meses&lt;/option&gt;
+        &lt;option value="36"&gt;36 meses&lt;/option&gt;
+        &lt;option value="48"&gt;48 meses&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;label for="prestamo-tasa"&gt;Tasa anual (%)&lt;/label&gt;
+    &lt;input type="number" id="prestamo-tasa" name="tasa" min="0" max="60" step="0.1" value="18"&gt;
+&lt;/form&gt;
+&lt;dl class="resumen"&gt;
+    &lt;dt&gt;Cuota mensual&lt;/dt&gt;
+    &lt;dd id="prestamo-cuota"&gt;&lt;/dd&gt;
+    &lt;dt&gt;Total a pagar&lt;/dt&gt;
+    &lt;dd id="prestamo-total"&gt;&lt;/dd&gt;
+    &lt;dt&gt;Intereses&lt;/dt&gt;
+    &lt;dd id="prestamo-intereses"&gt;&lt;/dd&gt;
+&lt;/dl&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const prestamo = document.querySelector("#prestamo");
+const dinero = (cantidad) =&gt; cantidad.toLocaleString("es", { style: "currency", currency: "USD" });
+
+const calcularPrestamo = () =&gt; {
+    const monto = prestamo.elements.monto.valueAsNumber;
+    const meses = Number(prestamo.elements.meses.value);
+    const tasaMensual = (prestamo.elements.tasa.valueAsNumber || 0) / 100 / 12;
+
+    let cuota = monto / meses;
+    if (tasaMensual &gt; 0) {
+        cuota = (monto * tasaMensual) / (1 - (1 + tasaMensual) ** -meses);
+    }
+    const total = cuota * meses;
+
+    document.querySelector("#prestamo-monto-texto").textContent = dinero(monto);
+    document.querySelector("#prestamo-cuota").textContent = dinero(cuota);
+    document.querySelector("#prestamo-total").textContent = dinero(total);
+    document.querySelector("#prestamo-intereses").textContent = dinero(total - monto);
+};
+
+prestamo.addEventListener("input", calcularPrestamo);
+calcularPrestamo();</pre>
+                </figure>
+            </div>
+            <p>Se llama a <code>calcularPrestamo()</code> una vez al final para que los números aparezcan sin esperar al primer cambio. <code>|| 0</code> evita el <code>NaN</code> si la tasa queda vacía. La fórmula es la de cuota fija (sistema francés) que usan los bancos.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Calculadora de préstamo en vivo&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label {
+            font-weight: 600;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .resumen {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 6px 16px;
+            max-width: 480px;
+            margin: 16px 0 0;
+            padding: 16px;
+            border-radius: 10px;
+            background: #fefce8;
+        }
+
+        dt {
+            color: #64748b;
+        }
+
+        dd {
+            margin: 0;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="prestamo" class="formulario"&gt;
+        &lt;label for="prestamo-monto"&gt;Monto: &lt;span id="prestamo-monto-texto"&gt;&lt;/span&gt;&lt;/label&gt;
+        &lt;input type="range" id="prestamo-monto" name="monto" min="1000" max="50000" step="500" value="10000"&gt;
+        &lt;label for="prestamo-meses"&gt;Plazo&lt;/label&gt;
+        &lt;select id="prestamo-meses" name="meses"&gt;
+            &lt;option value="12"&gt;12 meses&lt;/option&gt;
+            &lt;option value="24" selected&gt;24 meses&lt;/option&gt;
+            &lt;option value="36"&gt;36 meses&lt;/option&gt;
+            &lt;option value="48"&gt;48 meses&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;label for="prestamo-tasa"&gt;Tasa anual (%)&lt;/label&gt;
+        &lt;input type="number" id="prestamo-tasa" name="tasa" min="0" max="60" step="0.1" value="18"&gt;
+    &lt;/form&gt;
+    &lt;dl class="resumen"&gt;
+        &lt;dt&gt;Cuota mensual&lt;/dt&gt;
+        &lt;dd id="prestamo-cuota"&gt;&lt;/dd&gt;
+        &lt;dt&gt;Total a pagar&lt;/dt&gt;
+        &lt;dd id="prestamo-total"&gt;&lt;/dd&gt;
+        &lt;dt&gt;Intereses&lt;/dt&gt;
+        &lt;dd id="prestamo-intereses"&gt;&lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;script&gt;
+        const prestamo = document.querySelector("#prestamo");
+        const dinero = (cantidad) =&gt; cantidad.toLocaleString("es", { style: "currency", currency: "USD" });
+
+        const calcularPrestamo = () =&gt; {
+            const monto = prestamo.elements.monto.valueAsNumber;
+            const meses = Number(prestamo.elements.meses.value);
+            const tasaMensual = (prestamo.elements.tasa.valueAsNumber || 0) / 100 / 12;
+
+            let cuota = monto / meses;
+            if (tasaMensual &gt; 0) {
+                cuota = (monto * tasaMensual) / (1 - (1 + tasaMensual) ** -meses);
+            }
+            const total = cuota * meses;
+
+            document.querySelector("#prestamo-monto-texto").textContent = dinero(monto);
+            document.querySelector("#prestamo-cuota").textContent = dinero(cuota);
+            document.querySelector("#prestamo-total").textContent = dinero(total);
+            document.querySelector("#prestamo-intereses").textContent = dinero(total - monto);
+        };
+
+        prestamo.addEventListener("input", calcularPrestamo);
+        calcularPrestamo();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-cotizador" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Cotizador con extras</h2>
+            <p>Una agencia cotiza páginas web: el tipo de sitio es un radio y los extras son checkboxes con el mismo <code>name</code>. <code>datos.getAll("extra")</code> devuelve el precio de todos los marcados. Con 3 extras o más hay 10% de descuento en los extras.</p>
+            <div class="resultado">
+                <form id="cotizador" class="formulario">
+                    <fieldset>
+                        <legend>Tipo de sitio</legend>
+                        <label class="opcion"><input type="radio" name="base" value="300" checked> Página personal — $300</label>
+                        <label class="opcion"><input type="radio" name="base" value="800"> Tienda online — $800</label>
+                        <label class="opcion"><input type="radio" name="base" value="1500"> Plataforma a medida — $1500</label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Extras</legend>
+                        <label class="opcion"><input type="checkbox" name="extra" value="120"> Dominio y hosting 1 año — $120</label>
+                        <label class="opcion"><input type="checkbox" name="extra" value="200"> Blog administrable — $200</label>
+                        <label class="opcion"><input type="checkbox" name="extra" value="150"> Versión en inglés — $150</label>
+                        <label class="opcion"><input type="checkbox" name="extra" value="90"> Formulario de contacto — $90</label>
+                        <label class="opcion"><input type="checkbox" name="extra" value="250"> Posicionamiento en buscadores — $250</label>
+                    </fieldset>
+                </form>
+                <div class="cotizacion" aria-live="polite">
+                    <span id="cotizacion-detalle"></span>
+                    <strong id="cotizacion-total"></strong>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="cotizador" class="formulario"&gt;
+    &lt;fieldset&gt;
+        &lt;legend&gt;Tipo de sitio&lt;/legend&gt;
+        &lt;label class="opcion"&gt;&lt;input type="radio" name="base" value="300" checked&gt; Página personal — $300&lt;/label&gt;
+        &lt;label class="opcion"&gt;&lt;input type="radio" name="base" value="800"&gt; Tienda online — $800&lt;/label&gt;
+        &lt;label class="opcion"&gt;&lt;input type="radio" name="base" value="1500"&gt; Plataforma a medida — $1500&lt;/label&gt;
+    &lt;/fieldset&gt;
+    &lt;fieldset&gt;
+        &lt;legend&gt;Extras&lt;/legend&gt;
+        &lt;label class="opcion"&gt;&lt;input type="checkbox" name="extra" value="120"&gt; Dominio y hosting 1 año — $120&lt;/label&gt;
+        &lt;label class="opcion"&gt;&lt;input type="checkbox" name="extra" value="200"&gt; Blog administrable — $200&lt;/label&gt;
+        &lt;label class="opcion"&gt;&lt;input type="checkbox" name="extra" value="150"&gt; Versión en inglés — $150&lt;/label&gt;
+        &lt;label class="opcion"&gt;&lt;input type="checkbox" name="extra" value="90"&gt; Formulario de contacto — $90&lt;/label&gt;
+        &lt;label class="opcion"&gt;&lt;input type="checkbox" name="extra" value="250"&gt; Posicionamiento en buscadores — $250&lt;/label&gt;
+    &lt;/fieldset&gt;
+&lt;/form&gt;
+&lt;div class="cotizacion" aria-live="polite"&gt;
+    &lt;span id="cotizacion-detalle"&gt;&lt;/span&gt;
+    &lt;strong id="cotizacion-total"&gt;&lt;/strong&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const cotizador = document.querySelector("#cotizador");
+const cotizacionDetalle = document.querySelector("#cotizacion-detalle");
+const cotizacionTotal = document.querySelector("#cotizacion-total");
+
+const cotizar = () =&gt; {
+    const datos = new FormData(cotizador);
+    const base = Number(datos.get("base"));
+    const extras = datos.getAll("extra").map(Number);
+    const sumaExtras = extras.reduce((suma, precio) =&gt; suma + precio, 0);
+    const descuento = extras.length &gt;= 3 ? Math.round(sumaExtras * 0.1) : 0;
+
+    cotizacionDetalle.textContent = `Base $${base} + ${extras.length} extra(s) $${sumaExtras}`;
+    if (descuento &gt; 0) {
+        cotizacionDetalle.textContent += ` − descuento $${descuento}`;
+    }
+    cotizacionTotal.textContent = `$${base + sumaExtras - descuento}`;
+};
+
+cotizador.addEventListener("input", cotizar);
+cotizar();</pre>
+                </figure>
+            </div>
+            <p>Los valores de <code>FormData</code> son texto: <code>.map(Number)</code> convierte toda la lista a números antes de sumar con <code>reduce</code>.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Cotizador con extras&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label {
+            font-weight: 600;
+        }
+
+        .formulario .opcion {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 400;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .cotizacion {
+            max-width: 480px;
+            margin-top: 12px;
+            padding: 16px;
+            border-radius: 10px;
+            background: #1f2430;
+            color: #f8fafc;
+        }
+
+        .cotizacion strong {
+            display: block;
+            color: #f7df1e;
+            font-size: 2rem;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="cotizador" class="formulario"&gt;
+        &lt;fieldset&gt;
+            &lt;legend&gt;Tipo de sitio&lt;/legend&gt;
+            &lt;label class="opcion"&gt;&lt;input type="radio" name="base" value="300" checked&gt; Página personal — $300&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="radio" name="base" value="800"&gt; Tienda online — $800&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="radio" name="base" value="1500"&gt; Plataforma a medida — $1500&lt;/label&gt;
+        &lt;/fieldset&gt;
+        &lt;fieldset&gt;
+            &lt;legend&gt;Extras&lt;/legend&gt;
+            &lt;label class="opcion"&gt;&lt;input type="checkbox" name="extra" value="120"&gt; Dominio y hosting 1 año — $120&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="checkbox" name="extra" value="200"&gt; Blog administrable — $200&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="checkbox" name="extra" value="150"&gt; Versión en inglés — $150&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="checkbox" name="extra" value="90"&gt; Formulario de contacto — $90&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="checkbox" name="extra" value="250"&gt; Posicionamiento en buscadores — $250&lt;/label&gt;
+        &lt;/fieldset&gt;
+    &lt;/form&gt;
+    &lt;div class="cotizacion" aria-live="polite"&gt;
+        &lt;span id="cotizacion-detalle"&gt;&lt;/span&gt;
+        &lt;strong id="cotizacion-total"&gt;&lt;/strong&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const cotizador = document.querySelector("#cotizador");
+        const cotizacionDetalle = document.querySelector("#cotizacion-detalle");
+        const cotizacionTotal = document.querySelector("#cotizacion-total");
+
+        const cotizar = () =&gt; {
+            const datos = new FormData(cotizador);
+            const base = Number(datos.get("base"));
+            const extras = datos.getAll("extra").map(Number);
+            const sumaExtras = extras.reduce((suma, precio) =&gt; suma + precio, 0);
+            const descuento = extras.length &gt;= 3 ? Math.round(sumaExtras * 0.1) : 0;
+
+            cotizacionDetalle.textContent = `Base $${base} + ${extras.length} extra(s) $${sumaExtras}`;
+            if (descuento &gt; 0) {
+                cotizacionDetalle.textContent += ` − descuento $${descuento}`;
+            }
+            cotizacionTotal.textContent = `$${base + sumaExtras - descuento}`;
+        };
+
+        cotizador.addEventListener("input", cotizar);
+        cotizar();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-tarjeta" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Pago: número en grupos de 4 y marca de la tarjeta</h2>
+            <p>Mientras escribes, el número se separa en grupos de cuatro, la tarjeta de muestra se actualiza y se detecta la marca: empieza con 4 → Visa; entre 51 y 55 → Mastercard. La fecha agrega la barra sola. Prueba con 4111 1111 1111 1111 o 5500 0000 0000 0004 (números de prueba, no son tarjetas reales).</p>
+            <div class="resultado">
+                <form id="pago" class="formulario">
+                    <div id="pago-vista" class="tarjeta-vista" aria-hidden="true">
+                        <span id="pago-marca" class="marca">Tarjeta</span>
+                        <span id="pago-vista-numero" class="vista-numero">•••• •••• •••• ••••</span>
+                        <span class="vista-pie">
+                            <span id="pago-vista-nombre">NOMBRE APELLIDO</span>
+                            <span id="pago-vista-vence">MM/AA</span>
+                        </span>
+                    </div>
+                    <label for="pago-numero">Número de tarjeta</label>
+                    <input type="text" id="pago-numero" name="numero" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}" required>
+                    <label for="pago-nombre">Nombre en la tarjeta</label>
+                    <input type="text" id="pago-nombre" name="nombre" autocomplete="cc-name" required>
+                    <div class="fila">
+                        <div class="campo">
+                            <label for="pago-vence">Vence</label>
+                            <input type="text" id="pago-vence" name="vence" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" pattern="(0[1-9]|1[0-2])/[0-9]{2}" required>
+                        </div>
+                        <div class="campo">
+                            <label for="pago-cvv">CVV</label>
+                            <input type="text" id="pago-cvv" name="cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4" pattern="[0-9]{3,4}" required>
+                        </div>
+                    </div>
+                    <button type="submit">Pagar $49.90</button>
+                    <p id="pago-estado" class="aviso" role="status"></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="pago" class="formulario"&gt;
+    &lt;div id="pago-vista" class="tarjeta-vista" aria-hidden="true"&gt;
+        &lt;span id="pago-marca" class="marca"&gt;Tarjeta&lt;/span&gt;
+        &lt;span id="pago-vista-numero" class="vista-numero"&gt;•••• •••• •••• ••••&lt;/span&gt;
+        &lt;span class="vista-pie"&gt;
+            &lt;span id="pago-vista-nombre"&gt;NOMBRE APELLIDO&lt;/span&gt;
+            &lt;span id="pago-vista-vence"&gt;MM/AA&lt;/span&gt;
+        &lt;/span&gt;
+    &lt;/div&gt;
+    &lt;label for="pago-numero"&gt;Número de tarjeta&lt;/label&gt;
+    &lt;input type="text" id="pago-numero" name="numero" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}" required&gt;
+    &lt;label for="pago-nombre"&gt;Nombre en la tarjeta&lt;/label&gt;
+    &lt;input type="text" id="pago-nombre" name="nombre" autocomplete="cc-name" required&gt;
+    &lt;div class="fila"&gt;
+        &lt;div class="campo"&gt;
+            &lt;label for="pago-vence"&gt;Vence&lt;/label&gt;
+            &lt;input type="text" id="pago-vence" name="vence" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" pattern="(0[1-9]|1[0-2])/[0-9]{2}" required&gt;
+        &lt;/div&gt;
+        &lt;div class="campo"&gt;
+            &lt;label for="pago-cvv"&gt;CVV&lt;/label&gt;
+            &lt;input type="text" id="pago-cvv" name="cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4" pattern="[0-9]{3,4}" required&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;button type="submit"&gt;Pagar $49.90&lt;/button&gt;
+    &lt;p id="pago-estado" class="aviso" role="status"&gt;&lt;/p&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const pago = document.querySelector("#pago");
+const pagoVista = document.querySelector("#pago-vista");
+const pagoMarca = document.querySelector("#pago-marca");
+const pagoNumero = document.querySelector("#pago-numero");
+const pagoNombre = document.querySelector("#pago-nombre");
+const pagoVence = document.querySelector("#pago-vence");
+const pagoEstado = document.querySelector("#pago-estado");
+
+const enGruposDeCuatro = (texto) =&gt; (texto.match(/.{1,4}/g) || []).join(" ");
+
+const detectarMarca = (numero) =&gt; {
+    const dosPrimeros = Number(numero.slice(0, 2));
+    if (numero.startsWith("4")) {
+        return "Visa";
+    }
+    if (dosPrimeros &gt;= 51 &amp;&amp; dosPrimeros &lt;= 55) {
+        return "Mastercard";
+    }
+    return "Tarjeta";
+};
+
+pagoNumero.addEventListener("input", () =&gt; {
+    const soloNumeros = pagoNumero.value.replace(/[^0-9]/g, "").slice(0, 16);
+    pagoNumero.value = enGruposDeCuatro(soloNumeros);
+    document.querySelector("#pago-vista-numero").textContent = enGruposDeCuatro(soloNumeros.padEnd(16, "•"));
+
+    const marca = detectarMarca(soloNumeros);
+    pagoMarca.textContent = marca;
+    pagoVista.dataset.marca = marca.toLowerCase();
+});
+
+pagoNombre.addEventListener("input", () =&gt; {
+    document.querySelector("#pago-vista-nombre").textContent = pagoNombre.value.toUpperCase() || "NOMBRE APELLIDO";
+});
+
+pagoVence.addEventListener("input", () =&gt; {
+    const numeros = pagoVence.value.replace(/[^0-9]/g, "").slice(0, 4);
+    pagoVence.value = numeros.length &gt; 2 ? `${numeros.slice(0, 2)}/${numeros.slice(2)}` : numeros;
+    document.querySelector("#pago-vista-vence").textContent = pagoVence.value || "MM/AA";
+});
+
+pago.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    pagoEstado.textContent = `Pago aprobado con ${pagoMarca.textContent} terminada en ${pagoNumero.value.slice(-4)}.`;
+});</pre>
+                </figure>
+            </div>
+            <p>El campo es <code>type="text"</code> con <code>inputmode="numeric"</code>: en el celular sale el teclado numérico, pero se pueden escribir los espacios (un <code>type="number"</code> no los permite). El <code>pattern</code> exige los 16 dígitos con sus espacios. Una tienda real nunca guarda el número completo: lo envía directo a la pasarela de pago.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Pago: número en grupos de 4 y marca de la tarjeta&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label,
+        .campo label {
+            font-weight: 600;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .campo {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .tarjeta-vista {
+            display: grid;
+            gap: 10px;
+            max-width: 340px;
+            margin-bottom: 12px;
+            padding: 20px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #334155, #0f172a);
+            color: #f8fafc;
+            font-family: "Courier New", monospace;
+        }
+
+        .tarjeta-vista[data-marca="visa"] {
+            background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+        }
+
+        .tarjeta-vista[data-marca="mastercard"] {
+            background: linear-gradient(135deg, #ea580c, #7c2d12);
+        }
+
+        .marca {
+            justify-self: end;
+            font-family: system-ui, sans-serif;
+            font-weight: 700;
+        }
+
+        .vista-numero {
+            font-size: 1.3rem;
+            letter-spacing: 0.08em;
+        }
+
+        .vista-pie {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .fila {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="pago" class="formulario"&gt;
+        &lt;div id="pago-vista" class="tarjeta-vista" aria-hidden="true"&gt;
+            &lt;span id="pago-marca" class="marca"&gt;Tarjeta&lt;/span&gt;
+            &lt;span id="pago-vista-numero" class="vista-numero"&gt;•••• •••• •••• ••••&lt;/span&gt;
+            &lt;span class="vista-pie"&gt;
+                &lt;span id="pago-vista-nombre"&gt;NOMBRE APELLIDO&lt;/span&gt;
+                &lt;span id="pago-vista-vence"&gt;MM/AA&lt;/span&gt;
+            &lt;/span&gt;
+        &lt;/div&gt;
+        &lt;label for="pago-numero"&gt;Número de tarjeta&lt;/label&gt;
+        &lt;input type="text" id="pago-numero" name="numero" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}" required&gt;
+        &lt;label for="pago-nombre"&gt;Nombre en la tarjeta&lt;/label&gt;
+        &lt;input type="text" id="pago-nombre" name="nombre" autocomplete="cc-name" required&gt;
+        &lt;div class="fila"&gt;
+            &lt;div class="campo"&gt;
+                &lt;label for="pago-vence"&gt;Vence&lt;/label&gt;
+                &lt;input type="text" id="pago-vence" name="vence" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" pattern="(0[1-9]|1[0-2])/[0-9]{2}" required&gt;
+            &lt;/div&gt;
+            &lt;div class="campo"&gt;
+                &lt;label for="pago-cvv"&gt;CVV&lt;/label&gt;
+                &lt;input type="text" id="pago-cvv" name="cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4" pattern="[0-9]{3,4}" required&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;button type="submit"&gt;Pagar $49.90&lt;/button&gt;
+        &lt;p id="pago-estado" class="aviso" role="status"&gt;&lt;/p&gt;
+    &lt;/form&gt;
+    &lt;script&gt;
+        const pago = document.querySelector("#pago");
+        const pagoVista = document.querySelector("#pago-vista");
+        const pagoMarca = document.querySelector("#pago-marca");
+        const pagoNumero = document.querySelector("#pago-numero");
+        const pagoNombre = document.querySelector("#pago-nombre");
+        const pagoVence = document.querySelector("#pago-vence");
+        const pagoEstado = document.querySelector("#pago-estado");
+
+        const enGruposDeCuatro = (texto) =&gt; (texto.match(/.{1,4}/g) || []).join(" ");
+
+        const detectarMarca = (numero) =&gt; {
+            const dosPrimeros = Number(numero.slice(0, 2));
+            if (numero.startsWith("4")) {
+                return "Visa";
+            }
+            if (dosPrimeros &gt;= 51 &amp;&amp; dosPrimeros &lt;= 55) {
+                return "Mastercard";
+            }
+            return "Tarjeta";
+        };
+
+        pagoNumero.addEventListener("input", () =&gt; {
+            const soloNumeros = pagoNumero.value.replace(/[^0-9]/g, "").slice(0, 16);
+            pagoNumero.value = enGruposDeCuatro(soloNumeros);
+            document.querySelector("#pago-vista-numero").textContent = enGruposDeCuatro(soloNumeros.padEnd(16, "•"));
+
+            const marca = detectarMarca(soloNumeros);
+            pagoMarca.textContent = marca;
+            pagoVista.dataset.marca = marca.toLowerCase();
+        });
+
+        pagoNombre.addEventListener("input", () =&gt; {
+            document.querySelector("#pago-vista-nombre").textContent = pagoNombre.value.toUpperCase() || "NOMBRE APELLIDO";
+        });
+
+        pagoVence.addEventListener("input", () =&gt; {
+            const numeros = pagoVence.value.replace(/[^0-9]/g, "").slice(0, 4);
+            pagoVence.value = numeros.length &gt; 2 ? `${numeros.slice(0, 2)}/${numeros.slice(2)}` : numeros;
+            document.querySelector("#pago-vista-vence").textContent = pagoVence.value || "MM/AA";
+        });
+
+        pago.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            pagoEstado.textContent = `Pago aprobado con ${pagoMarca.textContent} terminada en ${pagoNumero.value.slice(-4)}.`;
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-pais-ciudad" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Select dependiente: país → ciudad</h2>
+            <p>Al elegir un país, el segundo select se llena con sus ciudades y se activa. Las opciones se crean con <code>new Option(texto, valor)</code> a partir de un objeto.</p>
+            <div class="resultado">
+                <form id="envio" class="formulario">
+                    <label for="envio-pais">País</label>
+                    <select id="envio-pais" name="pais" required>
+                        <option value="">Elige un país</option>
+                        <option value="ar">Argentina</option>
+                        <option value="cl">Chile</option>
+                        <option value="mx">México</option>
+                        <option value="pe">Perú</option>
+                    </select>
+                    <label for="envio-ciudad">Ciudad</label>
+                    <select id="envio-ciudad" name="ciudad" required disabled>
+                        <option value="">Primero elige un país</option>
+                    </select>
+                    <p id="envio-plazo" class="aviso" role="status"></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="envio" class="formulario"&gt;
+    &lt;label for="envio-pais"&gt;País&lt;/label&gt;
+    &lt;select id="envio-pais" name="pais" required&gt;
+        &lt;option value=""&gt;Elige un país&lt;/option&gt;
+        &lt;option value="ar"&gt;Argentina&lt;/option&gt;
+        &lt;option value="cl"&gt;Chile&lt;/option&gt;
+        &lt;option value="mx"&gt;México&lt;/option&gt;
+        &lt;option value="pe"&gt;Perú&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;label for="envio-ciudad"&gt;Ciudad&lt;/label&gt;
+    &lt;select id="envio-ciudad" name="ciudad" required disabled&gt;
+        &lt;option value=""&gt;Primero elige un país&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;p id="envio-plazo" class="aviso" role="status"&gt;&lt;/p&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const ciudadesPorPais = {
+    ar: ["Buenos Aires", "Córdoba", "Rosario", "Mendoza"],
+    cl: ["Santiago", "Valparaíso", "Concepción"],
+    mx: ["Ciudad de México", "Guadalajara", "Monterrey", "Puebla"],
+    pe: ["Lima", "Arequipa", "Trujillo", "Cusco"],
+};
+const envioPais = document.querySelector("#envio-pais");
+const envioCiudad = document.querySelector("#envio-ciudad");
+const envioPlazo = document.querySelector("#envio-plazo");
+
+envioPais.addEventListener("change", () =&gt; {
+    const ciudades = ciudadesPorPais[envioPais.value] || [];
+    envioCiudad.innerHTML = "";
+    envioCiudad.append(new Option(ciudades.length &gt; 0 ? "Elige una ciudad" : "Primero elige un país", ""));
+    for (const ciudad of ciudades) {
+        envioCiudad.append(new Option(ciudad, ciudad));
+    }
+    envioCiudad.disabled = ciudades.length === 0;
+    envioPlazo.textContent = "";
+});
+
+envioCiudad.addEventListener("change", () =&gt; {
+    const pais = envioPais.options[envioPais.selectedIndex].text;
+    envioPlazo.textContent = envioCiudad.value ? `Envío a ${envioCiudad.value}, ${pais}: llega en 3 a 5 días.` : "";
+});</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Select dependiente: país → ciudad&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label {
+            font-weight: 600;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="envio" class="formulario"&gt;
+        &lt;label for="envio-pais"&gt;País&lt;/label&gt;
+        &lt;select id="envio-pais" name="pais" required&gt;
+            &lt;option value=""&gt;Elige un país&lt;/option&gt;
+            &lt;option value="ar"&gt;Argentina&lt;/option&gt;
+            &lt;option value="cl"&gt;Chile&lt;/option&gt;
+            &lt;option value="mx"&gt;México&lt;/option&gt;
+            &lt;option value="pe"&gt;Perú&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;label for="envio-ciudad"&gt;Ciudad&lt;/label&gt;
+        &lt;select id="envio-ciudad" name="ciudad" required disabled&gt;
+            &lt;option value=""&gt;Primero elige un país&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;p id="envio-plazo" class="aviso" role="status"&gt;&lt;/p&gt;
+    &lt;/form&gt;
+    &lt;script&gt;
+        const ciudadesPorPais = {
+            ar: ["Buenos Aires", "Córdoba", "Rosario", "Mendoza"],
+            cl: ["Santiago", "Valparaíso", "Concepción"],
+            mx: ["Ciudad de México", "Guadalajara", "Monterrey", "Puebla"],
+            pe: ["Lima", "Arequipa", "Trujillo", "Cusco"],
+        };
+        const envioPais = document.querySelector("#envio-pais");
+        const envioCiudad = document.querySelector("#envio-ciudad");
+        const envioPlazo = document.querySelector("#envio-plazo");
+
+        envioPais.addEventListener("change", () =&gt; {
+            const ciudades = ciudadesPorPais[envioPais.value] || [];
+            envioCiudad.innerHTML = "";
+            envioCiudad.append(new Option(ciudades.length &gt; 0 ? "Elige una ciudad" : "Primero elige un país", ""));
+            for (const ciudad of ciudades) {
+                envioCiudad.append(new Option(ciudad, ciudad));
+            }
+            envioCiudad.disabled = ciudades.length === 0;
+            envioPlazo.textContent = "";
+        });
+
+        envioCiudad.addEventListener("change", () =&gt; {
+            const pais = envioPais.options[envioPais.selectedIndex].text;
+            envioPlazo.textContent = envioCiudad.value ? `Envío a ${envioCiudad.value}, ${pais}: llega en 3 a 5 días.` : "";
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-buscador" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Buscador que filtra mientras escribes</h2>
+            <p>Un directorio de la empresa. Con cada tecla se ocultan las personas que no coinciden. La búsqueda no distingue mayúsculas ni tildes: «rios» encuentra a «Ríos».</p>
+            <div class="resultado">
+                <div class="campo">
+                    <label for="buscador-texto">Buscar en el directorio</label>
+                    <input type="search" id="buscador-texto" placeholder="Nombre o área…" autocomplete="off">
+                    <p id="buscador-total" class="ayuda" aria-live="polite"></p>
+                </div>
+                <ul id="buscador-lista" class="directorio">
+                    <li>Ana Ríos — Diseño</li>
+                    <li>Bruno Paredes — Ventas</li>
+                    <li>Camila Núñez — Desarrollo</li>
+                    <li>Diego Salazar — Soporte</li>
+                    <li>Elena Quispe — Desarrollo</li>
+                    <li>Fabián Ortiz — Marketing</li>
+                    <li>Gabriela Méndez — Diseño</li>
+                    <li>Héctor Ibáñez — Ventas</li>
+                    <li>Inés Valdivia — Recursos humanos</li>
+                    <li>Julián Cárdenas — Soporte</li>
+                </ul>
+                <p id="buscador-vacio" class="aviso" hidden>No hay nadie con ese nombre o área.</p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="campo"&gt;
+    &lt;label for="buscador-texto"&gt;Buscar en el directorio&lt;/label&gt;
+    &lt;input type="search" id="buscador-texto" placeholder="Nombre o área…" autocomplete="off"&gt;
+    &lt;p id="buscador-total" class="ayuda" aria-live="polite"&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;ul id="buscador-lista" class="directorio"&gt;
+    &lt;li&gt;Ana Ríos — Diseño&lt;/li&gt;
+    &lt;li&gt;Bruno Paredes — Ventas&lt;/li&gt;
+    &lt;li&gt;Camila Núñez — Desarrollo&lt;/li&gt;
+    &lt;li&gt;Diego Salazar — Soporte&lt;/li&gt;
+    &lt;li&gt;Elena Quispe — Desarrollo&lt;/li&gt;
+    &lt;li&gt;Fabián Ortiz — Marketing&lt;/li&gt;
+    &lt;li&gt;Gabriela Méndez — Diseño&lt;/li&gt;
+    &lt;li&gt;Héctor Ibáñez — Ventas&lt;/li&gt;
+    &lt;li&gt;Inés Valdivia — Recursos humanos&lt;/li&gt;
+    &lt;li&gt;Julián Cárdenas — Soporte&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p id="buscador-vacio" class="aviso" hidden&gt;No hay nadie con ese nombre o área.&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const buscadorTexto = document.querySelector("#buscador-texto");
+const buscadorTotal = document.querySelector("#buscador-total");
+const buscadorVacio = document.querySelector("#buscador-vacio");
+const personas = [...document.querySelectorAll("#buscador-lista li")];
+
+const normalizar = (texto) =&gt; texto.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+const filtrarDirectorio = () =&gt; {
+    const busqueda = normalizar(buscadorTexto.value.trim());
+    let visibles = 0;
+    for (const persona of personas) {
+        const coincide = normalizar(persona.textContent).includes(busqueda);
+        persona.hidden = !coincide;
+        if (coincide) {
+            visibles++;
+        }
+    }
+    buscadorTotal.textContent = `${visibles} de ${personas.length} personas`;
+    buscadorVacio.hidden = visibles &gt; 0;
+};
+
+buscadorTexto.addEventListener("input", filtrarDirectorio);
+filtrarDirectorio();</pre>
+                </figure>
+            </div>
+            <p><code>normalize("NFD")</code> separa cada letra de su tilde («í» pasa a «i» + «´») y el <code>replace</code> borra las tildes sueltas. La propiedad <code>hidden</code> oculta el elemento igual que el atributo HTML.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Buscador que filtra mientras escribes&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .campo label {
+            font-weight: 600;
+        }
+
+        .campo {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .ayuda {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .directorio {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .directorio li {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="campo"&gt;
+        &lt;label for="buscador-texto"&gt;Buscar en el directorio&lt;/label&gt;
+        &lt;input type="search" id="buscador-texto" placeholder="Nombre o área…" autocomplete="off"&gt;
+        &lt;p id="buscador-total" class="ayuda" aria-live="polite"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;ul id="buscador-lista" class="directorio"&gt;
+        &lt;li&gt;Ana Ríos — Diseño&lt;/li&gt;
+        &lt;li&gt;Bruno Paredes — Ventas&lt;/li&gt;
+        &lt;li&gt;Camila Núñez — Desarrollo&lt;/li&gt;
+        &lt;li&gt;Diego Salazar — Soporte&lt;/li&gt;
+        &lt;li&gt;Elena Quispe — Desarrollo&lt;/li&gt;
+        &lt;li&gt;Fabián Ortiz — Marketing&lt;/li&gt;
+        &lt;li&gt;Gabriela Méndez — Diseño&lt;/li&gt;
+        &lt;li&gt;Héctor Ibáñez — Ventas&lt;/li&gt;
+        &lt;li&gt;Inés Valdivia — Recursos humanos&lt;/li&gt;
+        &lt;li&gt;Julián Cárdenas — Soporte&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;p id="buscador-vacio" class="aviso" hidden&gt;No hay nadie con ese nombre o área.&lt;/p&gt;
+    &lt;script&gt;
+        const buscadorTexto = document.querySelector("#buscador-texto");
+        const buscadorTotal = document.querySelector("#buscador-total");
+        const buscadorVacio = document.querySelector("#buscador-vacio");
+        const personas = [...document.querySelectorAll("#buscador-lista li")];
+
+        const normalizar = (texto) =&gt; texto.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+        const filtrarDirectorio = () =&gt; {
+            const busqueda = normalizar(buscadorTexto.value.trim());
+            let visibles = 0;
+            for (const persona of personas) {
+                const coincide = normalizar(persona.textContent).includes(busqueda);
+                persona.hidden = !coincide;
+                if (coincide) {
+                    visibles++;
+                }
+            }
+            buscadorTotal.textContent = `${visibles} de ${personas.length} personas`;
+            buscadorVacio.hidden = visibles &gt; 0;
+        };
+
+        buscadorTexto.addEventListener("input", filtrarDirectorio);
+        filtrarDirectorio();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-encuesta" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Encuesta por pasos con resumen final</h2>
+            <p>La versión con JavaScript de la encuesta de la lección 17: <strong>Siguiente</strong> solo avanza si el paso actual es válido (<code>reportValidity</code> en cada campo), <strong>Atrás</strong> no valida, y al enviar se arma una tabla con todo lo respondido a partir de <code>FormData</code>.</p>
+            <div class="resultado">
+                <form id="encuesta" class="formulario" novalidate>
+                    <p id="encuesta-progreso" class="progreso">Paso 1 de 3</p>
+                    <fieldset class="paso">
+                        <legend>Sobre ti</legend>
+                        <label for="encuesta-nombre">Nombre</label>
+                        <input type="text" id="encuesta-nombre" name="nombre" required>
+                        <label for="encuesta-edad">Edad</label>
+                        <select id="encuesta-edad" name="edad" required>
+                            <option value="">Elige un rango</option>
+                            <option>18 a 24</option>
+                            <option>25 a 34</option>
+                            <option>35 a 49</option>
+                            <option>50 o más</option>
+                        </select>
+                    </fieldset>
+                    <fieldset class="paso" hidden>
+                        <legend>Tu experiencia</legend>
+                        <p>Del 1 al 5, ¿nos recomendarías?</p>
+                        <div class="escala">
+                            <label class="opcion"><input type="radio" name="nota" value="1" required> 1</label>
+                            <label class="opcion"><input type="radio" name="nota" value="2"> 2</label>
+                            <label class="opcion"><input type="radio" name="nota" value="3"> 3</label>
+                            <label class="opcion"><input type="radio" name="nota" value="4"> 4</label>
+                            <label class="opcion"><input type="radio" name="nota" value="5"> 5</label>
+                        </div>
+                        <p>¿Dónde nos usas?</p>
+                        <label class="opcion"><input type="checkbox" name="canal" value="Web"> Web</label>
+                        <label class="opcion"><input type="checkbox" name="canal" value="App"> App</label>
+                        <label class="opcion"><input type="checkbox" name="canal" value="Tienda física"> Tienda física</label>
+                    </fieldset>
+                    <fieldset class="paso" hidden>
+                        <legend>Comentarios</legend>
+                        <label for="encuesta-comentario">¿Qué mejorarías? (10 caracteres o más)</label>
+                        <textarea id="encuesta-comentario" name="comentario" rows="3" required minlength="10"></textarea>
+                    </fieldset>
+                    <div class="botones">
+                        <button type="button" id="encuesta-atras" class="boton-secundario" hidden>Atrás</button>
+                        <button type="button" id="encuesta-siguiente">Siguiente</button>
+                        <button type="submit" id="encuesta-enviar" hidden>Enviar respuestas</button>
+                    </div>
+                </form>
+                <table id="encuesta-resumen" class="resumen-tabla" hidden>
+                    <caption>Tus respuestas</caption>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="encuesta" class="formulario" novalidate&gt;
+    &lt;p id="encuesta-progreso" class="progreso"&gt;Paso 1 de 3&lt;/p&gt;
+    &lt;fieldset class="paso"&gt;
+        &lt;legend&gt;Sobre ti&lt;/legend&gt;
+        &lt;label for="encuesta-nombre"&gt;Nombre&lt;/label&gt;
+        &lt;input type="text" id="encuesta-nombre" name="nombre" required&gt;
+        &lt;label for="encuesta-edad"&gt;Edad&lt;/label&gt;
+        &lt;select id="encuesta-edad" name="edad" required&gt;
+            &lt;option value=""&gt;Elige un rango&lt;/option&gt;
+            &lt;option&gt;18 a 24&lt;/option&gt;
+            &lt;option&gt;25 a 34&lt;/option&gt;
+            &lt;option&gt;35 a 49&lt;/option&gt;
+            &lt;option&gt;50 o más&lt;/option&gt;
+        &lt;/select&gt;
+    &lt;/fieldset&gt;
+    &lt;fieldset class="paso" hidden&gt;
+        &lt;legend&gt;Tu experiencia&lt;/legend&gt;
+        &lt;p&gt;Del 1 al 5, ¿nos recomendarías?&lt;/p&gt;
+        &lt;div class="escala"&gt;
+            &lt;label class="opcion"&gt;&lt;input type="radio" name="nota" value="1" required&gt; 1&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="radio" name="nota" value="2"&gt; 2&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="radio" name="nota" value="3"&gt; 3&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="radio" name="nota" value="4"&gt; 4&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="radio" name="nota" value="5"&gt; 5&lt;/label&gt;
+        &lt;/div&gt;
+        &lt;p&gt;¿Dónde nos usas?&lt;/p&gt;
+        &lt;label class="opcion"&gt;&lt;input type="checkbox" name="canal" value="Web"&gt; Web&lt;/label&gt;
+        &lt;label class="opcion"&gt;&lt;input type="checkbox" name="canal" value="App"&gt; App&lt;/label&gt;
+        &lt;label class="opcion"&gt;&lt;input type="checkbox" name="canal" value="Tienda física"&gt; Tienda física&lt;/label&gt;
+    &lt;/fieldset&gt;
+    &lt;fieldset class="paso" hidden&gt;
+        &lt;legend&gt;Comentarios&lt;/legend&gt;
+        &lt;label for="encuesta-comentario"&gt;¿Qué mejorarías? (10 caracteres o más)&lt;/label&gt;
+        &lt;textarea id="encuesta-comentario" name="comentario" rows="3" required minlength="10"&gt;&lt;/textarea&gt;
+    &lt;/fieldset&gt;
+    &lt;div class="botones"&gt;
+        &lt;button type="button" id="encuesta-atras" class="boton-secundario" hidden&gt;Atrás&lt;/button&gt;
+        &lt;button type="button" id="encuesta-siguiente"&gt;Siguiente&lt;/button&gt;
+        &lt;button type="submit" id="encuesta-enviar" hidden&gt;Enviar respuestas&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/form&gt;
+&lt;table id="encuesta-resumen" class="resumen-tabla" hidden&gt;
+    &lt;caption&gt;Tus respuestas&lt;/caption&gt;
+    &lt;tbody&gt;&lt;/tbody&gt;
+&lt;/table&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const encuesta = document.querySelector("#encuesta");
+const pasos = [...encuesta.querySelectorAll(".paso")];
+const encuestaProgreso = document.querySelector("#encuesta-progreso");
+const encuestaAtras = document.querySelector("#encuesta-atras");
+const encuestaSiguiente = document.querySelector("#encuesta-siguiente");
+const encuestaEnviar = document.querySelector("#encuesta-enviar");
+const encuestaResumen = document.querySelector("#encuesta-resumen");
+let pasoActual = 0;
+
+const mostrarPaso = (numero) =&gt; {
+    pasoActual = numero;
+    pasos.forEach((paso, i) =&gt; {
+        paso.hidden = i !== numero;
+    });
+    const esUltimo = numero === pasos.length - 1;
+    encuestaAtras.hidden = numero === 0;
+    encuestaSiguiente.hidden = esUltimo;
+    encuestaEnviar.hidden = !esUltimo;
+    encuestaProgreso.textContent = `Paso ${numero + 1} de ${pasos.length}`;
+};
+
+const pasoValido = () =&gt; {
+    const campos = [...pasos[pasoActual].querySelectorAll("input, select, textarea")];
+    return campos.every((campo) =&gt; campo.reportValidity());
+};
+
+encuestaSiguiente.addEventListener("click", () =&gt; {
+    if (pasoValido()) {
+        mostrarPaso(pasoActual + 1);
+    }
+});
+
+encuestaAtras.addEventListener("click", () =&gt; {
+    mostrarPaso(pasoActual - 1);
+});
+
+encuesta.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    if (!pasoValido()) {
+        return;
+    }
+    const datos = new FormData(encuesta);
+    const filas = encuestaResumen.querySelector("tbody");
+    filas.innerHTML = "";
+    for (const campo of Object.keys(Object.fromEntries(datos))) {
+        const fila = filas.insertRow();
+        fila.insertCell().textContent = campo;
+        fila.insertCell().textContent = datos.getAll(campo).join(", ");
+    }
+    encuestaResumen.hidden = false;
+    encuesta.reset();
+    mostrarPaso(0);
+});</pre>
+                </figure>
+            </div>
+            <p><code>every</code> se detiene en el primer campo inválido, así el globito aparece en ese y no en todos a la vez. <code>Object.keys(Object.fromEntries(datos))</code> da cada <code>name</code> una sola vez, y <code>getAll</code> junta los checkbox marcados («Web, App»). Los checkbox sin marcar no aparecen en <code>FormData</code>.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Encuesta por pasos con resumen final&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label,
+        .campo label {
+            font-weight: 600;
+        }
+
+        .formulario .opcion {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 400;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .campo {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .botones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .escala {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .progreso {
+            margin: 0;
+            color: #a16207;
+            font-weight: 700;
+        }
+
+        .resumen-tabla {
+            max-width: 480px;
+            margin-top: 16px;
+            border-collapse: collapse;
+        }
+
+        .resumen-tabla caption {
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .resumen-tabla td {
+            padding: 6px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .resumen-tabla td:first-child {
+            font-weight: 600;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="encuesta" class="formulario" novalidate&gt;
+        &lt;p id="encuesta-progreso" class="progreso"&gt;Paso 1 de 3&lt;/p&gt;
+        &lt;fieldset class="paso"&gt;
+            &lt;legend&gt;Sobre ti&lt;/legend&gt;
+            &lt;label for="encuesta-nombre"&gt;Nombre&lt;/label&gt;
+            &lt;input type="text" id="encuesta-nombre" name="nombre" required&gt;
+            &lt;label for="encuesta-edad"&gt;Edad&lt;/label&gt;
+            &lt;select id="encuesta-edad" name="edad" required&gt;
+                &lt;option value=""&gt;Elige un rango&lt;/option&gt;
+                &lt;option&gt;18 a 24&lt;/option&gt;
+                &lt;option&gt;25 a 34&lt;/option&gt;
+                &lt;option&gt;35 a 49&lt;/option&gt;
+                &lt;option&gt;50 o más&lt;/option&gt;
+            &lt;/select&gt;
+        &lt;/fieldset&gt;
+        &lt;fieldset class="paso" hidden&gt;
+            &lt;legend&gt;Tu experiencia&lt;/legend&gt;
+            &lt;p&gt;Del 1 al 5, ¿nos recomendarías?&lt;/p&gt;
+            &lt;div class="escala"&gt;
+                &lt;label class="opcion"&gt;&lt;input type="radio" name="nota" value="1" required&gt; 1&lt;/label&gt;
+                &lt;label class="opcion"&gt;&lt;input type="radio" name="nota" value="2"&gt; 2&lt;/label&gt;
+                &lt;label class="opcion"&gt;&lt;input type="radio" name="nota" value="3"&gt; 3&lt;/label&gt;
+                &lt;label class="opcion"&gt;&lt;input type="radio" name="nota" value="4"&gt; 4&lt;/label&gt;
+                &lt;label class="opcion"&gt;&lt;input type="radio" name="nota" value="5"&gt; 5&lt;/label&gt;
+            &lt;/div&gt;
+            &lt;p&gt;¿Dónde nos usas?&lt;/p&gt;
+            &lt;label class="opcion"&gt;&lt;input type="checkbox" name="canal" value="Web"&gt; Web&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="checkbox" name="canal" value="App"&gt; App&lt;/label&gt;
+            &lt;label class="opcion"&gt;&lt;input type="checkbox" name="canal" value="Tienda física"&gt; Tienda física&lt;/label&gt;
+        &lt;/fieldset&gt;
+        &lt;fieldset class="paso" hidden&gt;
+            &lt;legend&gt;Comentarios&lt;/legend&gt;
+            &lt;label for="encuesta-comentario"&gt;¿Qué mejorarías? (10 caracteres o más)&lt;/label&gt;
+            &lt;textarea id="encuesta-comentario" name="comentario" rows="3" required minlength="10"&gt;&lt;/textarea&gt;
+        &lt;/fieldset&gt;
+        &lt;div class="botones"&gt;
+            &lt;button type="button" id="encuesta-atras" class="boton-secundario" hidden&gt;Atrás&lt;/button&gt;
+            &lt;button type="button" id="encuesta-siguiente"&gt;Siguiente&lt;/button&gt;
+            &lt;button type="submit" id="encuesta-enviar" hidden&gt;Enviar respuestas&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/form&gt;
+    &lt;table id="encuesta-resumen" class="resumen-tabla" hidden&gt;
+        &lt;caption&gt;Tus respuestas&lt;/caption&gt;
+        &lt;tbody&gt;&lt;/tbody&gt;
+    &lt;/table&gt;
+    &lt;script&gt;
+        const encuesta = document.querySelector("#encuesta");
+        const pasos = [...encuesta.querySelectorAll(".paso")];
+        const encuestaProgreso = document.querySelector("#encuesta-progreso");
+        const encuestaAtras = document.querySelector("#encuesta-atras");
+        const encuestaSiguiente = document.querySelector("#encuesta-siguiente");
+        const encuestaEnviar = document.querySelector("#encuesta-enviar");
+        const encuestaResumen = document.querySelector("#encuesta-resumen");
+        let pasoActual = 0;
+
+        const mostrarPaso = (numero) =&gt; {
+            pasoActual = numero;
+            pasos.forEach((paso, i) =&gt; {
+                paso.hidden = i !== numero;
+            });
+            const esUltimo = numero === pasos.length - 1;
+            encuestaAtras.hidden = numero === 0;
+            encuestaSiguiente.hidden = esUltimo;
+            encuestaEnviar.hidden = !esUltimo;
+            encuestaProgreso.textContent = `Paso ${numero + 1} de ${pasos.length}`;
+        };
+
+        const pasoValido = () =&gt; {
+            const campos = [...pasos[pasoActual].querySelectorAll("input, select, textarea")];
+            return campos.every((campo) =&gt; campo.reportValidity());
+        };
+
+        encuestaSiguiente.addEventListener("click", () =&gt; {
+            if (pasoValido()) {
+                mostrarPaso(pasoActual + 1);
+            }
+        });
+
+        encuestaAtras.addEventListener("click", () =&gt; {
+            mostrarPaso(pasoActual - 1);
+        });
+
+        encuesta.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            if (!pasoValido()) {
+                return;
+            }
+            const datos = new FormData(encuesta);
+            const filas = encuestaResumen.querySelector("tbody");
+            filas.innerHTML = "";
+            for (const campo of Object.keys(Object.fromEntries(datos))) {
+                const fila = filas.insertRow();
+                fila.insertCell().textContent = campo;
+                fila.insertCell().textContent = datos.getAll(campo).join(", ");
+            }
+            encuestaResumen.hidden = false;
+            encuesta.reset();
+            mostrarPaso(0);
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="23-js-eventos.html">Anterior: eventos</a> |
+            <a href="index.html">Índice</a> |
+            <a href="25-js-localstorage.html">Siguiente: localStorage</a>
+        </nav>
+    </footer>
+</body>
+</html>

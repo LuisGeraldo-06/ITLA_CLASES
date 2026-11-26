@@ -1,0 +1,3377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>26. JavaScript: fetch y APIs</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <script src="js/consola.js" defer></script>
+    <link rel="stylesheet" href="css/26-js-fetch-apis.css">
+    <script src="js/26-js-fetch-apis.js" defer></script>
+</head>
+<body class="leccion-js">
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>26. JavaScript: fetch y APIs</h1>
+        <p>Hasta ahora todos los datos vivían dentro de la página. Con <code>fetch</code> la página <strong>le pide datos a un servidor</strong>: el clima de una ciudad, las tasas de cambio del día, un Pokémon, un perfil de GitHub… Aprenderemos a esperar respuestas con <code>async/await</code>, a mostrar estados de <em>cargando</em> y de <em>error</em>, a cancelar pedidos y a enviar datos con POST. Todos los ejemplos usan APIs públicas y gratuitas que no piden clave: necesitas conexión a internet para verlos funcionar.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-fetch-basico">Primer fetch</a></li>
+            <li><a href="#ej-json">JSON</a></li>
+            <li><a href="#ej-promesas">then vs await</a></li>
+            <li><a href="#ej-response-ok">response.ok</a></li>
+            <li><a href="#ej-tiempos">setTimeout y sleep</a></li>
+            <li><a href="#ej-chiste">Chiste aleatorio</a></li>
+            <li><a href="#ej-pokemon">Pokémon</a></li>
+            <li><a href="#ej-clima">Clima por ciudad</a></li>
+            <li><a href="#ej-perfiles">Perfiles (skeleton)</a></li>
+            <li><a href="#ej-perros">Galería de perros</a></li>
+            <li><a href="#ej-monedas">Conversor de monedas</a></li>
+            <li><a href="#ej-paginacion">Paginación</a></li>
+            <li><a href="#ej-buscador">Debounce y cancelación</a></li>
+            <li><a href="#ej-post">Crear con POST</a></li>
+            <li><a href="#ej-github">Perfil de GitHub</a></li>
+            <li><a href="#ej-pais">Ficha de país (Promise.all)</a></li>
+            <li><a href="#ej-reintentar">Reintentar</a></li>
+            <li><a href="#ej-vivo">Actualización automática</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Cómo habla una página con un servidor</h2>
+            <p>Una <strong>API</strong> (interfaz de programación) es una dirección web pensada para programas, no para personas: en vez de devolver una página HTML devuelve <strong>datos</strong>, casi siempre en formato <strong>JSON</strong>. JSON es texto que se parece a un objeto de JavaScript, pero con reglas más estrictas: las claves van entre comillas dobles y no hay funciones ni comentarios.</p>
+            <p>La conversación siempre es igual: el navegador envía una <strong>petición</strong> (método + URL + a veces un cuerpo) y el servidor contesta con una <strong>respuesta</strong> (un código de estado + cabeceras + un cuerpo).</p>
+            <table>
+                <thead>
+                    <tr><th>Método HTTP</th><th>Para qué sirve</th><th>Ejemplo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>GET</code></td><td>leer datos (es el método por defecto de <code>fetch</code>)</td><td>ver el clima, listar publicaciones</td></tr>
+                    <tr><td><code>POST</code></td><td>crear algo nuevo</td><td>publicar un comentario, registrar un usuario</td></tr>
+                    <tr><td><code>PUT</code></td><td>reemplazar un recurso completo</td><td>guardar todo el perfil editado</td></tr>
+                    <tr><td><code>PATCH</code></td><td>cambiar solo algunos campos</td><td>marcar una tarea como hecha</td></tr>
+                    <tr><td><code>DELETE</code></td><td>borrar</td><td>eliminar una foto</td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Código</th><th>Significado</th><th>¿<code>response.ok</code>?</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>200</code> OK</td><td>todo bien, aquí están los datos</td><td>sí</td></tr>
+                    <tr><td><code>201</code> Created</td><td>se creó el recurso (típico tras un POST)</td><td>sí</td></tr>
+                    <tr><td><code>204</code> No Content</td><td>salió bien pero no hay cuerpo (típico tras un DELETE)</td><td>sí</td></tr>
+                    <tr><td><code>301</code> / <code>302</code></td><td>redirección: el recurso está en otra dirección</td><td><code>fetch</code> la sigue solo</td></tr>
+                    <tr><td><code>400</code> Bad Request</td><td>la petición está mal formada</td><td>no</td></tr>
+                    <tr><td><code>401</code> / <code>403</code></td><td>falta iniciar sesión / no tienes permiso (o superaste un límite)</td><td>no</td></tr>
+                    <tr><td><code>404</code> Not Found</td><td>no existe lo que pediste</td><td>no</td></tr>
+                    <tr><td><code>429</code> Too Many Requests</td><td>hiciste demasiados pedidos seguidos</td><td>no</td></tr>
+                    <tr><td><code>500</code> / <code>503</code></td><td>el servidor falló o está caído</td><td>no</td></tr>
+                </tbody>
+            </table>
+            <p>Ojo: <code>fetch</code> <strong>solo lanza un error cuando no hay respuesta</strong> (sin internet, dirección inexistente, CORS). Un 404 o un 500 <em>sí</em> son respuestas, así que hay que revisar <code>response.ok</code> a mano.</p>
+            <table>
+                <thead>
+                    <tr><th>Herramienta</th><th>Qué hace</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>fetch(url, opciones)</code></td><td>envía la petición y devuelve una <em>promesa</em> de respuesta</td></tr>
+                    <tr><td><code>await respuesta.json()</code></td><td>lee el cuerpo y lo convierte de JSON a objeto</td></tr>
+                    <tr><td><code>JSON.stringify(obj)</code> / <code>JSON.parse(texto)</code></td><td>objeto → texto JSON / texto JSON → objeto</td></tr>
+                    <tr><td><code>async</code> / <code>await</code></td><td>escribir código asíncrono como si fuera de arriba hacia abajo</td></tr>
+                    <tr><td><code>try / catch / finally</code></td><td>atrapar errores y limpiar pase lo que pase</td></tr>
+                    <tr><td><code>setTimeout</code> / <code>setInterval</code></td><td>ejecutar algo una vez más tarde / cada cierto tiempo</td></tr>
+                    <tr><td><code>Promise.all([...])</code></td><td>esperar varias promesas a la vez (en paralelo)</td></tr>
+                    <tr><td><code>new URLSearchParams({...})</code></td><td>armar la parte <code>?clave=valor&amp;…</code> de una URL bien codificada</td></tr>
+                    <tr><td><code>AbortController</code></td><td>cancelar un pedido que ya no hace falta</td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>API gratuita (sin clave)</th><th>Qué ofrece</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>jsonplaceholder.typicode.com</code></td><td>publicaciones, usuarios y tareas de prueba; finge los POST</td></tr>
+                    <tr><td><code>pokeapi.co</code></td><td>todos los Pokémon con sus datos e imágenes</td></tr>
+                    <tr><td><code>api.open-meteo.com</code> y <code>geocoding-api.open-meteo.com</code></td><td>clima por latitud/longitud y buscador de ciudades</td></tr>
+                    <tr><td><code>open.er-api.com</code></td><td>tasas de cambio del día</td></tr>
+                    <tr><td><code>dog.ceo/api</code> y <code>randomuser.me</code></td><td>fotos de perros por raza y personas ficticias</td></tr>
+                    <tr><td><code>api.github.com/users/…</code></td><td>perfiles públicos de GitHub (60 consultas por hora)</td></tr>
+                    <tr><td><code>v2.jokeapi.dev</code></td><td>chistes, también en español</td></tr>
+                    <tr><td><code>flagcdn.com</code></td><td>imágenes de banderas por código de país</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>La plantilla que usarás el 90 % de las veces</figcaption>
+<pre>async function cargarDatos() {
+    estado.textContent = "Cargando…";
+    try {
+        const respuesta = await fetch("https://api.ejemplo.com/datos");
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const datos = await respuesta.json();
+        estado.textContent = "";
+        mostrar(datos);
+    } catch (error) {
+        estado.textContent = "No se pudo cargar. Revisa tu conexión.";
+    }
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>Lo mismo con then / catch</figcaption>
+<pre>fetch("https://api.ejemplo.com/datos")
+    .then((respuesta) =&gt; respuesta.json())
+    .then((datos) =&gt; mostrar(datos))
+    .catch(() =&gt; {
+        estado.textContent = "No se pudo cargar.";
+    });</pre>
+                </figure>
+                <figure>
+                    <figcaption>Enviar datos (POST con cuerpo JSON)</figcaption>
+<pre>const respuesta = await fetch("https://api.ejemplo.com/comentarios", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ autor: "Ana", texto: "¡Hola!" })
+});</pre>
+                </figure>
+                <figure>
+                    <figcaption>Parámetros, paralelo y cancelación</figcaption>
+<pre>const parametros = new URLSearchParams({ ciudad: "Panamá", dias: 3 });
+fetch(`https://api.ejemplo.com/clima?${parametros}`);
+
+const [usuario, tareas] = await Promise.all([
+    fetch("/usuario").then((r) =&gt; r.json()),
+    fetch("/tareas").then((r) =&gt; r.json())
+]);
+
+const controlador = new AbortController();
+fetch(url, { signal: controlador.signal });
+controlador.abort();</pre>
+                </figure>
+            </div>
+            <p><strong>CORS:</strong> por seguridad, el navegador solo deja leer respuestas de otro dominio si ese servidor lo permite. Todas las APIs de esta lección lo permiten; si algún día ves <em>“blocked by CORS policy”</em> en la consola, el problema está en el servidor, no en tu código.</p>
+        </section>
+
+        <section id="ej-fetch-basico" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Tu primer fetch</h2>
+            <p>Pedimos un usuario de prueba a JSONPlaceholder. <code>fetch</code> devuelve la respuesta; <code>.json()</code> lee el cuerpo y lo convierte en objeto. Las dos cosas toman tiempo, por eso van con <code>await</code>.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>try {
+    const respuesta = await fetch("https://jsonplaceholder.typicode.com/users/1");
+    console.log("Estado:", respuesta.status, "¿ok?", respuesta.ok);
+    console.log("Tipo:", respuesta.headers.get("content-type"));
+
+    const usuario = await respuesta.json();
+    console.log("Nombre:", usuario.name);
+    console.log("Correo:", usuario.email);
+    console.log("Ciudad:", usuario.address.city);
+    console.log("Empresa:", usuario.company.name);
+} catch (error) {
+    console.log("No hay conexión con el servidor 😕", error.message);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-json" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>JSON: texto con forma de objeto</h2>
+            <p>Los servidores no envían objetos, envían <strong>texto</strong>. <code>JSON.stringify</code> convierte un objeto en ese texto y <code>JSON.parse</code> hace el camino de vuelta. Si el texto no es JSON válido, <code>parse</code> lanza un error.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const pedido = {
+    id: 1042,
+    cliente: "Ana Ríos",
+    total: 37.5,
+    pagado: true,
+    productos: ["café", "pan de queso"]
+};
+
+const texto = JSON.stringify(pedido);
+console.log(texto);
+console.log("Tipo:", typeof texto);
+
+const deVuelta = JSON.parse(texto);
+console.log("Segundo producto:", deVuelta.productos[1]);
+
+console.log(JSON.stringify(pedido, null, 2));
+
+try {
+    JSON.parse("{ cliente: 'Ana' }");
+} catch (error) {
+    console.log("JSON inválido:", error.name);
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-promesas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Promesas: then/catch frente a async/await</h2>
+            <p><code>fetch</code> devuelve una <strong>promesa</strong>: un valor que llegará más tarde. Se puede encadenar con <code>.then()</code> o esperar con <code>await</code>. Hacen lo mismo; <code>await</code> se lee de arriba hacia abajo y se combina con <code>try/catch</code>.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const url = "https://jsonplaceholder.typicode.com/todos/5";
+
+await fetch(url)
+    .then((respuesta) =&gt; respuesta.json())
+    .then((tarea) =&gt; console.log("Con then:", tarea.title))
+    .catch(() =&gt; console.log("Con then: falló la conexión"));
+
+try {
+    const respuesta = await fetch(url);
+    const tarea = await respuesta.json();
+    console.log("Con await:", tarea.title);
+} catch {
+    console.log("Con await: falló la conexión");
+}
+
+const promesa = fetch(url);
+console.log("Sin await obtengo:", promesa instanceof Promise ? "una Promise" : promesa);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-response-ok" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>response.ok y los errores HTTP</h2>
+            <p>Pedir la publicación 9999, que no existe, <strong>no</strong> hace fallar a <code>fetch</code>: llega una respuesta con estado 404. Por eso conviene una función que revise <code>respuesta.ok</code> y lance un error si algo salió mal.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>async function pedirJSON(url) {
+    const respuesta = await fetch(url);
+    if (!respuesta.ok) {
+        throw new Error(`Error HTTP ${respuesta.status}`);
+    }
+    return respuesta.json();
+}
+
+const ids = [1, 9999, 3];
+
+for (const id of ids) {
+    try {
+        const post = await pedirJSON(`https://jsonplaceholder.typicode.com/posts/${id}`);
+        console.log(`✔ Post ${id}:`, post.title.slice(0, 30) + "…");
+    } catch (error) {
+        console.log(`✖ Post ${id}:`, error.message);
+    }
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tiempos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>setTimeout, setInterval y una promesa «esperar»</h2>
+            <p><code>setTimeout</code> ejecuta algo una vez después de un tiempo; <code>setInterval</code> lo repite hasta llamar a <code>clearInterval</code>. Envolviendo <code>setTimeout</code> en una promesa obtenemos <code>esperar(ms)</code>, muy útil con <code>await</code>.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const esperar = (ms) =&gt; new Promise((resolver) =&gt; setTimeout(resolver, ms));
+
+console.log("🧾 Pedido recibido");
+await esperar(700);
+console.log("🍕 Horneando pizza…");
+await esperar(700);
+console.log("🛵 En camino");
+
+let segundos = 3;
+await new Promise((resolver) =&gt; {
+    const intervalo = setInterval(() =&gt; {
+        console.log(`Llega en ${segundos}…`);
+        segundos--;
+        if (segundos === 0) {
+            clearInterval(intervalo);
+            resolver();
+        }
+    }, 600);
+});
+
+console.log("🔔 ¡Ding dong! Pedido entregado");</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-chiste" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Chiste aleatorio con estado de carga</h2>
+            <p>Un patrón básico: desactivar el botón mientras se espera, mostrar «Cargando…», pintar el resultado y, pase lo que pase, volver a activar el botón en <code>finally</code>. El remate aparece 1,5 s después con <code>setTimeout</code>.</p>
+            <div class="resultado">
+                <div class="chiste">
+                    <p id="chiste-texto" class="chiste-texto">Pulsa el botón para leer un chiste.</p>
+                    <p id="chiste-remate" class="chiste-remate"></p>
+                    <button type="button" id="chiste-boton">Cuéntame un chiste</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="chiste"&gt;
+    &lt;p id="chiste-texto" class="chiste-texto"&gt;Pulsa el botón para leer un chiste.&lt;/p&gt;
+    &lt;p id="chiste-remate" class="chiste-remate"&gt;&lt;/p&gt;
+    &lt;button type="button" id="chiste-boton"&gt;Cuéntame un chiste&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const chisteTexto = document.querySelector("#chiste-texto");
+const chisteRemate = document.querySelector("#chiste-remate");
+const chisteBoton = document.querySelector("#chiste-boton");
+
+chisteBoton.addEventListener("click", async () =&gt; {
+    chisteBoton.disabled = true;
+    chisteTexto.textContent = "Cargando…";
+    chisteRemate.textContent = "";
+    try {
+        const respuesta = await fetch("https://v2.jokeapi.dev/joke/Any?lang=es&amp;type=twopart&amp;safe-mode");
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const chiste = await respuesta.json();
+        chisteTexto.textContent = chiste.setup;
+        setTimeout(() =&gt; {
+            chisteRemate.textContent = chiste.delivery;
+        }, 1500);
+    } catch {
+        chisteTexto.textContent = "😕 No pudimos traer un chiste. ¿Tienes conexión?";
+    } finally {
+        chisteBoton.disabled = false;
+        chisteBoton.textContent = "Otro chiste";
+    }
+});</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Chiste aleatorio con estado de carga&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .chiste {
+            max-width: 520px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #fffbea;
+            border: 2px solid #f7df1e;
+        }
+
+        .chiste-texto {
+            margin-top: 0;
+            font-size: 1.1rem;
+        }
+
+        .chiste-remate {
+            min-height: 1.6em;
+            font-weight: 700;
+            color: #b45309;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="chiste"&gt;
+        &lt;p id="chiste-texto" class="chiste-texto"&gt;Pulsa el botón para leer un chiste.&lt;/p&gt;
+        &lt;p id="chiste-remate" class="chiste-remate"&gt;&lt;/p&gt;
+        &lt;button type="button" id="chiste-boton"&gt;Cuéntame un chiste&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const chisteTexto = document.querySelector("#chiste-texto");
+        const chisteRemate = document.querySelector("#chiste-remate");
+        const chisteBoton = document.querySelector("#chiste-boton");
+
+        chisteBoton.addEventListener("click", async () =&gt; {
+            chisteBoton.disabled = true;
+            chisteTexto.textContent = "Cargando…";
+            chisteRemate.textContent = "";
+            try {
+                const respuesta = await fetch("https://v2.jokeapi.dev/joke/Any?lang=es&amp;type=twopart&amp;safe-mode");
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const chiste = await respuesta.json();
+                chisteTexto.textContent = chiste.setup;
+                setTimeout(() =&gt; {
+                    chisteRemate.textContent = chiste.delivery;
+                }, 1500);
+            } catch {
+                chisteTexto.textContent = "😕 No pudimos traer un chiste. ¿Tienes conexión?";
+            } finally {
+                chisteBoton.disabled = false;
+                chisteBoton.textContent = "Otro chiste";
+            }
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-pokemon" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Tarjeta de Pokémon buscable</h2>
+            <p>Un formulario busca en la PokéAPI. Un 404 no es un fallo de conexión: significa que ese Pokémon no existe, así que se muestra un mensaje distinto. <code>encodeURIComponent</code> protege la URL si escriben espacios o símbolos.</p>
+            <div class="resultado">
+                <form id="poke-form" class="barra-fila">
+                    <label for="poke-nombre">Nombre o número</label>
+                    <input type="text" id="poke-nombre" value="pikachu" list="poke-sugerencias" required>
+                    <datalist id="poke-sugerencias">
+                        <option value="bulbasaur"></option>
+                        <option value="charmander"></option>
+                        <option value="squirtle"></option>
+                        <option value="eevee"></option>
+                        <option value="snorlax"></option>
+                        <option value="mewtwo"></option>
+                    </datalist>
+                    <button type="submit">Buscar</button>
+                </form>
+                <article id="poke-tarjeta" class="poke-tarjeta" aria-live="polite"></article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="poke-form" class="barra-fila"&gt;
+    &lt;label for="poke-nombre"&gt;Nombre o número&lt;/label&gt;
+    &lt;input type="text" id="poke-nombre" value="pikachu" list="poke-sugerencias" required&gt;
+    &lt;datalist id="poke-sugerencias"&gt;
+        &lt;option value="bulbasaur"&gt;&lt;/option&gt;
+        &lt;option value="charmander"&gt;&lt;/option&gt;
+        &lt;option value="squirtle"&gt;&lt;/option&gt;
+        &lt;option value="eevee"&gt;&lt;/option&gt;
+        &lt;option value="snorlax"&gt;&lt;/option&gt;
+        &lt;option value="mewtwo"&gt;&lt;/option&gt;
+    &lt;/datalist&gt;
+    &lt;button type="submit"&gt;Buscar&lt;/button&gt;
+&lt;/form&gt;
+&lt;article id="poke-tarjeta" class="poke-tarjeta" aria-live="polite"&gt;&lt;/article&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const pokeForm = document.querySelector("#poke-form");
+const pokeNombre = document.querySelector("#poke-nombre");
+const pokeTarjeta = document.querySelector("#poke-tarjeta");
+
+async function buscarPokemon(nombre) {
+    const busqueda = encodeURIComponent(nombre.trim().toLowerCase());
+    pokeTarjeta.className = "poke-tarjeta";
+    pokeTarjeta.textContent = "Buscando…";
+    try {
+        const respuesta = await fetch(`https://pokeapi.co/api/v2/pokemon/${busqueda}`);
+        if (respuesta.status === 404) {
+            pokeTarjeta.className = "poke-tarjeta aviso-error";
+            pokeTarjeta.textContent = `No existe ningún Pokémon llamado «${nombre}».`;
+            return;
+        }
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const poke = await respuesta.json();
+        const tipos = poke.types.map((t) =&gt; `&lt;span class="poke-tipo"&gt;${t.type.name}&lt;/span&gt;`).join("");
+        const stats = poke.stats.map((s) =&gt; `&lt;li&gt;${s.stat.name}: &lt;strong&gt;${s.base_stat}&lt;/strong&gt;&lt;/li&gt;`).join("");
+        pokeTarjeta.innerHTML = `
+            &lt;img src="${poke.sprites.other["official-artwork"].front_default}" alt="${poke.name}"&gt;
+            &lt;div&gt;
+                &lt;h3&gt;#${poke.id} ${poke.name}&lt;/h3&gt;
+                &lt;p&gt;${tipos}&lt;/p&gt;
+                &lt;p&gt;Altura: ${poke.height / 10} m · Peso: ${poke.weight / 10} kg&lt;/p&gt;
+                &lt;ul&gt;${stats}&lt;/ul&gt;
+            &lt;/div&gt;
+        `;
+    } catch {
+        pokeTarjeta.className = "poke-tarjeta aviso-error";
+        pokeTarjeta.textContent = "No pudimos conectar con la PokéAPI. Intenta de nuevo.";
+    }
+}
+
+pokeForm.addEventListener("submit", (evento) =&gt; {
+    evento.preventDefault();
+    buscarPokemon(pokeNombre.value);
+});
+
+buscarPokemon(pokeNombre.value);</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Tarjeta de Pokémon buscable&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .aviso-error {
+            padding: 12px 16px;
+            border-left: 4px solid #ef4444;
+            border-radius: 8px;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .barra-fila {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .poke-tarjeta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            max-width: 560px;
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #fef9c3, #fde68a);
+        }
+
+        .poke-tarjeta img {
+            width: 160px;
+            height: 160px;
+        }
+
+        .poke-tarjeta h3 {
+            margin: 0;
+            text-transform: capitalize;
+        }
+
+        .poke-tarjeta ul {
+            margin: 0;
+            padding-left: 18px;
+            columns: 2;
+            font-size: 0.85rem;
+        }
+
+        .poke-tipo {
+            display: inline-block;
+            margin-right: 6px;
+            padding: 2px 10px;
+            border-radius: 999px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-size: 0.8rem;
+            text-transform: capitalize;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="poke-form" class="barra-fila"&gt;
+        &lt;label for="poke-nombre"&gt;Nombre o número&lt;/label&gt;
+        &lt;input type="text" id="poke-nombre" value="pikachu" list="poke-sugerencias" required&gt;
+        &lt;datalist id="poke-sugerencias"&gt;
+            &lt;option value="bulbasaur"&gt;&lt;/option&gt;
+            &lt;option value="charmander"&gt;&lt;/option&gt;
+            &lt;option value="squirtle"&gt;&lt;/option&gt;
+            &lt;option value="eevee"&gt;&lt;/option&gt;
+            &lt;option value="snorlax"&gt;&lt;/option&gt;
+            &lt;option value="mewtwo"&gt;&lt;/option&gt;
+        &lt;/datalist&gt;
+        &lt;button type="submit"&gt;Buscar&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;article id="poke-tarjeta" class="poke-tarjeta" aria-live="polite"&gt;&lt;/article&gt;
+    &lt;script&gt;
+        const pokeForm = document.querySelector("#poke-form");
+        const pokeNombre = document.querySelector("#poke-nombre");
+        const pokeTarjeta = document.querySelector("#poke-tarjeta");
+
+        async function buscarPokemon(nombre) {
+            const busqueda = encodeURIComponent(nombre.trim().toLowerCase());
+            pokeTarjeta.className = "poke-tarjeta";
+            pokeTarjeta.textContent = "Buscando…";
+            try {
+                const respuesta = await fetch(`https://pokeapi.co/api/v2/pokemon/${busqueda}`);
+                if (respuesta.status === 404) {
+                    pokeTarjeta.className = "poke-tarjeta aviso-error";
+                    pokeTarjeta.textContent = `No existe ningún Pokémon llamado «${nombre}».`;
+                    return;
+                }
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const poke = await respuesta.json();
+                const tipos = poke.types.map((t) =&gt; `&lt;span class="poke-tipo"&gt;${t.type.name}&lt;/span&gt;`).join("");
+                const stats = poke.stats.map((s) =&gt; `&lt;li&gt;${s.stat.name}: &lt;strong&gt;${s.base_stat}&lt;/strong&gt;&lt;/li&gt;`).join("");
+                pokeTarjeta.innerHTML = `
+                    &lt;img src="${poke.sprites.other["official-artwork"].front_default}" alt="${poke.name}"&gt;
+                    &lt;div&gt;
+                        &lt;h3&gt;#${poke.id} ${poke.name}&lt;/h3&gt;
+                        &lt;p&gt;${tipos}&lt;/p&gt;
+                        &lt;p&gt;Altura: ${poke.height / 10} m · Peso: ${poke.weight / 10} kg&lt;/p&gt;
+                        &lt;ul&gt;${stats}&lt;/ul&gt;
+                    &lt;/div&gt;
+                `;
+            } catch {
+                pokeTarjeta.className = "poke-tarjeta aviso-error";
+                pokeTarjeta.textContent = "No pudimos conectar con la PokéAPI. Intenta de nuevo.";
+            }
+        }
+
+        pokeForm.addEventListener("submit", (evento) =&gt; {
+            evento.preventDefault();
+            buscarPokemon(pokeNombre.value);
+        });
+
+        buscarPokemon(pokeNombre.value);
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-clima" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>El clima de una ciudad elegida</h2>
+            <p>Cada opción del <code>select</code> guarda la latitud y longitud de la ciudad. <code>URLSearchParams</code> arma la parte <code>?latitude=…&amp;longitude=…</code> sin errores de comas ni espacios. El código del clima (WMO) se traduce con un objeto.</p>
+            <div class="resultado">
+                <label for="clima-ciudad">Ciudad</label>
+                <select id="clima-ciudad">
+                    <option value="8.98,-79.52">Ciudad de Panamá</option>
+                    <option value="19.43,-99.13">Ciudad de México</option>
+                    <option value="4.71,-74.07">Bogotá</option>
+                    <option value="40.42,-3.70">Madrid</option>
+                    <option value="-34.60,-58.38">Buenos Aires</option>
+                    <option value="-12.05,-77.04">Lima</option>
+                    <option value="-33.45,-70.67">Santiago de Chile</option>
+                </select>
+                <div id="clima-panel" class="clima-panel" aria-live="polite"></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label for="clima-ciudad"&gt;Ciudad&lt;/label&gt;
+&lt;select id="clima-ciudad"&gt;
+    &lt;option value="8.98,-79.52"&gt;Ciudad de Panamá&lt;/option&gt;
+    &lt;option value="19.43,-99.13"&gt;Ciudad de México&lt;/option&gt;
+    &lt;option value="4.71,-74.07"&gt;Bogotá&lt;/option&gt;
+    &lt;option value="40.42,-3.70"&gt;Madrid&lt;/option&gt;
+    &lt;option value="-34.60,-58.38"&gt;Buenos Aires&lt;/option&gt;
+    &lt;option value="-12.05,-77.04"&gt;Lima&lt;/option&gt;
+    &lt;option value="-33.45,-70.67"&gt;Santiago de Chile&lt;/option&gt;
+&lt;/select&gt;
+&lt;div id="clima-panel" class="clima-panel" aria-live="polite"&gt;&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const climaCiudad = document.querySelector("#clima-ciudad");
+const climaPanel = document.querySelector("#clima-panel");
+
+const climaTextos = {
+    0: "☀️ Despejado",
+    1: "🌤️ Casi despejado",
+    2: "⛅ Parcialmente nublado",
+    3: "☁️ Nublado",
+    45: "🌫️ Niebla",
+    51: "🌦️ Llovizna",
+    61: "🌧️ Lluvia ligera",
+    63: "🌧️ Lluvia",
+    65: "🌧️ Lluvia fuerte",
+    80: "🌦️ Chubascos",
+    95: "⛈️ Tormenta"
+};
+
+async function mostrarClima() {
+    const [latitud, longitud] = climaCiudad.value.split(",");
+    const parametros = new URLSearchParams({
+        latitude: latitud,
+        longitude: longitud,
+        current: "temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code",
+        timezone: "auto"
+    });
+    climaPanel.textContent = "Consultando el clima…";
+    try {
+        const respuesta = await fetch(`https://api.open-meteo.com/v1/forecast?${parametros}`);
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const datos = await respuesta.json();
+        const actual = datos.current;
+        climaPanel.innerHTML = `
+            &lt;p class="clima-temp"&gt;${Math.round(actual.temperature_2m)} °C&lt;/p&gt;
+            &lt;p&gt;${climaTextos[actual.weather_code] || "🌡️ Código " + actual.weather_code}&lt;/p&gt;
+            &lt;p&gt;💧 Humedad ${actual.relative_humidity_2m} % · 💨 Viento ${actual.wind_speed_10m} km/h&lt;/p&gt;
+            &lt;p class="estado"&gt;Hora local: ${actual.time.slice(11)}&lt;/p&gt;
+        `;
+    } catch {
+        climaPanel.innerHTML = `&lt;p class="aviso-error"&gt;No pudimos consultar el clima. Revisa tu conexión.&lt;/p&gt;`;
+    }
+}
+
+climaCiudad.addEventListener("change", mostrarClima);
+mostrarClima();</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;El clima de una ciudad elegida&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .estado {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .aviso-error {
+            padding: 12px 16px;
+            border-left: 4px solid #ef4444;
+            border-radius: 8px;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .clima-panel {
+            max-width: 360px;
+            margin-top: 12px;
+            padding: 16px 20px;
+            border-radius: 16px;
+            background: linear-gradient(160deg, #0ea5e9, #1e3a8a);
+            color: #fff;
+        }
+
+        .clima-panel p {
+            margin: 4px 0;
+        }
+
+        .clima-panel .estado {
+            color: #bae6fd;
+        }
+
+        .clima-temp {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;label for="clima-ciudad"&gt;Ciudad&lt;/label&gt;
+    &lt;select id="clima-ciudad"&gt;
+        &lt;option value="8.98,-79.52"&gt;Ciudad de Panamá&lt;/option&gt;
+        &lt;option value="19.43,-99.13"&gt;Ciudad de México&lt;/option&gt;
+        &lt;option value="4.71,-74.07"&gt;Bogotá&lt;/option&gt;
+        &lt;option value="40.42,-3.70"&gt;Madrid&lt;/option&gt;
+        &lt;option value="-34.60,-58.38"&gt;Buenos Aires&lt;/option&gt;
+        &lt;option value="-12.05,-77.04"&gt;Lima&lt;/option&gt;
+        &lt;option value="-33.45,-70.67"&gt;Santiago de Chile&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;div id="clima-panel" class="clima-panel" aria-live="polite"&gt;&lt;/div&gt;
+    &lt;script&gt;
+        const climaCiudad = document.querySelector("#clima-ciudad");
+        const climaPanel = document.querySelector("#clima-panel");
+
+        const climaTextos = {
+            0: "☀️ Despejado",
+            1: "🌤️ Casi despejado",
+            2: "⛅ Parcialmente nublado",
+            3: "☁️ Nublado",
+            45: "🌫️ Niebla",
+            51: "🌦️ Llovizna",
+            61: "🌧️ Lluvia ligera",
+            63: "🌧️ Lluvia",
+            65: "🌧️ Lluvia fuerte",
+            80: "🌦️ Chubascos",
+            95: "⛈️ Tormenta"
+        };
+
+        async function mostrarClima() {
+            const [latitud, longitud] = climaCiudad.value.split(",");
+            const parametros = new URLSearchParams({
+                latitude: latitud,
+                longitude: longitud,
+                current: "temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code",
+                timezone: "auto"
+            });
+            climaPanel.textContent = "Consultando el clima…";
+            try {
+                const respuesta = await fetch(`https://api.open-meteo.com/v1/forecast?${parametros}`);
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const datos = await respuesta.json();
+                const actual = datos.current;
+                climaPanel.innerHTML = `
+                    &lt;p class="clima-temp"&gt;${Math.round(actual.temperature_2m)} °C&lt;/p&gt;
+                    &lt;p&gt;${climaTextos[actual.weather_code] || "🌡️ Código " + actual.weather_code}&lt;/p&gt;
+                    &lt;p&gt;💧 Humedad ${actual.relative_humidity_2m} % · 💨 Viento ${actual.wind_speed_10m} km/h&lt;/p&gt;
+                    &lt;p class="estado"&gt;Hora local: ${actual.time.slice(11)}&lt;/p&gt;
+                `;
+            } catch {
+                climaPanel.innerHTML = `&lt;p class="aviso-error"&gt;No pudimos consultar el clima. Revisa tu conexión.&lt;/p&gt;`;
+            }
+        }
+
+        climaCiudad.addEventListener("change", mostrarClima);
+        mostrarClima();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-perfiles" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Generador de perfiles con skeleton loader</h2>
+            <p>Mientras llegan los datos se dibujan tarjetas grises animadas (<em>skeletons</em>) del mismo tamaño que las reales: la página no «salta» y se percibe más rápida. RandomUser inventa personas con foto, nombre y ciudad.</p>
+            <div class="resultado">
+                <div class="barra-fila">
+                    <label for="perfiles-pais">Nacionalidad</label>
+                    <select id="perfiles-pais">
+                        <option value="es">España</option>
+                        <option value="mx">México</option>
+                        <option value="br">Brasil</option>
+                        <option value="fr">Francia</option>
+                    </select>
+                    <button type="button" id="perfiles-boton">Generar 3 perfiles</button>
+                </div>
+                <div id="perfiles-lista" class="perfiles-lista"></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="barra-fila"&gt;
+    &lt;label for="perfiles-pais"&gt;Nacionalidad&lt;/label&gt;
+    &lt;select id="perfiles-pais"&gt;
+        &lt;option value="es"&gt;España&lt;/option&gt;
+        &lt;option value="mx"&gt;México&lt;/option&gt;
+        &lt;option value="br"&gt;Brasil&lt;/option&gt;
+        &lt;option value="fr"&gt;Francia&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;button type="button" id="perfiles-boton"&gt;Generar 3 perfiles&lt;/button&gt;
+&lt;/div&gt;
+&lt;div id="perfiles-lista" class="perfiles-lista"&gt;&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const perfilesPais = document.querySelector("#perfiles-pais");
+const perfilesBoton = document.querySelector("#perfiles-boton");
+const perfilesLista = document.querySelector("#perfiles-lista");
+
+function mostrarEsqueletos(cantidad) {
+    perfilesLista.innerHTML = "";
+    for (let i = 0; i &lt; cantidad; i++) {
+        perfilesLista.innerHTML += `
+            &lt;div class="perfil esqueleto"&gt;
+                &lt;div class="esqueleto-foto"&gt;&lt;/div&gt;
+                &lt;div class="esqueleto-linea"&gt;&lt;/div&gt;
+                &lt;div class="esqueleto-linea corta"&gt;&lt;/div&gt;
+            &lt;/div&gt;
+        `;
+    }
+}
+
+async function generarPerfiles() {
+    mostrarEsqueletos(3);
+    const parametros = new URLSearchParams({ results: 3, nat: perfilesPais.value });
+    try {
+        const respuesta = await fetch(`https://randomuser.me/api/?${parametros}`);
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const datos = await respuesta.json();
+        perfilesLista.innerHTML = datos.results.map((persona) =&gt; `
+            &lt;div class="perfil"&gt;
+                &lt;img src="${persona.picture.large}" alt="Foto de ${persona.name.first}"&gt;
+                &lt;h3&gt;${persona.name.first} ${persona.name.last}&lt;/h3&gt;
+                &lt;p&gt;${persona.dob.age} años · ${persona.location.city}&lt;/p&gt;
+                &lt;p class="perfil-correo"&gt;${persona.email}&lt;/p&gt;
+            &lt;/div&gt;
+        `).join("");
+    } catch {
+        perfilesLista.innerHTML = `&lt;p class="aviso-error"&gt;No se pudieron generar los perfiles. Revisa tu conexión.&lt;/p&gt;`;
+    }
+}
+
+perfilesBoton.addEventListener("click", generarPerfiles);
+perfilesPais.addEventListener("change", generarPerfiles);
+generarPerfiles();</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Generador de perfiles con skeleton loader&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        @keyframes brillo {
+            from {
+                background-position: 200% 0;
+            }
+
+            to {
+                background-position: -200% 0;
+            }
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .aviso-error {
+            padding: 12px 16px;
+            border-left: 4px solid #ef4444;
+            border-radius: 8px;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .barra-fila {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .perfiles-lista {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .perfil {
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #fff;
+            text-align: center;
+        }
+
+        .perfil img {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+        }
+
+        .perfil h3 {
+            margin: 8px 0 4px;
+            font-size: 1rem;
+        }
+
+        .perfil p {
+            margin: 2px 0;
+            font-size: 0.85rem;
+        }
+
+        .perfil-correo {
+            color: #64748b;
+            word-break: break-all;
+        }
+
+        .esqueleto-foto,
+        .esqueleto-linea {
+            margin: 0 auto 10px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: brillo 1.2s infinite linear;
+        }
+
+        .esqueleto-foto {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+        }
+
+        .esqueleto-linea {
+            width: 80%;
+            height: 14px;
+        }
+
+        .esqueleto-linea.corta {
+            width: 50%;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="barra-fila"&gt;
+        &lt;label for="perfiles-pais"&gt;Nacionalidad&lt;/label&gt;
+        &lt;select id="perfiles-pais"&gt;
+            &lt;option value="es"&gt;España&lt;/option&gt;
+            &lt;option value="mx"&gt;México&lt;/option&gt;
+            &lt;option value="br"&gt;Brasil&lt;/option&gt;
+            &lt;option value="fr"&gt;Francia&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;button type="button" id="perfiles-boton"&gt;Generar 3 perfiles&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div id="perfiles-lista" class="perfiles-lista"&gt;&lt;/div&gt;
+    &lt;script&gt;
+        const perfilesPais = document.querySelector("#perfiles-pais");
+        const perfilesBoton = document.querySelector("#perfiles-boton");
+        const perfilesLista = document.querySelector("#perfiles-lista");
+
+        function mostrarEsqueletos(cantidad) {
+            perfilesLista.innerHTML = "";
+            for (let i = 0; i &lt; cantidad; i++) {
+                perfilesLista.innerHTML += `
+                    &lt;div class="perfil esqueleto"&gt;
+                        &lt;div class="esqueleto-foto"&gt;&lt;/div&gt;
+                        &lt;div class="esqueleto-linea"&gt;&lt;/div&gt;
+                        &lt;div class="esqueleto-linea corta"&gt;&lt;/div&gt;
+                    &lt;/div&gt;
+                `;
+            }
+        }
+
+        async function generarPerfiles() {
+            mostrarEsqueletos(3);
+            const parametros = new URLSearchParams({ results: 3, nat: perfilesPais.value });
+            try {
+                const respuesta = await fetch(`https://randomuser.me/api/?${parametros}`);
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const datos = await respuesta.json();
+                perfilesLista.innerHTML = datos.results.map((persona) =&gt; `
+                    &lt;div class="perfil"&gt;
+                        &lt;img src="${persona.picture.large}" alt="Foto de ${persona.name.first}"&gt;
+                        &lt;h3&gt;${persona.name.first} ${persona.name.last}&lt;/h3&gt;
+                        &lt;p&gt;${persona.dob.age} años · ${persona.location.city}&lt;/p&gt;
+                        &lt;p class="perfil-correo"&gt;${persona.email}&lt;/p&gt;
+                    &lt;/div&gt;
+                `).join("");
+            } catch {
+                perfilesLista.innerHTML = `&lt;p class="aviso-error"&gt;No se pudieron generar los perfiles. Revisa tu conexión.&lt;/p&gt;`;
+            }
+        }
+
+        perfilesBoton.addEventListener("click", generarPerfiles);
+        perfilesPais.addEventListener("change", generarPerfiles);
+        generarPerfiles();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-perros" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Galería de perros por raza</h2>
+            <p>Dos pedidos encadenados: primero la lista de razas para llenar el <code>select</code>; luego, cada vez que cambia, seis fotos al azar de esa raza. Mientras no llega la lista, los controles quedan desactivados.</p>
+            <div class="resultado">
+                <div class="barra-fila">
+                    <label for="perros-raza">Raza</label>
+                    <select id="perros-raza" disabled>
+                        <option>Cargando razas…</option>
+                    </select>
+                    <button type="button" id="perros-otras" disabled>Otras fotos</button>
+                </div>
+                <p id="perros-estado" class="estado"></p>
+                <div id="perros-galeria" class="perros-galeria"></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="barra-fila"&gt;
+    &lt;label for="perros-raza"&gt;Raza&lt;/label&gt;
+    &lt;select id="perros-raza" disabled&gt;
+        &lt;option&gt;Cargando razas…&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;button type="button" id="perros-otras" disabled&gt;Otras fotos&lt;/button&gt;
+&lt;/div&gt;
+&lt;p id="perros-estado" class="estado"&gt;&lt;/p&gt;
+&lt;div id="perros-galeria" class="perros-galeria"&gt;&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const perrosRaza = document.querySelector("#perros-raza");
+const perrosOtras = document.querySelector("#perros-otras");
+const perrosEstado = document.querySelector("#perros-estado");
+const perrosGaleria = document.querySelector("#perros-galeria");
+
+async function cargarFotos() {
+    perrosEstado.textContent = "Buscando perritos…";
+    perrosGaleria.innerHTML = "";
+    try {
+        const respuesta = await fetch(`https://dog.ceo/api/breed/${perrosRaza.value}/images/random/6`);
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const datos = await respuesta.json();
+        perrosGaleria.innerHTML = datos.message
+            .map((url) =&gt; `&lt;img src="${url}" alt="Perro de raza ${perrosRaza.value}" loading="lazy"&gt;`)
+            .join("");
+        perrosEstado.textContent = "";
+    } catch {
+        perrosEstado.textContent = "🐶💤 No pudimos traer las fotos. Intenta otra vez.";
+    }
+}
+
+async function cargarRazas() {
+    try {
+        const respuesta = await fetch("https://dog.ceo/api/breeds/list/all");
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const datos = await respuesta.json();
+        const razas = Object.keys(datos.message);
+        perrosRaza.innerHTML = razas.map((raza) =&gt; `&lt;option value="${raza}"&gt;${raza}&lt;/option&gt;`).join("");
+        perrosRaza.value = "beagle";
+        perrosRaza.disabled = false;
+        perrosOtras.disabled = false;
+        cargarFotos();
+    } catch {
+        perrosEstado.textContent = "No pudimos cargar la lista de razas. Recarga la página para reintentar.";
+    }
+}
+
+perrosRaza.addEventListener("change", cargarFotos);
+perrosOtras.addEventListener("click", cargarFotos);
+cargarRazas();</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Galería de perros por raza&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .estado {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .barra-fila {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .perros-galeria {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+        }
+
+        .perros-galeria img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #e2e8f0;
+        }
+
+        #perros-raza {
+            text-transform: capitalize;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="barra-fila"&gt;
+        &lt;label for="perros-raza"&gt;Raza&lt;/label&gt;
+        &lt;select id="perros-raza" disabled&gt;
+            &lt;option&gt;Cargando razas…&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;button type="button" id="perros-otras" disabled&gt;Otras fotos&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p id="perros-estado" class="estado"&gt;&lt;/p&gt;
+    &lt;div id="perros-galeria" class="perros-galeria"&gt;&lt;/div&gt;
+    &lt;script&gt;
+        const perrosRaza = document.querySelector("#perros-raza");
+        const perrosOtras = document.querySelector("#perros-otras");
+        const perrosEstado = document.querySelector("#perros-estado");
+        const perrosGaleria = document.querySelector("#perros-galeria");
+
+        async function cargarFotos() {
+            perrosEstado.textContent = "Buscando perritos…";
+            perrosGaleria.innerHTML = "";
+            try {
+                const respuesta = await fetch(`https://dog.ceo/api/breed/${perrosRaza.value}/images/random/6`);
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const datos = await respuesta.json();
+                perrosGaleria.innerHTML = datos.message
+                    .map((url) =&gt; `&lt;img src="${url}" alt="Perro de raza ${perrosRaza.value}" loading="lazy"&gt;`)
+                    .join("");
+                perrosEstado.textContent = "";
+            } catch {
+                perrosEstado.textContent = "🐶💤 No pudimos traer las fotos. Intenta otra vez.";
+            }
+        }
+
+        async function cargarRazas() {
+            try {
+                const respuesta = await fetch("https://dog.ceo/api/breeds/list/all");
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const datos = await respuesta.json();
+                const razas = Object.keys(datos.message);
+                perrosRaza.innerHTML = razas.map((raza) =&gt; `&lt;option value="${raza}"&gt;${raza}&lt;/option&gt;`).join("");
+                perrosRaza.value = "beagle";
+                perrosRaza.disabled = false;
+                perrosOtras.disabled = false;
+                cargarFotos();
+            } catch {
+                perrosEstado.textContent = "No pudimos cargar la lista de razas. Recarga la página para reintentar.";
+            }
+        }
+
+        perrosRaza.addEventListener("change", cargarFotos);
+        perrosOtras.addEventListener("click", cargarFotos);
+        cargarRazas();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-monedas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Conversor de monedas con tasas reales</h2>
+            <p>Las tasas se piden <strong>una sola vez</strong> al cargar y se guardan en una variable; luego cada cambio en el monto o en las monedas se calcula al instante, sin volver a la red. <code>Intl.NumberFormat</code> pone el símbolo y los decimales correctos.</p>
+            <div class="resultado">
+                <div class="conversor">
+                    <label for="conversor-monto">Monto</label>
+                    <input type="number" id="conversor-monto" value="100" min="0" step="0.01">
+                    <label for="conversor-de">De</label>
+                    <select id="conversor-de"></select>
+                    <button type="button" id="conversor-invertir" aria-label="Invertir monedas">⇄</button>
+                    <label for="conversor-a">A</label>
+                    <select id="conversor-a"></select>
+                </div>
+                <p id="conversor-resultado" class="conversor-resultado" aria-live="polite"></p>
+                <p id="conversor-fecha" class="estado"></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="conversor"&gt;
+    &lt;label for="conversor-monto"&gt;Monto&lt;/label&gt;
+    &lt;input type="number" id="conversor-monto" value="100" min="0" step="0.01"&gt;
+    &lt;label for="conversor-de"&gt;De&lt;/label&gt;
+    &lt;select id="conversor-de"&gt;&lt;/select&gt;
+    &lt;button type="button" id="conversor-invertir" aria-label="Invertir monedas"&gt;⇄&lt;/button&gt;
+    &lt;label for="conversor-a"&gt;A&lt;/label&gt;
+    &lt;select id="conversor-a"&gt;&lt;/select&gt;
+&lt;/div&gt;
+&lt;p id="conversor-resultado" class="conversor-resultado" aria-live="polite"&gt;&lt;/p&gt;
+&lt;p id="conversor-fecha" class="estado"&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const conversorMonto = document.querySelector("#conversor-monto");
+const conversorDe = document.querySelector("#conversor-de");
+const conversorA = document.querySelector("#conversor-a");
+const conversorInvertir = document.querySelector("#conversor-invertir");
+const conversorResultado = document.querySelector("#conversor-resultado");
+const conversorFecha = document.querySelector("#conversor-fecha");
+
+const monedas = ["USD", "EUR", "MXN", "COP", "PEN", "CLP", "ARS", "BRL", "GBP", "JPY"];
+let tasas = null;
+
+for (const moneda of monedas) {
+    conversorDe.add(new Option(moneda, moneda));
+    conversorA.add(new Option(moneda, moneda));
+}
+conversorDe.value = "USD";
+conversorA.value = "MXN";
+
+function convertir() {
+    if (!tasas) {
+        return;
+    }
+    const monto = Number(conversorMonto.value);
+    const resultado = (monto / tasas[conversorDe.value]) * tasas[conversorA.value];
+    const formato = new Intl.NumberFormat("es", { style: "currency", currency: conversorA.value });
+    conversorResultado.textContent = `${monto} ${conversorDe.value} = ${formato.format(resultado)}`;
+}
+
+async function cargarTasas() {
+    conversorResultado.textContent = "Cargando tasas de cambio…";
+    try {
+        const respuesta = await fetch("https://open.er-api.com/v6/latest/USD");
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const datos = await respuesta.json();
+        tasas = datos.rates;
+        const fecha = new Date(datos.time_last_update_unix * 1000);
+        conversorFecha.textContent = `Tasas actualizadas el ${fecha.toLocaleString("es")}`;
+        convertir();
+    } catch {
+        conversorResultado.textContent = "No se pudieron cargar las tasas. Revisa tu conexión.";
+    }
+}
+
+conversorMonto.addEventListener("input", convertir);
+conversorDe.addEventListener("change", convertir);
+conversorA.addEventListener("change", convertir);
+conversorInvertir.addEventListener("click", () =&gt; {
+    const de = conversorDe.value;
+    conversorDe.value = conversorA.value;
+    conversorA.value = de;
+    convertir();
+});
+
+cargarTasas();</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Conversor de monedas con tasas reales&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .estado {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .conversor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .conversor input {
+            width: 130px;
+        }
+
+        .conversor-resultado {
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="conversor"&gt;
+        &lt;label for="conversor-monto"&gt;Monto&lt;/label&gt;
+        &lt;input type="number" id="conversor-monto" value="100" min="0" step="0.01"&gt;
+        &lt;label for="conversor-de"&gt;De&lt;/label&gt;
+        &lt;select id="conversor-de"&gt;&lt;/select&gt;
+        &lt;button type="button" id="conversor-invertir" aria-label="Invertir monedas"&gt;⇄&lt;/button&gt;
+        &lt;label for="conversor-a"&gt;A&lt;/label&gt;
+        &lt;select id="conversor-a"&gt;&lt;/select&gt;
+    &lt;/div&gt;
+    &lt;p id="conversor-resultado" class="conversor-resultado" aria-live="polite"&gt;&lt;/p&gt;
+    &lt;p id="conversor-fecha" class="estado"&gt;&lt;/p&gt;
+    &lt;script&gt;
+        const conversorMonto = document.querySelector("#conversor-monto");
+        const conversorDe = document.querySelector("#conversor-de");
+        const conversorA = document.querySelector("#conversor-a");
+        const conversorInvertir = document.querySelector("#conversor-invertir");
+        const conversorResultado = document.querySelector("#conversor-resultado");
+        const conversorFecha = document.querySelector("#conversor-fecha");
+
+        const monedas = ["USD", "EUR", "MXN", "COP", "PEN", "CLP", "ARS", "BRL", "GBP", "JPY"];
+        let tasas = null;
+
+        for (const moneda of monedas) {
+            conversorDe.add(new Option(moneda, moneda));
+            conversorA.add(new Option(moneda, moneda));
+        }
+        conversorDe.value = "USD";
+        conversorA.value = "MXN";
+
+        function convertir() {
+            if (!tasas) {
+                return;
+            }
+            const monto = Number(conversorMonto.value);
+            const resultado = (monto / tasas[conversorDe.value]) * tasas[conversorA.value];
+            const formato = new Intl.NumberFormat("es", { style: "currency", currency: conversorA.value });
+            conversorResultado.textContent = `${monto} ${conversorDe.value} = ${formato.format(resultado)}`;
+        }
+
+        async function cargarTasas() {
+            conversorResultado.textContent = "Cargando tasas de cambio…";
+            try {
+                const respuesta = await fetch("https://open.er-api.com/v6/latest/USD");
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const datos = await respuesta.json();
+                tasas = datos.rates;
+                const fecha = new Date(datos.time_last_update_unix * 1000);
+                conversorFecha.textContent = `Tasas actualizadas el ${fecha.toLocaleString("es")}`;
+                convertir();
+            } catch {
+                conversorResultado.textContent = "No se pudieron cargar las tasas. Revisa tu conexión.";
+            }
+        }
+
+        conversorMonto.addEventListener("input", convertir);
+        conversorDe.addEventListener("change", convertir);
+        conversorA.addEventListener("change", convertir);
+        conversorInvertir.addEventListener("click", () =&gt; {
+            const de = conversorDe.value;
+            conversorDe.value = conversorA.value;
+            conversorA.value = de;
+            convertir();
+        });
+
+        cargarTasas();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-paginacion" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Lista de publicaciones con paginación</h2>
+            <p>JSONPlaceholder entiende <code>_page</code> y <code>_limit</code> y avisa el total en la cabecera <code>X-Total-Count</code>. Con eso se calculan las páginas y se activan o desactivan los botones. Si falla, aparece un botón para reintentar.</p>
+            <div class="resultado">
+                <ul id="posts-lista" class="posts-lista"></ul>
+                <div class="posts-paginas">
+                    <button type="button" id="posts-anterior">← Anterior</button>
+                    <span id="posts-info">Página 1</span>
+                    <button type="button" id="posts-siguiente">Siguiente →</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;ul id="posts-lista" class="posts-lista"&gt;&lt;/ul&gt;
+&lt;div class="posts-paginas"&gt;
+    &lt;button type="button" id="posts-anterior"&gt;← Anterior&lt;/button&gt;
+    &lt;span id="posts-info"&gt;Página 1&lt;/span&gt;
+    &lt;button type="button" id="posts-siguiente"&gt;Siguiente →&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const postsLista = document.querySelector("#posts-lista");
+const postsAnterior = document.querySelector("#posts-anterior");
+const postsSiguiente = document.querySelector("#posts-siguiente");
+const postsInfo = document.querySelector("#posts-info");
+
+const porPagina = 4;
+let pagina = 1;
+let totalPaginas = 1;
+
+async function cargarPagina() {
+    postsLista.innerHTML = `&lt;li class="estado"&gt;Cargando página ${pagina}…&lt;/li&gt;`;
+    postsAnterior.disabled = true;
+    postsSiguiente.disabled = true;
+    const parametros = new URLSearchParams({ _page: pagina, _limit: porPagina });
+    try {
+        const respuesta = await fetch(`https://jsonplaceholder.typicode.com/posts?${parametros}`);
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const total = Number(respuesta.headers.get("X-Total-Count"));
+        totalPaginas = Math.ceil(total / porPagina);
+        const posts = await respuesta.json();
+        postsLista.innerHTML = posts.map((post) =&gt; `
+            &lt;li&gt;
+                &lt;strong&gt;#${post.id} ${post.title}&lt;/strong&gt;
+                &lt;p&gt;${post.body}&lt;/p&gt;
+            &lt;/li&gt;
+        `).join("");
+        postsInfo.textContent = `Página ${pagina} de ${totalPaginas}`;
+        postsAnterior.disabled = pagina === 1;
+        postsSiguiente.disabled = pagina === totalPaginas;
+    } catch {
+        postsLista.innerHTML = `
+            &lt;li class="aviso-error"&gt;
+                No pudimos cargar las publicaciones.
+                &lt;button type="button" class="posts-reintentar"&gt;Reintentar&lt;/button&gt;
+            &lt;/li&gt;
+        `;
+    }
+}
+
+postsAnterior.addEventListener("click", () =&gt; {
+    pagina--;
+    cargarPagina();
+});
+
+postsSiguiente.addEventListener("click", () =&gt; {
+    pagina++;
+    cargarPagina();
+});
+
+postsLista.addEventListener("click", (evento) =&gt; {
+    if (evento.target.classList.contains("posts-reintentar")) {
+        cargarPagina();
+    }
+});
+
+cargarPagina();</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Lista de publicaciones con paginación&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .estado {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .aviso-error {
+            padding: 12px 16px;
+            border-left: 4px solid #ef4444;
+            border-radius: 8px;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .posts-lista {
+            display: grid;
+            gap: 8px;
+            min-height: 200px;
+            margin: 0 0 12px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .posts-lista li {
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .posts-lista p {
+            margin: 4px 0 0;
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .posts-paginas {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;ul id="posts-lista" class="posts-lista"&gt;&lt;/ul&gt;
+    &lt;div class="posts-paginas"&gt;
+        &lt;button type="button" id="posts-anterior"&gt;← Anterior&lt;/button&gt;
+        &lt;span id="posts-info"&gt;Página 1&lt;/span&gt;
+        &lt;button type="button" id="posts-siguiente"&gt;Siguiente →&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const postsLista = document.querySelector("#posts-lista");
+        const postsAnterior = document.querySelector("#posts-anterior");
+        const postsSiguiente = document.querySelector("#posts-siguiente");
+        const postsInfo = document.querySelector("#posts-info");
+
+        const porPagina = 4;
+        let pagina = 1;
+        let totalPaginas = 1;
+
+        async function cargarPagina() {
+            postsLista.innerHTML = `&lt;li class="estado"&gt;Cargando página ${pagina}…&lt;/li&gt;`;
+            postsAnterior.disabled = true;
+            postsSiguiente.disabled = true;
+            const parametros = new URLSearchParams({ _page: pagina, _limit: porPagina });
+            try {
+                const respuesta = await fetch(`https://jsonplaceholder.typicode.com/posts?${parametros}`);
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const total = Number(respuesta.headers.get("X-Total-Count"));
+                totalPaginas = Math.ceil(total / porPagina);
+                const posts = await respuesta.json();
+                postsLista.innerHTML = posts.map((post) =&gt; `
+                    &lt;li&gt;
+                        &lt;strong&gt;#${post.id} ${post.title}&lt;/strong&gt;
+                        &lt;p&gt;${post.body}&lt;/p&gt;
+                    &lt;/li&gt;
+                `).join("");
+                postsInfo.textContent = `Página ${pagina} de ${totalPaginas}`;
+                postsAnterior.disabled = pagina === 1;
+                postsSiguiente.disabled = pagina === totalPaginas;
+            } catch {
+                postsLista.innerHTML = `
+                    &lt;li class="aviso-error"&gt;
+                        No pudimos cargar las publicaciones.
+                        &lt;button type="button" class="posts-reintentar"&gt;Reintentar&lt;/button&gt;
+                    &lt;/li&gt;
+                `;
+            }
+        }
+
+        postsAnterior.addEventListener("click", () =&gt; {
+            pagina--;
+            cargarPagina();
+        });
+
+        postsSiguiente.addEventListener("click", () =&gt; {
+            pagina++;
+            cargarPagina();
+        });
+
+        postsLista.addEventListener("click", (evento) =&gt; {
+            if (evento.target.classList.contains("posts-reintentar")) {
+                cargarPagina();
+            }
+        });
+
+        cargarPagina();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-buscador" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Buscador de ciudades con debounce y AbortController</h2>
+            <p>Si buscáramos en cada tecla, «Barranquilla» enviaría 12 pedidos. El <strong>debounce</strong> espera a que la persona deje de escribir 400 ms. Y si llega una búsqueda nueva mientras otra sigue en camino, la vieja se <strong>cancela</strong> con <code>AbortController</code> para que no pise a la nueva. Escribe rápido y mira los contadores.</p>
+            <div class="resultado">
+                <label for="ciudad-busqueda">Busca una ciudad</label>
+                <input type="search" id="ciudad-busqueda" placeholder="Ej.: Barranquilla" autocomplete="off">
+                <p id="ciudad-estado" class="estado">Escribe al menos 2 letras.</p>
+                <ul id="ciudad-resultados" class="ciudad-resultados"></ul>
+                <p class="estado">Pedidos enviados: <strong id="ciudad-pedidos">0</strong> · cancelados: <strong id="ciudad-cancelados">0</strong></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label for="ciudad-busqueda"&gt;Busca una ciudad&lt;/label&gt;
+&lt;input type="search" id="ciudad-busqueda" placeholder="Ej.: Barranquilla" autocomplete="off"&gt;
+&lt;p id="ciudad-estado" class="estado"&gt;Escribe al menos 2 letras.&lt;/p&gt;
+&lt;ul id="ciudad-resultados" class="ciudad-resultados"&gt;&lt;/ul&gt;
+&lt;p class="estado"&gt;Pedidos enviados: &lt;strong id="ciudad-pedidos"&gt;0&lt;/strong&gt; · cancelados: &lt;strong id="ciudad-cancelados"&gt;0&lt;/strong&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const ciudadBusqueda = document.querySelector("#ciudad-busqueda");
+const ciudadEstado = document.querySelector("#ciudad-estado");
+const ciudadResultados = document.querySelector("#ciudad-resultados");
+const ciudadPedidos = document.querySelector("#ciudad-pedidos");
+const ciudadCancelados = document.querySelector("#ciudad-cancelados");
+
+let controlador = null;
+let pedidos = 0;
+let cancelados = 0;
+
+function debounce(funcion, espera) {
+    let temporizador;
+    return () =&gt; {
+        clearTimeout(temporizador);
+        temporizador = setTimeout(funcion, espera);
+    };
+}
+
+async function buscarCiudades() {
+    const texto = ciudadBusqueda.value.trim();
+    if (controlador) {
+        controlador.abort();
+    }
+    if (texto.length &lt; 2) {
+        ciudadResultados.innerHTML = "";
+        ciudadEstado.textContent = "Escribe al menos 2 letras.";
+        return;
+    }
+    controlador = new AbortController();
+    const parametros = new URLSearchParams({ name: texto, count: 6, language: "es" });
+    ciudadEstado.textContent = `Buscando «${texto}»…`;
+    pedidos++;
+    ciudadPedidos.textContent = pedidos;
+    try {
+        const respuesta = await fetch(`https://geocoding-api.open-meteo.com/v1/search?${parametros}`, {
+            signal: controlador.signal
+        });
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const datos = await respuesta.json();
+        const ciudades = datos.results || [];
+        ciudadEstado.textContent = ciudades.length ? `${ciudades.length} resultados` : "Sin resultados.";
+        ciudadResultados.innerHTML = ciudades.map((ciudad) =&gt; `
+            &lt;li&gt;
+                &lt;img src="https://flagcdn.com/24x18/${(ciudad.country_code || "un").toLowerCase()}.png" alt=""&gt;
+                &lt;strong&gt;${ciudad.name}&lt;/strong&gt;, ${ciudad.admin1 || ""} (${ciudad.country || "?"})
+            &lt;/li&gt;
+        `).join("");
+    } catch (error) {
+        if (error.name === "AbortError") {
+            cancelados++;
+            ciudadCancelados.textContent = cancelados;
+            return;
+        }
+        ciudadEstado.textContent = "No pudimos buscar. Revisa tu conexión.";
+    }
+}
+
+ciudadBusqueda.addEventListener("input", debounce(buscarCiudades, 400));</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Buscador de ciudades con debounce y AbortController&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .estado {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        #ciudad-busqueda {
+            display: block;
+            width: min(100%, 360px);
+            margin-top: 4px;
+        }
+
+        .ciudad-resultados {
+            max-width: 480px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .ciudad-resultados li {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .ciudad-resultados img {
+            width: 24px;
+            height: 18px;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;label for="ciudad-busqueda"&gt;Busca una ciudad&lt;/label&gt;
+    &lt;input type="search" id="ciudad-busqueda" placeholder="Ej.: Barranquilla" autocomplete="off"&gt;
+    &lt;p id="ciudad-estado" class="estado"&gt;Escribe al menos 2 letras.&lt;/p&gt;
+    &lt;ul id="ciudad-resultados" class="ciudad-resultados"&gt;&lt;/ul&gt;
+    &lt;p class="estado"&gt;Pedidos enviados: &lt;strong id="ciudad-pedidos"&gt;0&lt;/strong&gt; · cancelados: &lt;strong id="ciudad-cancelados"&gt;0&lt;/strong&gt;&lt;/p&gt;
+    &lt;script&gt;
+        const ciudadBusqueda = document.querySelector("#ciudad-busqueda");
+        const ciudadEstado = document.querySelector("#ciudad-estado");
+        const ciudadResultados = document.querySelector("#ciudad-resultados");
+        const ciudadPedidos = document.querySelector("#ciudad-pedidos");
+        const ciudadCancelados = document.querySelector("#ciudad-cancelados");
+
+        let controlador = null;
+        let pedidos = 0;
+        let cancelados = 0;
+
+        function debounce(funcion, espera) {
+            let temporizador;
+            return () =&gt; {
+                clearTimeout(temporizador);
+                temporizador = setTimeout(funcion, espera);
+            };
+        }
+
+        async function buscarCiudades() {
+            const texto = ciudadBusqueda.value.trim();
+            if (controlador) {
+                controlador.abort();
+            }
+            if (texto.length &lt; 2) {
+                ciudadResultados.innerHTML = "";
+                ciudadEstado.textContent = "Escribe al menos 2 letras.";
+                return;
+            }
+            controlador = new AbortController();
+            const parametros = new URLSearchParams({ name: texto, count: 6, language: "es" });
+            ciudadEstado.textContent = `Buscando «${texto}»…`;
+            pedidos++;
+            ciudadPedidos.textContent = pedidos;
+            try {
+                const respuesta = await fetch(`https://geocoding-api.open-meteo.com/v1/search?${parametros}`, {
+                    signal: controlador.signal
+                });
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const datos = await respuesta.json();
+                const ciudades = datos.results || [];
+                ciudadEstado.textContent = ciudades.length ? `${ciudades.length} resultados` : "Sin resultados.";
+                ciudadResultados.innerHTML = ciudades.map((ciudad) =&gt; `
+                    &lt;li&gt;
+                        &lt;img src="https://flagcdn.com/24x18/${(ciudad.country_code || "un").toLowerCase()}.png" alt=""&gt;
+                        &lt;strong&gt;${ciudad.name}&lt;/strong&gt;, ${ciudad.admin1 || ""} (${ciudad.country || "?"})
+                    &lt;/li&gt;
+                `).join("");
+            } catch (error) {
+                if (error.name === "AbortError") {
+                    cancelados++;
+                    ciudadCancelados.textContent = cancelados;
+                    return;
+                }
+                ciudadEstado.textContent = "No pudimos buscar. Revisa tu conexión.";
+            }
+        }
+
+        ciudadBusqueda.addEventListener("input", debounce(buscarCiudades, 400));
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-post" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Crear una publicación con POST</h2>
+            <p>Para enviar datos se pasa un segundo argumento a <code>fetch</code> con el método, la cabecera <code>Content-Type</code> y el cuerpo convertido a JSON. JSONPlaceholder <strong>finge</strong> guardarlo: responde 201 y el objeto con un <code>id</code> nuevo, pero no lo guarda de verdad.</p>
+            <div class="resultado">
+                <form id="post-form" class="post-form">
+                    <label for="post-titulo">Título</label>
+                    <input type="text" id="post-titulo" required maxlength="80" placeholder="Mi primera publicación">
+                    <label for="post-cuerpo">Contenido</label>
+                    <textarea id="post-cuerpo" rows="3" required placeholder="¿Qué quieres contar?"></textarea>
+                    <button type="submit" id="post-enviar">Publicar</button>
+                </form>
+                <p id="post-mensaje" aria-live="polite"></p>
+                <output id="post-json" class="post-json"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="post-form" class="post-form"&gt;
+    &lt;label for="post-titulo"&gt;Título&lt;/label&gt;
+    &lt;input type="text" id="post-titulo" required maxlength="80" placeholder="Mi primera publicación"&gt;
+    &lt;label for="post-cuerpo"&gt;Contenido&lt;/label&gt;
+    &lt;textarea id="post-cuerpo" rows="3" required placeholder="¿Qué quieres contar?"&gt;&lt;/textarea&gt;
+    &lt;button type="submit" id="post-enviar"&gt;Publicar&lt;/button&gt;
+&lt;/form&gt;
+&lt;p id="post-mensaje" aria-live="polite"&gt;&lt;/p&gt;
+&lt;output id="post-json" class="post-json"&gt;&lt;/output&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const postForm = document.querySelector("#post-form");
+const postTitulo = document.querySelector("#post-titulo");
+const postCuerpo = document.querySelector("#post-cuerpo");
+const postEnviar = document.querySelector("#post-enviar");
+const postMensaje = document.querySelector("#post-mensaje");
+const postJson = document.querySelector("#post-json");
+
+postForm.addEventListener("submit", async (evento) =&gt; {
+    evento.preventDefault();
+    postEnviar.disabled = true;
+    postEnviar.textContent = "Publicando…";
+    const nueva = {
+        title: postTitulo.value.trim(),
+        body: postCuerpo.value.trim(),
+        userId: 1
+    };
+    try {
+        const respuesta = await fetch("https://jsonplaceholder.typicode.com/posts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(nueva)
+        });
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const creada = await respuesta.json();
+        postMensaje.textContent = `✅ Publicada con id ${creada.id} (estado ${respuesta.status})`;
+        postJson.textContent = JSON.stringify(creada, null, 2);
+        postForm.reset();
+    } catch {
+        postMensaje.textContent = "❌ No se pudo publicar. Tus datos siguen en el formulario.";
+    } finally {
+        postEnviar.disabled = false;
+        postEnviar.textContent = "Publicar";
+    }
+});</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Crear una publicación con POST&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .estado {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .post-form {
+            display: grid;
+            gap: 6px;
+            max-width: 420px;
+        }
+
+        .post-form button {
+            justify-self: start;
+            margin-top: 6px;
+        }
+
+        .post-json {
+            display: block;
+            max-width: 420px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #0f172a;
+            color: #a6e3a1;
+            font-family: "Courier New", monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+        }
+
+        .post-json:empty {
+            display: none;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="post-form" class="post-form"&gt;
+        &lt;label for="post-titulo"&gt;Título&lt;/label&gt;
+        &lt;input type="text" id="post-titulo" required maxlength="80" placeholder="Mi primera publicación"&gt;
+        &lt;label for="post-cuerpo"&gt;Contenido&lt;/label&gt;
+        &lt;textarea id="post-cuerpo" rows="3" required placeholder="¿Qué quieres contar?"&gt;&lt;/textarea&gt;
+        &lt;button type="submit" id="post-enviar"&gt;Publicar&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;p id="post-mensaje" aria-live="polite"&gt;&lt;/p&gt;
+    &lt;output id="post-json" class="post-json"&gt;&lt;/output&gt;
+    &lt;script&gt;
+        const postForm = document.querySelector("#post-form");
+        const postTitulo = document.querySelector("#post-titulo");
+        const postCuerpo = document.querySelector("#post-cuerpo");
+        const postEnviar = document.querySelector("#post-enviar");
+        const postMensaje = document.querySelector("#post-mensaje");
+        const postJson = document.querySelector("#post-json");
+
+        postForm.addEventListener("submit", async (evento) =&gt; {
+            evento.preventDefault();
+            postEnviar.disabled = true;
+            postEnviar.textContent = "Publicando…";
+            const nueva = {
+                title: postTitulo.value.trim(),
+                body: postCuerpo.value.trim(),
+                userId: 1
+            };
+            try {
+                const respuesta = await fetch("https://jsonplaceholder.typicode.com/posts", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(nueva)
+                });
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const creada = await respuesta.json();
+                postMensaje.textContent = `✅ Publicada con id ${creada.id} (estado ${respuesta.status})`;
+                postJson.textContent = JSON.stringify(creada, null, 2);
+                postForm.reset();
+            } catch {
+                postMensaje.textContent = "❌ No se pudo publicar. Tus datos siguen en el formulario.";
+            } finally {
+                postEnviar.disabled = false;
+                postEnviar.textContent = "Publicar";
+            }
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-github" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Perfil de GitHub</h2>
+            <p>La API de GitHub permite 60 consultas por hora sin clave; al pasarse responde 403, y lo explicamos con un mensaje propio. Como la biografía la escribe cada persona, se coloca con <code>textContent</code> y no dentro del <code>innerHTML</code>.</p>
+            <div class="resultado">
+                <form id="github-form" class="barra-fila">
+                    <label for="github-usuario">Usuario u organización</label>
+                    <input type="text" id="github-usuario" value="github" required>
+                    <button type="submit">Ver perfil</button>
+                </form>
+                <div id="github-perfil" class="github-perfil" aria-live="polite"></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="github-form" class="barra-fila"&gt;
+    &lt;label for="github-usuario"&gt;Usuario u organización&lt;/label&gt;
+    &lt;input type="text" id="github-usuario" value="github" required&gt;
+    &lt;button type="submit"&gt;Ver perfil&lt;/button&gt;
+&lt;/form&gt;
+&lt;div id="github-perfil" class="github-perfil" aria-live="polite"&gt;&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const githubForm = document.querySelector("#github-form");
+const githubUsuario = document.querySelector("#github-usuario");
+const githubPerfil = document.querySelector("#github-perfil");
+
+async function verPerfil(usuario) {
+    githubPerfil.textContent = "Cargando perfil…";
+    try {
+        const respuesta = await fetch(`https://api.github.com/users/${encodeURIComponent(usuario.trim())}`);
+        if (respuesta.status === 404) {
+            githubPerfil.textContent = "Ese usuario no existe en GitHub.";
+            return;
+        }
+        if (respuesta.status === 403) {
+            githubPerfil.textContent = "GitHub limita a 60 consultas por hora. Prueba más tarde.";
+            return;
+        }
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const perfil = await respuesta.json();
+        githubPerfil.innerHTML = `
+            &lt;img src="${perfil.avatar_url}" alt="Avatar de ${perfil.login}"&gt;
+            &lt;div&gt;
+                &lt;h3&gt;&lt;/h3&gt;
+                &lt;p class="github-bio"&gt;&lt;/p&gt;
+                &lt;p&gt;📦 ${perfil.public_repos} repos · 👥 ${perfil.followers.toLocaleString("es")} seguidores · 📅 desde ${new Date(perfil.created_at).getFullYear()}&lt;/p&gt;
+                &lt;a href="${perfil.html_url}" target="_blank" rel="noopener"&gt;Ver en GitHub ↗&lt;/a&gt;
+            &lt;/div&gt;
+        `;
+        githubPerfil.querySelector("h3").textContent = perfil.name || perfil.login;
+        githubPerfil.querySelector(".github-bio").textContent = perfil.bio || "Sin biografía.";
+    } catch {
+        githubPerfil.textContent = "No pudimos conectar con GitHub. Revisa tu conexión.";
+    }
+}
+
+githubForm.addEventListener("submit", (evento) =&gt; {
+    evento.preventDefault();
+    verPerfil(githubUsuario.value);
+});
+
+verPerfil(githubUsuario.value);</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Perfil de GitHub&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .barra-fila {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .perfil {
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #fff;
+            text-align: center;
+        }
+
+        .perfil img {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+        }
+
+        .perfil h3 {
+            margin: 8px 0 4px;
+            font-size: 1rem;
+        }
+
+        .perfil p {
+            margin: 2px 0;
+            font-size: 0.85rem;
+        }
+
+        .github-perfil {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            max-width: 560px;
+            margin-top: 16px;
+            padding: 16px;
+            border: 1px solid #d0d7de;
+            border-radius: 12px;
+            background: #f6f8fa;
+        }
+
+        .github-perfil img {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+        }
+
+        .github-perfil h3 {
+            margin: 0;
+        }
+
+        .github-perfil p {
+            margin: 4px 0;
+        }
+
+        .github-bio {
+            color: #57606a;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="github-form" class="barra-fila"&gt;
+        &lt;label for="github-usuario"&gt;Usuario u organización&lt;/label&gt;
+        &lt;input type="text" id="github-usuario" value="github" required&gt;
+        &lt;button type="submit"&gt;Ver perfil&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;div id="github-perfil" class="github-perfil" aria-live="polite"&gt;&lt;/div&gt;
+    &lt;script&gt;
+        const githubForm = document.querySelector("#github-form");
+        const githubUsuario = document.querySelector("#github-usuario");
+        const githubPerfil = document.querySelector("#github-perfil");
+
+        async function verPerfil(usuario) {
+            githubPerfil.textContent = "Cargando perfil…";
+            try {
+                const respuesta = await fetch(`https://api.github.com/users/${encodeURIComponent(usuario.trim())}`);
+                if (respuesta.status === 404) {
+                    githubPerfil.textContent = "Ese usuario no existe en GitHub.";
+                    return;
+                }
+                if (respuesta.status === 403) {
+                    githubPerfil.textContent = "GitHub limita a 60 consultas por hora. Prueba más tarde.";
+                    return;
+                }
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const perfil = await respuesta.json();
+                githubPerfil.innerHTML = `
+                    &lt;img src="${perfil.avatar_url}" alt="Avatar de ${perfil.login}"&gt;
+                    &lt;div&gt;
+                        &lt;h3&gt;&lt;/h3&gt;
+                        &lt;p class="github-bio"&gt;&lt;/p&gt;
+                        &lt;p&gt;📦 ${perfil.public_repos} repos · 👥 ${perfil.followers.toLocaleString("es")} seguidores · 📅 desde ${new Date(perfil.created_at).getFullYear()}&lt;/p&gt;
+                        &lt;a href="${perfil.html_url}" target="_blank" rel="noopener"&gt;Ver en GitHub ↗&lt;/a&gt;
+                    &lt;/div&gt;
+                `;
+                githubPerfil.querySelector("h3").textContent = perfil.name || perfil.login;
+                githubPerfil.querySelector(".github-bio").textContent = perfil.bio || "Sin biografía.";
+            } catch {
+                githubPerfil.textContent = "No pudimos conectar con GitHub. Revisa tu conexión.";
+            }
+        }
+
+        githubForm.addEventListener("submit", (evento) =&gt; {
+            evento.preventDefault();
+            verPerfil(githubUsuario.value);
+        });
+
+        verPerfil(githubUsuario.value);
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-pais" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Ficha de país con bandera: varios pedidos en paralelo</h2>
+            <p>La ficha necesita tres datos de tres servidores distintos: la capital (geocodificación), el clima y la tasa de cambio. Con <code>Promise.all</code> se piden <strong>a la vez</strong> y se espera a que lleguen todos; si uno falla, falla el conjunto y lo atrapa el <code>catch</code>. La bandera es una imagen de flagcdn.</p>
+            <div class="resultado">
+                <label for="pais-select">País</label>
+                <select id="pais-select">
+                    <option value="PA" data-capital="Panamá" data-moneda="PAB" data-coordenadas="8.99,-79.52">Panamá</option>
+                    <option value="MX" data-capital="Ciudad de México" data-moneda="MXN" data-coordenadas="19.43,-99.13">México</option>
+                    <option value="CO" data-capital="Bogotá" data-moneda="COP" data-coordenadas="4.61,-74.08">Colombia</option>
+                    <option value="ES" data-capital="Madrid" data-moneda="EUR" data-coordenadas="40.42,-3.70">España</option>
+                    <option value="AR" data-capital="Buenos Aires" data-moneda="ARS" data-coordenadas="-34.61,-58.38">Argentina</option>
+                    <option value="PE" data-capital="Lima" data-moneda="PEN" data-coordenadas="-12.04,-77.03">Perú</option>
+                    <option value="JP" data-capital="Tokio" data-moneda="JPY" data-coordenadas="35.69,139.69">Japón</option>
+                </select>
+                <article id="pais-ficha" class="pais-ficha" aria-live="polite"></article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label for="pais-select"&gt;País&lt;/label&gt;
+&lt;select id="pais-select"&gt;
+    &lt;option value="PA" data-capital="Panamá" data-moneda="PAB" data-coordenadas="8.99,-79.52"&gt;Panamá&lt;/option&gt;
+    &lt;option value="MX" data-capital="Ciudad de México" data-moneda="MXN" data-coordenadas="19.43,-99.13"&gt;México&lt;/option&gt;
+    &lt;option value="CO" data-capital="Bogotá" data-moneda="COP" data-coordenadas="4.61,-74.08"&gt;Colombia&lt;/option&gt;
+    &lt;option value="ES" data-capital="Madrid" data-moneda="EUR" data-coordenadas="40.42,-3.70"&gt;España&lt;/option&gt;
+    &lt;option value="AR" data-capital="Buenos Aires" data-moneda="ARS" data-coordenadas="-34.61,-58.38"&gt;Argentina&lt;/option&gt;
+    &lt;option value="PE" data-capital="Lima" data-moneda="PEN" data-coordenadas="-12.04,-77.03"&gt;Perú&lt;/option&gt;
+    &lt;option value="JP" data-capital="Tokio" data-moneda="JPY" data-coordenadas="35.69,139.69"&gt;Japón&lt;/option&gt;
+&lt;/select&gt;
+&lt;article id="pais-ficha" class="pais-ficha" aria-live="polite"&gt;&lt;/article&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const paisSelect = document.querySelector("#pais-select");
+const paisFicha = document.querySelector("#pais-ficha");
+
+async function pedirJSON(url) {
+    const respuesta = await fetch(url);
+    if (!respuesta.ok) {
+        throw new Error(`Error HTTP ${respuesta.status}`);
+    }
+    return respuesta.json();
+}
+
+async function mostrarPais() {
+    const opcion = paisSelect.selectedOptions[0];
+    const codigo = opcion.value;
+    const { capital, moneda, coordenadas } = opcion.dataset;
+    const [latitud, longitud] = coordenadas.split(",");
+    const busqueda = new URLSearchParams({ name: capital, count: 1, language: "es", countryCode: codigo });
+    const clima = new URLSearchParams({ latitude: latitud, longitude: longitud, current: "temperature_2m" });
+
+    paisFicha.innerHTML = `&lt;p class="estado"&gt;Cargando la ficha de ${opcion.text}…&lt;/p&gt;`;
+    const inicio = performance.now();
+    try {
+        const [geo, tiempo, cambio] = await Promise.all([
+            pedirJSON(`https://geocoding-api.open-meteo.com/v1/search?${busqueda}`),
+            pedirJSON(`https://api.open-meteo.com/v1/forecast?${clima}`),
+            pedirJSON("https://open.er-api.com/v6/latest/USD")
+        ]);
+        const lugar = geo.results[0];
+        const milisegundos = Math.round(performance.now() - inicio);
+        paisFicha.innerHTML = `
+            &lt;img src="https://flagcdn.com/w160/${codigo.toLowerCase()}.png" alt="Bandera de ${opcion.text}"&gt;
+            &lt;div&gt;
+                &lt;h3&gt;${opcion.text}&lt;/h3&gt;
+                &lt;p&gt;🏛️ Capital: ${lugar.name} (${(lugar.population || 0).toLocaleString("es")} hab.)&lt;/p&gt;
+                &lt;p&gt;🕒 Zona horaria: ${lugar.timezone}&lt;/p&gt;
+                &lt;p&gt;🌡️ Ahora en la capital: ${Math.round(tiempo.current.temperature_2m)} °C&lt;/p&gt;
+                &lt;p&gt;💵 1 USD = ${cambio.rates[moneda].toLocaleString("es")} ${moneda}&lt;/p&gt;
+                &lt;p class="estado"&gt;3 pedidos en paralelo en ${milisegundos} ms&lt;/p&gt;
+            &lt;/div&gt;
+        `;
+    } catch {
+        paisFicha.innerHTML = `&lt;p class="aviso-error"&gt;No pudimos armar la ficha. Revisa tu conexión.&lt;/p&gt;`;
+    }
+}
+
+paisSelect.addEventListener("change", mostrarPais);
+mostrarPais();</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Ficha de país con bandera: varios pedidos en paralelo&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .estado {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .aviso-error {
+            padding: 12px 16px;
+            border-left: 4px solid #ef4444;
+            border-radius: 8px;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .pais-ficha {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            max-width: 560px;
+            margin-top: 12px;
+            padding: 16px;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+        }
+
+        .pais-ficha img {
+            width: 160px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+
+        .pais-ficha h3 {
+            margin: 0 0 4px;
+        }
+
+        .pais-ficha p {
+            margin: 2px 0;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;label for="pais-select"&gt;País&lt;/label&gt;
+    &lt;select id="pais-select"&gt;
+        &lt;option value="PA" data-capital="Panamá" data-moneda="PAB" data-coordenadas="8.99,-79.52"&gt;Panamá&lt;/option&gt;
+        &lt;option value="MX" data-capital="Ciudad de México" data-moneda="MXN" data-coordenadas="19.43,-99.13"&gt;México&lt;/option&gt;
+        &lt;option value="CO" data-capital="Bogotá" data-moneda="COP" data-coordenadas="4.61,-74.08"&gt;Colombia&lt;/option&gt;
+        &lt;option value="ES" data-capital="Madrid" data-moneda="EUR" data-coordenadas="40.42,-3.70"&gt;España&lt;/option&gt;
+        &lt;option value="AR" data-capital="Buenos Aires" data-moneda="ARS" data-coordenadas="-34.61,-58.38"&gt;Argentina&lt;/option&gt;
+        &lt;option value="PE" data-capital="Lima" data-moneda="PEN" data-coordenadas="-12.04,-77.03"&gt;Perú&lt;/option&gt;
+        &lt;option value="JP" data-capital="Tokio" data-moneda="JPY" data-coordenadas="35.69,139.69"&gt;Japón&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;article id="pais-ficha" class="pais-ficha" aria-live="polite"&gt;&lt;/article&gt;
+    &lt;script&gt;
+        const paisSelect = document.querySelector("#pais-select");
+        const paisFicha = document.querySelector("#pais-ficha");
+
+        async function pedirJSON(url) {
+            const respuesta = await fetch(url);
+            if (!respuesta.ok) {
+                throw new Error(`Error HTTP ${respuesta.status}`);
+            }
+            return respuesta.json();
+        }
+
+        async function mostrarPais() {
+            const opcion = paisSelect.selectedOptions[0];
+            const codigo = opcion.value;
+            const { capital, moneda, coordenadas } = opcion.dataset;
+            const [latitud, longitud] = coordenadas.split(",");
+            const busqueda = new URLSearchParams({ name: capital, count: 1, language: "es", countryCode: codigo });
+            const clima = new URLSearchParams({ latitude: latitud, longitude: longitud, current: "temperature_2m" });
+
+            paisFicha.innerHTML = `&lt;p class="estado"&gt;Cargando la ficha de ${opcion.text}…&lt;/p&gt;`;
+            const inicio = performance.now();
+            try {
+                const [geo, tiempo, cambio] = await Promise.all([
+                    pedirJSON(`https://geocoding-api.open-meteo.com/v1/search?${busqueda}`),
+                    pedirJSON(`https://api.open-meteo.com/v1/forecast?${clima}`),
+                    pedirJSON("https://open.er-api.com/v6/latest/USD")
+                ]);
+                const lugar = geo.results[0];
+                const milisegundos = Math.round(performance.now() - inicio);
+                paisFicha.innerHTML = `
+                    &lt;img src="https://flagcdn.com/w160/${codigo.toLowerCase()}.png" alt="Bandera de ${opcion.text}"&gt;
+                    &lt;div&gt;
+                        &lt;h3&gt;${opcion.text}&lt;/h3&gt;
+                        &lt;p&gt;🏛️ Capital: ${lugar.name} (${(lugar.population || 0).toLocaleString("es")} hab.)&lt;/p&gt;
+                        &lt;p&gt;🕒 Zona horaria: ${lugar.timezone}&lt;/p&gt;
+                        &lt;p&gt;🌡️ Ahora en la capital: ${Math.round(tiempo.current.temperature_2m)} °C&lt;/p&gt;
+                        &lt;p&gt;💵 1 USD = ${cambio.rates[moneda].toLocaleString("es")} ${moneda}&lt;/p&gt;
+                        &lt;p class="estado"&gt;3 pedidos en paralelo en ${milisegundos} ms&lt;/p&gt;
+                    &lt;/div&gt;
+                `;
+            } catch {
+                paisFicha.innerHTML = `&lt;p class="aviso-error"&gt;No pudimos armar la ficha. Revisa tu conexión.&lt;/p&gt;`;
+            }
+        }
+
+        paisSelect.addEventListener("change", mostrarPais);
+        mostrarPais();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-reintentar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Reintentar tras un error</h2>
+            <p>Las redes fallan. Esta función intenta hasta 3 veces y espera un poco más entre cada intento (1 s, 2 s…). Además, <code>AbortSignal.timeout(5000)</code> abandona un pedido que tarde más de 5 segundos. La casilla simula que el servidor falla las dos primeras veces.</p>
+            <div class="resultado">
+                <label class="reintento-opcion"><input type="checkbox" id="reintento-fallar" checked> Simular que el servidor falla 2 veces</label>
+                <button type="button" id="reintento-boton">Cargar un usuario</button>
+                <ol id="reintento-registro" class="reintento-registro"></ol>
+                <p id="reintento-resultado" class="reintento-resultado" aria-live="polite"></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;label class="reintento-opcion"&gt;&lt;input type="checkbox" id="reintento-fallar" checked&gt; Simular que el servidor falla 2 veces&lt;/label&gt;
+&lt;button type="button" id="reintento-boton"&gt;Cargar un usuario&lt;/button&gt;
+&lt;ol id="reintento-registro" class="reintento-registro"&gt;&lt;/ol&gt;
+&lt;p id="reintento-resultado" class="reintento-resultado" aria-live="polite"&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const reintentoFallar = document.querySelector("#reintento-fallar");
+const reintentoBoton = document.querySelector("#reintento-boton");
+const reintentoRegistro = document.querySelector("#reintento-registro");
+const reintentoResultado = document.querySelector("#reintento-resultado");
+
+const esperar = (ms) =&gt; new Promise((resolver) =&gt; setTimeout(resolver, ms));
+let fallosSimulados = 0;
+
+function anotar(texto) {
+    const linea = document.createElement("li");
+    linea.textContent = texto;
+    reintentoRegistro.append(linea);
+}
+
+async function pedirConReintentos(url, intentos) {
+    for (let intento = 1; intento &lt;= intentos; intento++) {
+        try {
+            anotar(`Intento ${intento}…`);
+            if (fallosSimulados &gt; 0) {
+                fallosSimulados--;
+                throw new Error("Servidor no disponible (simulado)");
+            }
+            const respuesta = await fetch(url, { signal: AbortSignal.timeout(5000) });
+            if (!respuesta.ok) {
+                throw new Error(`Error HTTP ${respuesta.status}`);
+            }
+            return await respuesta.json();
+        } catch (error) {
+            anotar(`✖ ${error.message}`);
+            if (intento === intentos) {
+                throw error;
+            }
+            anotar(`Esperando ${intento} s antes de reintentar…`);
+            await esperar(intento * 1000);
+        }
+    }
+}
+
+reintentoBoton.addEventListener("click", async () =&gt; {
+    reintentoBoton.disabled = true;
+    reintentoRegistro.innerHTML = "";
+    reintentoResultado.textContent = "";
+    fallosSimulados = reintentoFallar.checked ? 2 : 0;
+    const id = Math.floor(Math.random() * 10) + 1;
+    try {
+        const usuario = await pedirConReintentos(`https://jsonplaceholder.typicode.com/users/${id}`, 3);
+        reintentoResultado.textContent = `✅ ${usuario.name} — trabaja en ${usuario.company.name}`;
+    } catch {
+        reintentoResultado.textContent = "😕 No se pudo después de 3 intentos. Prueba más tarde.";
+    } finally {
+        reintentoBoton.disabled = false;
+    }
+});</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Reintentar tras un error&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .reintento-opcion {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .reintento-registro {
+            font-family: "Courier New", monospace;
+            font-size: 0.85rem;
+        }
+
+        .reintento-resultado {
+            font-weight: 700;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;label class="reintento-opcion"&gt;&lt;input type="checkbox" id="reintento-fallar" checked&gt; Simular que el servidor falla 2 veces&lt;/label&gt;
+    &lt;button type="button" id="reintento-boton"&gt;Cargar un usuario&lt;/button&gt;
+    &lt;ol id="reintento-registro" class="reintento-registro"&gt;&lt;/ol&gt;
+    &lt;p id="reintento-resultado" class="reintento-resultado" aria-live="polite"&gt;&lt;/p&gt;
+    &lt;script&gt;
+        const reintentoFallar = document.querySelector("#reintento-fallar");
+        const reintentoBoton = document.querySelector("#reintento-boton");
+        const reintentoRegistro = document.querySelector("#reintento-registro");
+        const reintentoResultado = document.querySelector("#reintento-resultado");
+
+        const esperar = (ms) =&gt; new Promise((resolver) =&gt; setTimeout(resolver, ms));
+        let fallosSimulados = 0;
+
+        function anotar(texto) {
+            const linea = document.createElement("li");
+            linea.textContent = texto;
+            reintentoRegistro.append(linea);
+        }
+
+        async function pedirConReintentos(url, intentos) {
+            for (let intento = 1; intento &lt;= intentos; intento++) {
+                try {
+                    anotar(`Intento ${intento}…`);
+                    if (fallosSimulados &gt; 0) {
+                        fallosSimulados--;
+                        throw new Error("Servidor no disponible (simulado)");
+                    }
+                    const respuesta = await fetch(url, { signal: AbortSignal.timeout(5000) });
+                    if (!respuesta.ok) {
+                        throw new Error(`Error HTTP ${respuesta.status}`);
+                    }
+                    return await respuesta.json();
+                } catch (error) {
+                    anotar(`✖ ${error.message}`);
+                    if (intento === intentos) {
+                        throw error;
+                    }
+                    anotar(`Esperando ${intento} s antes de reintentar…`);
+                    await esperar(intento * 1000);
+                }
+            }
+        }
+
+        reintentoBoton.addEventListener("click", async () =&gt; {
+            reintentoBoton.disabled = true;
+            reintentoRegistro.innerHTML = "";
+            reintentoResultado.textContent = "";
+            fallosSimulados = reintentoFallar.checked ? 2 : 0;
+            const id = Math.floor(Math.random() * 10) + 1;
+            try {
+                const usuario = await pedirConReintentos(`https://jsonplaceholder.typicode.com/users/${id}`, 3);
+                reintentoResultado.textContent = `✅ ${usuario.name} — trabaja en ${usuario.company.name}`;
+            } catch {
+                reintentoResultado.textContent = "😕 No se pudo después de 3 intentos. Prueba más tarde.";
+            } finally {
+                reintentoBoton.disabled = false;
+            }
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-vivo" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Feed en vivo con setInterval</h2>
+            <p>Un panel de «nuevos registros» que se actualiza solo cada 5 segundos, con cuenta regresiva y botón de pausa. <code>setInterval</code> marca el ritmo y <code>clearInterval</code> lo detiene. Solo se muestran los 5 más recientes.</p>
+            <div class="resultado">
+                <div class="barra-fila">
+                    <button type="button" id="vivo-boton">⏸ Pausar</button>
+                    <span id="vivo-cuenta" class="estado"></span>
+                </div>
+                <ul id="vivo-lista" class="vivo-lista"></ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="barra-fila"&gt;
+    &lt;button type="button" id="vivo-boton"&gt;⏸ Pausar&lt;/button&gt;
+    &lt;span id="vivo-cuenta" class="estado"&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;ul id="vivo-lista" class="vivo-lista"&gt;&lt;/ul&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const vivoBoton = document.querySelector("#vivo-boton");
+const vivoCuenta = document.querySelector("#vivo-cuenta");
+const vivoLista = document.querySelector("#vivo-lista");
+
+const cadaSegundos = 5;
+let segundos = cadaSegundos;
+let intervalo = null;
+
+function agregarItem(html) {
+    const item = document.createElement("li");
+    item.innerHTML = html;
+    vivoLista.prepend(item);
+    if (vivoLista.children.length &gt; 5) {
+        vivoLista.lastElementChild.remove();
+    }
+}
+
+async function nuevoRegistro() {
+    const hora = new Date().toLocaleTimeString("es");
+    try {
+        const respuesta = await fetch("https://randomuser.me/api/?nat=es,mx,br&amp;inc=name,picture,location");
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}`);
+        }
+        const datos = await respuesta.json();
+        const persona = datos.results[0];
+        agregarItem(`
+            &lt;img src="${persona.picture.thumbnail}" alt=""&gt;
+            &lt;span&gt;&lt;strong&gt;${persona.name.first} ${persona.name.last}&lt;/strong&gt; se registró desde ${persona.location.city}&lt;/span&gt;
+            &lt;time&gt;${hora}&lt;/time&gt;
+        `);
+    } catch {
+        agregarItem(`&lt;span&gt;⚠️ Sin conexión, reintentamos en el próximo ciclo&lt;/span&gt;&lt;time&gt;${hora}&lt;/time&gt;`);
+    }
+}
+
+function tic() {
+    segundos--;
+    if (segundos === 0) {
+        segundos = cadaSegundos;
+        nuevoRegistro();
+    }
+    vivoCuenta.textContent = `Próxima actualización en ${segundos} s`;
+}
+
+vivoBoton.addEventListener("click", () =&gt; {
+    if (intervalo) {
+        clearInterval(intervalo);
+        intervalo = null;
+        vivoBoton.textContent = "▶ Reanudar";
+        vivoCuenta.textContent = "En pausa";
+    } else {
+        intervalo = setInterval(tic, 1000);
+        vivoBoton.textContent = "⏸ Pausar";
+    }
+});
+
+nuevoRegistro();
+intervalo = setInterval(tic, 1000);</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Feed en vivo con setInterval&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        @keyframes entrar {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        :where(button:not(.ejecutar)) {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button:not(.ejecutar)):hover {
+            background: #334155;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        :where(label) {
+            font-weight: 600;
+        }
+
+        .estado {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .barra-fila {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .vivo-lista {
+            max-width: 560px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .vivo-lista li {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            animation: entrar 0.4s ease;
+        }
+
+        .vivo-lista img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .vivo-lista span {
+            flex: 1;
+        }
+
+        .vivo-lista time {
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="barra-fila"&gt;
+        &lt;button type="button" id="vivo-boton"&gt;⏸ Pausar&lt;/button&gt;
+        &lt;span id="vivo-cuenta" class="estado"&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;ul id="vivo-lista" class="vivo-lista"&gt;&lt;/ul&gt;
+    &lt;script&gt;
+        const vivoBoton = document.querySelector("#vivo-boton");
+        const vivoCuenta = document.querySelector("#vivo-cuenta");
+        const vivoLista = document.querySelector("#vivo-lista");
+
+        const cadaSegundos = 5;
+        let segundos = cadaSegundos;
+        let intervalo = null;
+
+        function agregarItem(html) {
+            const item = document.createElement("li");
+            item.innerHTML = html;
+            vivoLista.prepend(item);
+            if (vivoLista.children.length &gt; 5) {
+                vivoLista.lastElementChild.remove();
+            }
+        }
+
+        async function nuevoRegistro() {
+            const hora = new Date().toLocaleTimeString("es");
+            try {
+                const respuesta = await fetch("https://randomuser.me/api/?nat=es,mx,br&amp;inc=name,picture,location");
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP ${respuesta.status}`);
+                }
+                const datos = await respuesta.json();
+                const persona = datos.results[0];
+                agregarItem(`
+                    &lt;img src="${persona.picture.thumbnail}" alt=""&gt;
+                    &lt;span&gt;&lt;strong&gt;${persona.name.first} ${persona.name.last}&lt;/strong&gt; se registró desde ${persona.location.city}&lt;/span&gt;
+                    &lt;time&gt;${hora}&lt;/time&gt;
+                `);
+            } catch {
+                agregarItem(`&lt;span&gt;⚠️ Sin conexión, reintentamos en el próximo ciclo&lt;/span&gt;&lt;time&gt;${hora}&lt;/time&gt;`);
+            }
+        }
+
+        function tic() {
+            segundos--;
+            if (segundos === 0) {
+                segundos = cadaSegundos;
+                nuevoRegistro();
+            }
+            vivoCuenta.textContent = `Próxima actualización en ${segundos} s`;
+        }
+
+        vivoBoton.addEventListener("click", () =&gt; {
+            if (intervalo) {
+                clearInterval(intervalo);
+                intervalo = null;
+                vivoBoton.textContent = "▶ Reanudar";
+                vivoCuenta.textContent = "En pausa";
+            } else {
+                intervalo = setInterval(tic, 1000);
+                vivoBoton.textContent = "⏸ Pausar";
+            }
+        });
+
+        nuevoRegistro();
+        intervalo = setInterval(tic, 1000);
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="25-js-localstorage.html">Anterior: localStorage</a> |
+            <a href="index.html">Índice</a> |
+            <a href="27-js-mini-apps.html">Siguiente: mini aplicaciones</a>
+        </nav>
+    </footer>
+</body>
+</html>

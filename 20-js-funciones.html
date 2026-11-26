@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>20. JavaScript: funciones</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <script src="js/consola.js" defer></script>
+    <link rel="stylesheet" href="css/20-js-funciones.css">
+    <script src="js/20-js-funciones.js" defer></script>
+</head>
+<body class="leccion-js">
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>20. JavaScript: funciones</h1>
+        <p>Hasta ahora el código corría de arriba abajo una sola vez. Una <strong>función</strong> es un bloque de código con nombre que se escribe una vez y se usa todas las veces que haga falta, con datos distintos cada vez. Vas a crear formateadores de precios, validadores, generadores de slugs y contraseñas, cupones, contadores con memoria y hasta funciones que se llaman a sí mismas. Todos los ejemplos muestran su resultado en la consola de la página: pulsa <strong>Ejecutar</strong>.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-declaracion">Declaración</a></li>
+            <li><a href="#ej-expresion">Expresión y flecha</a></li>
+            <li><a href="#ej-defecto">Valores por defecto</a></li>
+            <li><a href="#ej-return">return</a></li>
+            <li><a href="#ej-temprano">return temprano</a></li>
+            <li><a href="#ej-hora">Saludo según la hora</a></li>
+            <li><a href="#ej-scope">Scope</a></li>
+            <li><a href="#ej-puras">Funciones puras</a></li>
+            <li><a href="#ej-componer">Funciones que usan funciones</a></li>
+            <li><a href="#ej-slug">Slugs para URLs</a></li>
+            <li><a href="#ej-texto">Iniciales y títulos</a></li>
+            <li><a href="#ej-contrasena">Contraseñas</a></li>
+            <li><a href="#ej-cupon">Cupones</a></li>
+            <li><a href="#ej-callback">Callbacks</a></li>
+            <li><a href="#ej-closure">Closures</a></li>
+            <li><a href="#ej-fabricas">IDs y convertidores</a></li>
+            <li><a href="#ej-rest">Parámetros rest</a></li>
+            <li><a href="#ej-recursion">Recursión</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Cómo se escribe y se usa una función</h2>
+            <p>Una función se <strong>define</strong> una vez y se <strong>llama</strong> (se ejecuta) poniendo su nombre seguido de paréntesis. Lo que va entre paréntesis al definirla son los <strong>parámetros</strong>; lo que se le pasa al llamarla son los <strong>argumentos</strong>.</p>
+            <table>
+                <thead>
+                    <tr><th>Forma</th><th>Ejemplo</th><th>Cuándo usarla</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Declaración</td><td><code>function sumar(a, b) { return a + b; }</code></td><td>funciones principales; se pueden llamar antes de la línea donde están</td></tr>
+                    <tr><td>Expresión</td><td><code>const sumar = function (a, b) { return a + b; };</code></td><td>cuando la función se guarda como un valor más</td></tr>
+                    <tr><td>Flecha</td><td><code>const sumar = (a, b) =&gt; a + b;</code></td><td>funciones cortas y callbacks</td></tr>
+                    <tr><td>Flecha con cuerpo</td><td><code>const sumar = (a, b) =&gt; { return a + b; };</code></td><td>cuando hacen falta varias líneas: el <code>return</code> ya no es implícito</td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Concepto</th><th>Qué significa</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>return</code></td><td>devuelve un valor y termina la función; sin él la función devuelve <code>undefined</code></td></tr>
+                    <tr><td>Valor por defecto</td><td><code>(precio, cantidad = 1)</code>: se usa si el argumento no llega</td></tr>
+                    <tr><td>Scope</td><td>las variables creadas dentro de una función o bloque solo existen ahí</td></tr>
+                    <tr><td>Función pura</td><td>solo depende de sus parámetros y no cambia nada de afuera</td></tr>
+                    <tr><td>Callback</td><td>una función que se pasa como argumento para que otra la llame</td></tr>
+                    <tr><td>Closure</td><td>una función que recuerda las variables del lugar donde se creó</td></tr>
+                    <tr><td>Rest <code>...datos</code></td><td>junta todos los argumentos sobrantes en una lista</td></tr>
+                    <tr><td>Recursión</td><td>una función que se llama a sí misma hasta llegar a un caso base</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Anatomía de una función</figcaption>
+<pre>function calcularTotal(precio, cantidad = 1) {
+    const total = precio * cantidad;
+    return total;
+}
+
+const resultado = calcularTotal(25, 3);
+
+function       palabra clave
+calcularTotal  nombre (un verbo: calcular, crear, validar…)
+precio         parámetro
+cantidad = 1   parámetro con valor por defecto
+return total   valor que devuelve
+(25, 3)        argumentos de esta llamada
+resultado      guarda lo que devolvió: 75</pre>
+                </figure>
+                <figure>
+                    <figcaption>La misma función, de larga a corta</figcaption>
+<pre>function doble(n) {
+    return n * 2;
+}
+
+const doble = function (n) {
+    return n * 2;
+};
+
+const doble = (n) =&gt; {
+    return n * 2;
+};
+
+const doble = (n) =&gt; n * 2;
+
+Sin parámetros:   const hola = () =&gt; "Hola";
+Un parámetro:     (n) =&gt; n * 2     (los paréntesis son opcionales)
+Varios:           (a, b) =&gt; a + b</pre>
+                </figure>
+                <figure>
+                    <figcaption>Llamar o pasar la función</figcaption>
+<pre>saludar      la función misma (un valor)
+saludar()    la ejecuta y da su resultado
+
+aplicar(precio, descuento)     correcto: pasa la función
+aplicar(precio, descuento())   la ejecuta antes de tiempo</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-declaracion" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Declarar una función: formateador de precios</h2>
+            <p>Con <code>function nombre(parámetros) { … }</code> se declara una función. <code>return</code> entrega el resultado a quien la llamó. Las funciones declaradas así se pueden usar <strong>antes</strong> de la línea donde aparecen (<em>hoisting</em>).</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function formatearPrecio(monto) {
+    return `$${monto.toFixed(2)}`;
+}
+
+console.log(formatearPrecio(25));
+console.log(formatearPrecio(9.5));
+console.log(formatearPrecio(1299.999));
+
+console.log(mostrarOferta("Audífonos Nébula", 89.9));
+
+function mostrarOferta(producto, precio) {
+    return `${producto} a solo ${formatearPrecio(precio)} 🔥`;
+}</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-expresion" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Expresiones y funciones flecha: impuesto y total</h2>
+            <p>Una función también es un <strong>valor</strong>: se puede guardar en una constante. La forma más corta es la <strong>función flecha</strong> <code>=&gt;</code>; si su cuerpo es una sola expresión, el <code>return</code> es implícito.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const TASA_IMPUESTO = 0.18;
+
+function calcularImpuesto(subtotal) {
+    return subtotal * TASA_IMPUESTO;
+}
+
+const calcularTotal = function (subtotal) {
+    return subtotal + calcularImpuesto(subtotal);
+};
+
+const redondear = (numero) =&gt; Math.round(numero * 100) / 100;
+
+const precioFinal = (precio, cantidad) =&gt; {
+    const bruto = precio * cantidad;
+    return redondear(calcularTotal(bruto));
+};
+
+console.log("Subtotal: 150");
+console.log("Impuesto:", redondear(calcularImpuesto(150)));
+console.log("Total:", redondear(calcularTotal(150)));
+console.log("3 cuadernos de $12.50 con impuesto:", precioFinal(12.5, 3));
+console.log("¿Qué es calcularTotal?", typeof calcularTotal);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-defecto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Parámetros con valor por defecto: mensaje de WhatsApp</h2>
+            <p>Un parámetro puede traer un valor por defecto con <code>=</code>. Se usa cuando el argumento no llega (o llega <code>undefined</code>). Si falta un argumento sin valor por defecto, dentro de la función vale <code>undefined</code>.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function mensajeWhatsApp(nombre, pedido, tienda = "Tienda Aurora", llegada = "hoy entre las 15:00 y las 18:00") {
+    return `Hola ${nombre} 👋, tu pedido #${pedido} de ${tienda} llega ${llegada}. ¡Gracias por tu compra!`;
+}
+
+console.log(mensajeWhatsApp("Valeria", 1042));
+console.log(mensajeWhatsApp("Diego", 1043, "Café Brisa"));
+console.log(mensajeWhatsApp("Marta", 1044, undefined, "mañana a primera hora"));
+console.log(mensajeWhatsApp());
+
+const texto = encodeURIComponent(mensajeWhatsApp("Valeria", 1042));
+console.log(`https://wa.me/51900000000?text=${texto}`);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-return" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>return: convertidor de unidades</h2>
+            <p><code>return</code> devuelve un valor que se puede guardar, imprimir o pasar a otra función. Una función sin <code>return</code> devuelve <code>undefined</code>.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function convertir(valor, factor) {
+    return valor * factor;
+}
+
+const kmAMillas = (km) =&gt; convertir(km, 0.621371);
+const kgALibras = (kg) =&gt; convertir(kg, 2.20462);
+const celsiusAFahrenheit = (celsius) =&gt; celsius * 9 / 5 + 32;
+
+console.log(`10 km = ${kmAMillas(10).toFixed(2)} millas`);
+console.log(`5 kg = ${kgALibras(5).toFixed(2)} lb`);
+console.log(`30 °C = ${celsiusAFahrenheit(30)} °F`);
+
+const distanciaMaraton = kmAMillas(42.195);
+console.log(`Una maratón son ${distanciaMaraton.toFixed(1)} millas`);
+
+function duplicarSinReturn(numero) {
+    numero * 2;
+}
+
+console.log("Sin return se obtiene:", duplicarSinReturn(4));</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-temprano" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Return temprano: validador de correo</h2>
+            <p>Cada <code>return</code> termina la función en ese instante. Revisar los errores primero y salir con <code>return</code> evita <code>if</code> anidados: el caso feliz queda al final.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function validarCorreo(correo) {
+    const texto = correo.trim();
+    if (texto === "") {
+        return "Escribe un correo";
+    }
+    if (texto.includes(" ")) {
+        return "El correo no puede tener espacios";
+    }
+    const posicionArroba = texto.indexOf("@");
+    if (posicionArroba &lt; 1) {
+        return "Falta el usuario antes de la @";
+    }
+    if (posicionArroba !== texto.lastIndexOf("@")) {
+        return "Solo puede haber una @";
+    }
+    const dominio = texto.slice(posicionArroba + 1);
+    if (!dominio.includes(".") || dominio.endsWith(".")) {
+        return "El dominio debe ser como correo.com";
+    }
+    return "✅ Correo válido";
+}
+
+console.log("ana@correo.com →", validarCorreo("ana@correo.com"));
+console.log("'   ' →", validarCorreo("   "));
+console.log("ana @correo.com →", validarCorreo("ana @correo.com"));
+console.log("@correo.com →", validarCorreo("@correo.com"));
+console.log("ana@@correo.com →", validarCorreo("ana@@correo.com"));
+console.log("ana@correo →", validarCorreo("ana@correo"));
+console.log(" luis.p@empresa.pe  →", validarCorreo(" luis.p@empresa.pe "));</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-hora" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Saludo según la hora del día</h2>
+            <p>Una función que recibe un número y decide qué texto devolver. Con <code>new Date().getHours()</code> se obtiene la hora actual de la computadora (0 a 23).</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function saludoSegunHora(hora) {
+    if (hora &lt; 0 || hora &gt; 23) {
+        return "Hora inválida";
+    }
+    if (hora &lt; 5) {
+        return "Buenas noches 🌙";
+    }
+    if (hora &lt; 12) {
+        return "Buenos días ☀️";
+    }
+    if (hora &lt; 19) {
+        return "Buenas tardes 🌤️";
+    }
+    return "Buenas noches 🌙";
+}
+
+const ahora = new Date().getHours();
+console.log(`Ahora son las ${ahora} h: ${saludoSegunHora(ahora)}`);
+
+for (let hora = 2; hora &lt;= 23; hora += 5) {
+    console.log(`${hora} h → ${saludoSegunHora(hora)}`);
+}
+
+console.log(`25 h → ${saludoSegunHora(25)}`);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-scope" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Scope: qué variables ve cada función</h2>
+            <p>Las variables declaradas <strong>dentro</strong> de una función (o de un bloque <code>{ }</code>) solo existen ahí. Desde adentro sí se ven las de afuera. Si adentro se declara otra con el mismo nombre, la de adentro tapa a la de afuera.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const tienda = "Tienda Aurora";
+let visitas = 0;
+
+function registrarVisita() {
+    visitas++;
+    const mensaje = `Visita ${visitas} a ${tienda}`;
+    return mensaje;
+}
+
+console.log(registrarVisita());
+console.log(registrarVisita());
+console.log("visitas afuera:", visitas);
+console.log("¿mensaje existe afuera?", typeof mensaje);
+
+function calcularEnvio(total) {
+    let envio = 15;
+    if (total &gt;= 100) {
+        const rebaja = 15;
+        envio -= rebaja;
+    }
+    console.log("¿rebaja existe fuera del if?", typeof rebaja);
+    return envio;
+}
+
+console.log("Envío para $80:", calcularEnvio(80));
+console.log("Envío para $120:", calcularEnvio(120));
+
+const color = "azul";
+
+function pintar() {
+    const color = "rojo";
+    return `Dentro: ${color}`;
+}
+
+console.log(pintar(), `| Fuera: ${color}`);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-puras" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Funciones puras e impuras</h2>
+            <p>Una función <strong>pura</strong> solo usa sus parámetros y no cambia nada de afuera: con los mismos datos siempre da el mismo resultado. Son fáciles de probar y de reutilizar. Una <strong>impura</strong> depende o modifica variables externas.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>let totalCarrito = 0;
+
+function agregarAlCarrito(precio) {
+    totalCarrito += precio;
+    return totalCarrito;
+}
+
+console.log("Impura, mismo argumento:");
+console.log(agregarAlCarrito(20));
+console.log(agregarAlCarrito(20));
+
+function sumarPrecio(total, precio) {
+    return total + precio;
+}
+
+console.log("Pura, mismo argumento:");
+console.log(sumarPrecio(0, 20));
+console.log(sumarPrecio(0, 20));
+
+const subtotal = sumarPrecio(sumarPrecio(0, 20), 35);
+console.log("Subtotal con la pura:", subtotal);
+
+const precioConIva = (precio) =&gt; precio * 1.18;
+console.log("Siempre igual:", precioConIva(100), precioConIva(100));</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-componer" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Funciones que llaman a otras: generar una factura</h2>
+            <p>Las funciones pequeñas, cada una con una sola tarea, se combinan para resolver algo más grande. Si cambia la tasa del impuesto, se corrige en un único lugar.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const redondear = (numero) =&gt; Math.round(numero * 100) / 100;
+const formatear = (numero) =&gt; `$${redondear(numero).toFixed(2)}`;
+const calcularSubtotal = (precio, cantidad) =&gt; precio * cantidad;
+const aplicarDescuento = (monto, porcentaje) =&gt; monto - monto * porcentaje / 100;
+const agregarImpuesto = (monto) =&gt; monto * 1.18;
+
+function generarFactura(producto, precio, cantidad, descuento = 0) {
+    const subtotal = calcularSubtotal(precio, cantidad);
+    const conDescuento = aplicarDescuento(subtotal, descuento);
+    const total = agregarImpuesto(conDescuento);
+    console.log(`${cantidad} × ${producto}`);
+    console.log(`  Subtotal:    ${formatear(subtotal)}`);
+    console.log(`  Descuento:   ${descuento}%`);
+    console.log(`  Total + 18%: ${formatear(total)}`);
+}
+
+generarFactura("Polo básico", 39.9, 3);
+generarFactura("Zapatillas Trail", 249, 1, 15);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-slug" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Generador de slugs para URLs</h2>
+            <p>Los blogs y tiendas convierten el título en un <em>slug</em>: minúsculas, sin tildes, sin signos y con guiones. <code>normalize("NFD")</code> separa la tilde de su letra (á → a + ´) para poder descartarla.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function crearSlug(titulo) {
+    const permitidos = "abcdefghijklmnopqrstuvwxyz0123456789";
+    let slug = "";
+    for (const letra of titulo.toLowerCase().normalize("NFD")) {
+        if (permitidos.includes(letra)) {
+            slug += letra;
+        } else if ((letra === " " || letra === "-") &amp;&amp; slug !== "" &amp;&amp; !slug.endsWith("-")) {
+            slug += "-";
+        }
+    }
+    return slug.endsWith("-") ? slug.slice(0, -1) : slug;
+}
+
+console.log(crearSlug("Cómo hacer pan casero en 5 pasos"));
+console.log(crearSlug("  ¡Ofertas de Año Nuevo!  "));
+console.log(crearSlug("Guía de JavaScript - Parte 2"));
+
+const url = `https://blog-aurora.com/articulos/${crearSlug("Diseño web: ¿por dónde empiezo?")}`;
+console.log(url);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-texto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Iniciales de un nombre y títulos capitalizados</h2>
+            <p>Dos utilidades de texto que aparecen en cualquier app: las iniciales para el avatar del usuario y el título con cada palabra en mayúscula. Ambas recorren el texto letra por letra recordando la letra anterior.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function obtenerIniciales(nombreCompleto) {
+    let iniciales = "";
+    let anterior = " ";
+    for (const letra of nombreCompleto) {
+        if (anterior === " " &amp;&amp; letra !== " ") {
+            iniciales += letra.toUpperCase();
+        }
+        anterior = letra;
+    }
+    return iniciales;
+}
+
+function capitalizarTitulo(texto) {
+    let resultado = "";
+    let anterior = " ";
+    for (const letra of texto.toLowerCase()) {
+        resultado += anterior === " " ? letra.toUpperCase() : letra;
+        anterior = letra;
+    }
+    return resultado;
+}
+
+console.log(obtenerIniciales("ana lucía torres"));
+console.log(obtenerIniciales("  Jorge   Paredes "));
+console.log(capitalizarTitulo("el SEÑOR de los cafés"));
+console.log(`[${obtenerIniciales("Rosa Medina")}] ${capitalizarTitulo("rosa medina")}`);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-contrasena" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Generador de contraseñas</h2>
+            <p>Una función auxiliar elige un número al azar y otra arma la contraseña con la longitud y los caracteres pedidos. Se quitaron letras confusas como <code>l</code>, <code>I</code>, <code>O</code> y <code>0</code>. Para contraseñas reales se usa <code>crypto.getRandomValues</code>, que es más seguro que <code>Math.random</code>.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function numeroAlAzar(maximo) {
+    return Math.floor(Math.random() * maximo);
+}
+
+function generarContrasena(longitud = 12, conSimbolos = true) {
+    let caracteres = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    if (conSimbolos) {
+        caracteres += "!@#$%&amp;*?";
+    }
+    let contrasena = "";
+    for (let i = 0; i &lt; longitud; i++) {
+        contrasena += caracteres[numeroAlAzar(caracteres.length)];
+    }
+    return contrasena;
+}
+
+console.log("Por defecto:", generarContrasena());
+console.log("8 sin símbolos:", generarContrasena(8, false));
+console.log("20 caracteres:", generarContrasena(20));
+console.log("Dado de 6 caras:", numeroAlAzar(6) + 1);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-cupon" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Calculadora de descuentos por cupón</h2>
+            <p>Una función decide cuánto se descuenta según el cupón (con <code>switch</code> y <code>return</code> en cada caso) y otra arma el mensaje para el cliente usando la primera.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function calcularDescuento(total, cupon) {
+    switch (cupon.toUpperCase()) {
+        case "BIENVENIDA10":
+            return total * 0.1;
+        case "VERANO25":
+            return total &gt;= 200 ? total * 0.25 : 0;
+        case "ENVIOGRATIS":
+            return 15;
+        default:
+            return 0;
+    }
+}
+
+function aplicarCupon(total, cupon) {
+    const descuento = calcularDescuento(total, cupon);
+    if (descuento === 0) {
+        return `🚫 ${cupon} no aplica a $${total}. Pagas $${total.toFixed(2)}`;
+    }
+    return `✅ ${cupon.toUpperCase()}: -$${descuento.toFixed(2)} → pagas $${(total - descuento).toFixed(2)}`;
+}
+
+console.log(aplicarCupon(120, "bienvenida10"));
+console.log(aplicarCupon(150, "VERANO25"));
+console.log(aplicarCupon(250, "verano25"));
+console.log(aplicarCupon(80, "EnvioGratis"));
+console.log(aplicarCupon(80, "GRATIS100"));</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-callback" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Callbacks: pasar una función como argumento</h2>
+            <p>Como las funciones son valores, se pueden pasar a otra función. La que las recibe decide <strong>cuándo</strong> llamarlas. Ojo: <code>descuento20</code> pasa la función; <code>descuento20()</code> la ejecutaría.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function aplicarPromocion(precio, promocion) {
+    const final = promocion(precio);
+    return `Antes $${precio.toFixed(2)} → ahora $${final.toFixed(2)}`;
+}
+
+const descuento20 = (precio) =&gt; precio * 0.8;
+const menosQuince = (precio) =&gt; Math.max(precio - 15, 0);
+
+console.log(aplicarPromocion(50, descuento20));
+console.log(aplicarPromocion(50, menosQuince));
+console.log(aplicarPromocion(50, (precio) =&gt; precio / 2));
+
+function repetir(veces, accion) {
+    for (let i = 1; i &lt;= veces; i++) {
+        accion(i, veces);
+    }
+}
+
+repetir(3, (numero, total) =&gt; {
+    console.log(`📨 Enviando recordatorio ${numero} de ${total}`);
+});</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-closure" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Closures: contador de clics privado</h2>
+            <p>Una función creada dentro de otra <strong>recuerda</strong> las variables de donde nació, aunque la de afuera ya haya terminado. Eso es un <em>closure</em>. Cada contador tiene su propia cuenta y nadie de afuera la puede tocar.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function crearContador(nombre) {
+    let clics = 0;
+    return () =&gt; {
+        clics++;
+        return `${nombre}: ${clics} clic${clics === 1 ? "" : "s"}`;
+    };
+}
+
+const clicMeGusta = crearContador("Me gusta");
+const clicCompartir = crearContador("Compartir");
+
+console.log(clicMeGusta());
+console.log(clicMeGusta());
+console.log(clicCompartir());
+console.log(clicMeGusta());
+console.log("¿Se puede leer clics desde afuera?", typeof clics);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-fabricas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Fábricas de funciones: generador de IDs y convertidores</h2>
+            <p>Una función que <strong>devuelve funciones</strong> ya configuradas. Cada generador de IDs lleva su propia numeración y cada convertidor recuerda su factor y su unidad.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function crearGeneradorId(prefijo) {
+    let ultimo = 0;
+    return () =&gt; {
+        ultimo++;
+        return `${prefijo}-${String(ultimo).padStart(4, "0")}`;
+    };
+}
+
+const nuevoPedido = crearGeneradorId("PED");
+const nuevoCliente = crearGeneradorId("CLI");
+
+console.log(nuevoPedido(), nuevoPedido(), nuevoCliente(), nuevoPedido());
+
+function crearConvertidor(factor, unidad) {
+    return (valor) =&gt; `${(valor * factor).toFixed(2)} ${unidad}`;
+}
+
+const solesADolares = crearConvertidor(0.27, "USD");
+const cmAPulgadas = crearConvertidor(0.3937, "in");
+const litrosAGalones = crearConvertidor(0.264172, "gal");
+
+console.log("S/ 100 =", solesADolares(100));
+console.log("Pantalla de 140 cm =", cmAPulgadas(140));
+console.log("Tanque de 50 L =", litrosAGalones(50));</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-rest" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Parámetros rest: cuántos argumentos quieras</h2>
+            <p><code>...nombre</code> como último parámetro junta todos los argumentos sobrantes en una lista que se puede recorrer con <code>for…of</code> y que tiene <code>length</code>.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function totalTicket(...precios) {
+    let total = 0;
+    for (const precio of precios) {
+        total += precio;
+    }
+    return total;
+}
+
+console.log("Ticket 1:", totalTicket(4.5, 12, 3.2));
+console.log("Ticket 2:", totalTicket(99.9));
+console.log("Ticket vacío:", totalTicket());
+
+function promedio(alumno, ...notas) {
+    if (notas.length === 0) {
+        return `${alumno}: sin notas`;
+    }
+    let suma = 0;
+    for (const nota of notas) {
+        suma += nota;
+    }
+    return `${alumno}: ${(suma / notas.length).toFixed(1)} (${notas.length} notas)`;
+}
+
+console.log(promedio("Lucía", 15, 18, 12, 17));
+console.log(promedio("Tomás", 11, 14));
+console.log(promedio("Elena"));</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-recursion" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Recursión: factorial y carpetas anidadas</h2>
+            <p>Una función <strong>recursiva</strong> se llama a sí misma con un problema más pequeño. Siempre necesita un <em>caso base</em> que la detenga; si no, se llamaría para siempre.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>function factorial(n) {
+    if (n &lt;= 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+console.log("5! =", factorial(5));
+console.log("Formas de sentar a 6 invitados:", factorial(6));
+
+function mostrarRuta(ruta, nivel = 0) {
+    const barra = ruta.indexOf("/");
+    const carpeta = barra === -1 ? ruta : ruta.slice(0, barra);
+    console.log(`${"   ".repeat(nivel)}📁 ${carpeta}`);
+    if (barra !== -1) {
+        mostrarRuta(ruta.slice(barra + 1), nivel + 1);
+    }
+}
+
+mostrarRuta("proyectos/tienda/imagenes/productos/2026");
+
+function cuentaRegresiva(numero) {
+    if (numero === 0) {
+        console.log("🚀 ¡Despegue!");
+        return;
+    }
+    console.log(numero);
+    cuentaRegresiva(numero - 1);
+}
+
+cuentaRegresiva(3);</pre>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="19-js-condicionales-bucles.html">Anterior: condicionales y bucles</a> |
+            <a href="index.html">Índice</a> |
+            <a href="21-js-arrays-objetos.html">Siguiente: arrays y objetos</a>
+        </nav>
+    </footer>
+</body>
+</html>

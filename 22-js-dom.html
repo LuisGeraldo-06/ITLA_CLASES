@@ -1,0 +1,2904 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>22. JavaScript: el DOM</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <script src="js/consola.js" defer></script>
+    <link rel="stylesheet" href="css/22-js-dom.css">
+    <script src="js/22-js-dom.js" defer></script>
+</head>
+<body class="leccion-js">
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>22. JavaScript: el DOM</h1>
+        <p>Hasta ahora JavaScript solo escribía en la consola. Desde esta lección <strong>toca la página</strong>: busca elementos, cambia textos e imágenes, pone y quita clases, crea tarjetas, tablas y menús a partir de arrays de objetos, y elimina lo que sobra. Todo eso se hace a través del <strong>DOM</strong>. Algunos ejemplos usan un botón con <code>addEventListener("click", …)</code>: por ahora basta con leerlo como “cuando hagan clic, haz esto”; los eventos los vemos a fondo en la lección 23.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-buscar">Buscar elementos</a></li>
+            <li><a href="#ej-producto">Título e imagen</a></li>
+            <li><a href="#ej-texto-html">textContent vs innerHTML</a></li>
+            <li><a href="#ej-stock">Insignias de stock</a></li>
+            <li><a href="#ej-oscuro">Modo oscuro</a></li>
+            <li><a href="#ej-progreso">Barra de progreso</a></li>
+            <li><a href="#ej-atributos">Atributos</a></li>
+            <li><a href="#ej-notificaciones">Crear elementos</a></li>
+            <li><a href="#ej-tarjetas">Tarjetas desde un array</a></li>
+            <li><a href="#ej-galeria">Galería con dataset</a></li>
+            <li><a href="#ej-calificaciones">Tabla de notas</a></li>
+            <li><a href="#ej-contactos">Contactos con iniciales</a></li>
+            <li><a href="#ej-menu">Menú desde datos</a></li>
+            <li><a href="#ej-resaltar">Resaltar resultados</a></li>
+            <li><a href="#ej-eliminar">Eliminar elementos</a></li>
+            <li><a href="#ej-template">Clonar con template</a></li>
+            <li><a href="#ej-recorrer">Recorrer el árbol</a></li>
+            <li><a href="#ej-migas">Breadcrumbs</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Qué es el DOM</h2>
+            <p>Cuando el navegador lee el HTML, construye en memoria un <strong>árbol de objetos</strong>: el <em>Document Object Model</em>. Cada etiqueta es un <strong>nodo</strong> con padre, hijos y hermanos. JavaScript no edita el archivo HTML: edita ese árbol, y el navegador vuelve a pintar la página al instante.</p>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;body&gt;
+    &lt;header&gt;
+        &lt;h1&gt;Ofertas&lt;/h1&gt;
+    &lt;/header&gt;
+    &lt;main&gt;
+        &lt;ul class="productos"&gt;
+            &lt;li&gt;Taza&lt;/li&gt;
+            &lt;li class="destacado"&gt;Lámpara&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/main&gt;
+&lt;/body&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>El árbol que construye el navegador</figcaption>
+<pre>document
+└── html
+    ├── head
+    │   └── title
+    └── body                    ← document.body
+        ├── header
+        │   └── h1              → "Ofertas"
+        └── main
+            └── ul.productos    ← padre de los dos li
+                ├── li          → "Taza"
+                └── li.destacado → "Lámpara"</pre>
+                </figure>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Buscar elementos</th><th>Devuelve</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>document.getElementById("menu")</code></td><td>el elemento con ese id, o <code>null</code></td></tr>
+                    <tr><td><code>document.querySelector(".tarjeta")</code></td><td>el <strong>primer</strong> elemento que cumple el selector CSS, o <code>null</code></td></tr>
+                    <tr><td><code>document.querySelectorAll("li")</code></td><td><strong>todos</strong> los que cumplen (una <code>NodeList</code> con <code>forEach</code> y <code>length</code>)</td></tr>
+                    <tr><td><code>elemento.querySelector(...)</code></td><td>busca solo <em>dentro</em> de ese elemento</td></tr>
+                    <tr><td><code>elemento.closest(".pedido")</code></td><td>el ancestro más cercano (o él mismo) que cumple el selector</td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Leer y cambiar</th><th>Para qué sirve</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>textContent</code></td><td>el texto puro; lo que asignas se muestra tal cual (seguro)</td></tr>
+                    <tr><td><code>innerHTML</code></td><td>el HTML de dentro; lo que asignas <em>se interpreta</em> como etiquetas (cuidado con datos del usuario)</td></tr>
+                    <tr><td><code>classList.add / remove / toggle / contains</code></td><td>poner, quitar, alternar o consultar clases</td></tr>
+                    <tr><td><code>style.width = "40%"</code></td><td>estilo en línea; propiedades en camelCase (<code>backgroundColor</code>)</td></tr>
+                    <tr><td><code>getAttribute / setAttribute / removeAttribute / hasAttribute</code></td><td>cualquier atributo HTML</td></tr>
+                    <tr><td><code>img.src</code>, <code>a.href</code>, <code>input.value</code>, <code>boton.disabled</code></td><td>atajos para los atributos más comunes</td></tr>
+                    <tr><td><code>dataset.precio</code></td><td>lee y escribe atributos <code>data-precio</code></td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Crear, mover y eliminar</th><th>Qué hace</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>document.createElement("li")</code></td><td>crea un elemento nuevo, todavía fuera de la página</td></tr>
+                    <tr><td><code>padre.append(a, b)</code> / <code>padre.prepend(a)</code></td><td>lo mete al final / al principio del padre</td></tr>
+                    <tr><td><code>elemento.before(x)</code> / <code>elemento.after(x)</code></td><td>lo coloca como hermano anterior / siguiente</td></tr>
+                    <tr><td><code>elemento.remove()</code></td><td>lo quita de la página</td></tr>
+                    <tr><td><code>padre.replaceChildren()</code></td><td>vacía el padre (o lo reemplaza por lo que le pases)</td></tr>
+                    <tr><td><code>plantilla.content.cloneNode(true)</code></td><td>copia el contenido de un <code>&lt;template&gt;</code></td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Recorrer el árbol</th><th>Lleva a…</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>parentElement</code></td><td>el padre</td></tr>
+                    <tr><td><code>children</code></td><td>los hijos que son elementos</td></tr>
+                    <tr><td><code>firstElementChild</code> / <code>lastElementChild</code></td><td>el primer / último hijo</td></tr>
+                    <tr><td><code>nextElementSibling</code> / <code>previousElementSibling</code></td><td>el hermano siguiente / anterior</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Resumen rápido</figcaption>
+<pre>const titulo = document.querySelector("h1");
+titulo.textContent = "Ofertas de verano";
+
+const caja = document.querySelector(".aviso");
+caja.classList.add("visible");
+caja.style.backgroundColor = "#fef9c3";
+
+const enlace = document.querySelector("a");
+enlace.setAttribute("href", "https://tienda.test");
+
+const item = document.createElement("li");
+item.textContent = "Nuevo producto";
+document.querySelector("ul").append(item);</pre>
+                </figure>
+                <figure>
+                    <figcaption>¿Dónde va el script?</figcaption>
+<pre>&lt;head&gt;
+    &lt;script src="js/app.js" defer&gt;&lt;/script&gt;
+&lt;/head&gt;</pre>
+                </figure>
+            </div>
+            <p>Con <code>defer</code> el script se descarga en paralelo y se ejecuta <strong>cuando el HTML ya está completo</strong>, así que <code>querySelector</code> siempre encuentra los elementos. Sin <code>defer</code> y en el <code>&lt;head&gt;</code>, el script correría antes de que existan y obtendrías <code>null</code>.</p>
+        </section>
+
+        <section id="ej-buscar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Buscar elementos: getElementById, querySelector y querySelectorAll</h2>
+            <p>Antes de cambiar algo hay que encontrarlo. <code>querySelector</code> acepta <strong>cualquier selector CSS</strong> de las lecciones 08 a 17 y devuelve el primero; <code>querySelectorAll</code> los devuelve todos.</p>
+            <div class="resultado">
+                <div class="catalogo" id="catalogo">
+                    <h3 id="catalogo-titulo">Ofertas de la semana</h3>
+                    <ul>
+                        <li class="item-oferta">Taza térmica Nubo</li>
+                        <li class="item-oferta destacado">Lámpara Lumi</li>
+                        <li class="item-oferta">Mochila Trekka</li>
+                    </ul>
+                </div>
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="catalogo" id="catalogo"&gt;
+    &lt;h3 id="catalogo-titulo"&gt;Ofertas de la semana&lt;/h3&gt;
+    &lt;ul&gt;
+        &lt;li class="item-oferta"&gt;Taza térmica Nubo&lt;/li&gt;
+        &lt;li class="item-oferta destacado"&gt;Lámpara Lumi&lt;/li&gt;
+        &lt;li class="item-oferta"&gt;Mochila Trekka&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const titulo = document.getElementById("catalogo-titulo");
+console.log(titulo.textContent);
+
+const primera = document.querySelector(".item-oferta");
+console.log("Primera:", primera.textContent);
+
+const destacada = document.querySelector(".item-oferta.destacado");
+console.log("Destacada:", destacada.textContent);
+
+const todas = document.querySelectorAll("#catalogo .item-oferta");
+console.log("Cantidad:", todas.length);
+
+todas.forEach((item, indice) =&gt; {
+    console.log(`${indice + 1}. ${item.textContent}`);
+});
+
+const agotado = document.querySelector(".agotado");
+console.log("¿Hay agotados?", agotado);</pre>
+                </figure>
+            </div>
+            <p>Si no encuentra nada, <code>querySelector</code> devuelve <code>null</code> y <code>querySelectorAll</code> una lista vacía. Usar <code>null.textContent</code> provoca el error más común del DOM: <em>Cannot read properties of null</em>. En <code>getElementById</code> el id va <strong>sin</strong> <code>#</code>.</p>
+        </section>
+
+        <section id="ej-producto" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Cambiar el título, el precio y la imagen de un producto</h2>
+            <p>En una tienda, elegir otra variante cambia textos e imagen sin recargar. <code>textContent</code> cambia el texto; <code>src</code> y <code>alt</code> cambian la imagen.</p>
+            <div class="resultado">
+                <article class="ficha">
+                    <img id="ficha-foto" src="https://picsum.photos/id/1080/320/220" alt="Termo Nubo edición Fresa" width="320" height="220">
+                    <div>
+                        <h3 id="ficha-nombre">Termo Nubo · Fresa</h3>
+                        <p id="ficha-precio">$ 24.90</p>
+                        <button type="button" id="ficha-cambiar">Ver edición Bosque</button>
+                    </div>
+                </article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;article class="ficha"&gt;
+    &lt;img id="ficha-foto" src="https://picsum.photos/id/1080/320/220" alt="Termo Nubo edición Fresa" width="320" height="220"&gt;
+    &lt;div&gt;
+        &lt;h3 id="ficha-nombre"&gt;Termo Nubo · Fresa&lt;/h3&gt;
+        &lt;p id="ficha-precio"&gt;$ 24.90&lt;/p&gt;
+        &lt;button type="button" id="ficha-cambiar"&gt;Ver edición Bosque&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/article&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const foto = document.querySelector("#ficha-foto");
+const nombre = document.querySelector("#ficha-nombre");
+const precio = document.querySelector("#ficha-precio");
+const boton = document.querySelector("#ficha-cambiar");
+
+boton.addEventListener("click", () =&gt; {
+    nombre.textContent = "Termo Nubo · Bosque";
+    precio.textContent = "$ 27.50";
+    foto.src = "https://picsum.photos/id/10/320/220";
+    foto.alt = "Termo Nubo edición Bosque";
+    boton.textContent = "Edición Bosque elegida";
+    boton.disabled = true;
+});</pre>
+                </figure>
+            </div>
+            <p><code>addEventListener("click", …)</code> significa “cuando hagan clic, ejecuta esta función”; lo veremos a fondo en la lección 23. Fíjate en <code>boton.disabled = true</code>: las propiedades de los elementos se cambian igual que las de cualquier objeto.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Cambiar el título, el precio y la imagen de un producto&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .ficha {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .ficha img {
+            border-radius: 10px;
+        }
+
+        .ficha h3 {
+            margin: 0;
+        }
+
+        .ficha p {
+            margin: 6px 0 12px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .ficha button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            cursor: pointer;
+        }
+
+        .ficha button:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;article class="ficha"&gt;
+        &lt;img id="ficha-foto" src="https://picsum.photos/id/1080/320/220" alt="Termo Nubo edición Fresa" width="320" height="220"&gt;
+        &lt;div&gt;
+            &lt;h3 id="ficha-nombre"&gt;Termo Nubo · Fresa&lt;/h3&gt;
+            &lt;p id="ficha-precio"&gt;$ 24.90&lt;/p&gt;
+            &lt;button type="button" id="ficha-cambiar"&gt;Ver edición Bosque&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/article&gt;
+    &lt;script&gt;
+        const foto = document.querySelector("#ficha-foto");
+        const nombre = document.querySelector("#ficha-nombre");
+        const precio = document.querySelector("#ficha-precio");
+        const boton = document.querySelector("#ficha-cambiar");
+
+        boton.addEventListener("click", () =&gt; {
+            nombre.textContent = "Termo Nubo · Bosque";
+            precio.textContent = "$ 27.50";
+            foto.src = "https://picsum.photos/id/10/320/220";
+            foto.alt = "Termo Nubo edición Bosque";
+            boton.textContent = "Edición Bosque elegida";
+            boton.disabled = true;
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-texto-html" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>textContent vs innerHTML (y el riesgo XSS)</h2>
+            <p>Imagina que un usuario escribe un comentario con etiquetas HTML. Con <code>textContent</code> se ve como texto; con <code>innerHTML</code> el navegador <strong>lo interpreta</strong>. Ese es el origen de los ataques XSS.</p>
+            <div class="resultado">
+                <div class="comparar-xss">
+                    <div class="caja-xss segura">
+                        <h3>Con textContent</h3>
+                        <p id="comentario-seguro"></p>
+                    </div>
+                    <div class="caja-xss peligrosa">
+                        <h3>Con innerHTML</h3>
+                        <p id="comentario-peligroso"></p>
+                    </div>
+                    <div class="caja-xss">
+                        <h3>innerHTML con HTML propio</h3>
+                        <p id="precio-oferta"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="comparar-xss"&gt;
+    &lt;div class="caja-xss segura"&gt;
+        &lt;h3&gt;Con textContent&lt;/h3&gt;
+        &lt;p id="comentario-seguro"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="caja-xss peligrosa"&gt;
+        &lt;h3&gt;Con innerHTML&lt;/h3&gt;
+        &lt;p id="comentario-peligroso"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="caja-xss"&gt;
+        &lt;h3&gt;innerHTML con HTML propio&lt;/h3&gt;
+        &lt;p id="precio-oferta"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const comentario = `Gran producto &lt;strong style="color: crimson"&gt;¡HACKEADO!&lt;/strong&gt;`;
+
+document.querySelector("#comentario-seguro").textContent = comentario;
+document.querySelector("#comentario-peligroso").innerHTML = comentario;
+
+document.querySelector("#precio-oferta").innerHTML = "&lt;s&gt;$ 25.00&lt;/s&gt; &lt;strong&gt;$ 19.90&lt;/strong&gt;";</pre>
+                </figure>
+            </div>
+            <p>Aquí solo cambia un color, pero un atacante podría escribir <code>&lt;img src="x" onerror="…"&gt;</code> y ejecutar su propio JavaScript en la página de otra persona (robar la sesión, por ejemplo). Regla práctica: <strong>datos que escribe el usuario → <code>textContent</code></strong>; <code>innerHTML</code> solo con HTML que escribiste tú.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;textContent vs innerHTML (y el riesgo XSS)&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .comparar-xss {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .caja-xss {
+            padding: 12px;
+            border: 1px solid #dfe3ec;
+            border-radius: 10px;
+        }
+
+        .caja-xss h3 {
+            margin: 0 0 6px;
+            font-size: 0.9rem;
+        }
+
+        .segura {
+            border-color: #22c55e;
+        }
+
+        .peligrosa {
+            border-color: #ef4444;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="comparar-xss"&gt;
+        &lt;div class="caja-xss segura"&gt;
+            &lt;h3&gt;Con textContent&lt;/h3&gt;
+            &lt;p id="comentario-seguro"&gt;&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="caja-xss peligrosa"&gt;
+            &lt;h3&gt;Con innerHTML&lt;/h3&gt;
+            &lt;p id="comentario-peligroso"&gt;&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="caja-xss"&gt;
+            &lt;h3&gt;innerHTML con HTML propio&lt;/h3&gt;
+            &lt;p id="precio-oferta"&gt;&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const comentario = `Gran producto &lt;strong style="color: crimson"&gt;¡HACKEADO!&lt;/strong&gt;`;
+
+        document.querySelector("#comentario-seguro").textContent = comentario;
+        document.querySelector("#comentario-peligroso").innerHTML = comentario;
+
+        document.querySelector("#precio-oferta").innerHTML = "&lt;s&gt;$ 25.00&lt;/s&gt; &lt;strong&gt;$ 19.90&lt;/strong&gt;";
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-stock" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Insignias de stock con classList según la cantidad</h2>
+            <p>El HTML trae solo números. JavaScript los lee, decide y pone la clase que corresponde: <code>agotado</code>, <code>pocas</code> o <code>disponible</code>. El CSS se encarga del color.</p>
+            <div class="resultado">
+                <ul class="inventario">
+                    <li>Audífonos Sonar <span class="insignia">12</span></li>
+                    <li>Teclado Kappa <span class="insignia">3</span></li>
+                    <li>Mouse Orbe <span class="insignia">0</span></li>
+                    <li>Monitor Vista <span class="insignia">1</span></li>
+                </ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;ul class="inventario"&gt;
+    &lt;li&gt;Audífonos Sonar &lt;span class="insignia"&gt;12&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;Teclado Kappa &lt;span class="insignia"&gt;3&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;Mouse Orbe &lt;span class="insignia"&gt;0&lt;/span&gt;&lt;/li&gt;
+    &lt;li&gt;Monitor Vista &lt;span class="insignia"&gt;1&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.inventario {
+    display: grid;
+    gap: 8px;
+    padding: 0;
+    list-style: none;
+}
+
+.inventario li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border: 1px solid #dfe3ec;
+    border-radius: 8px;
+}
+
+.insignia {
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.disponible {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.pocas {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.agotado {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.sin-stock {
+    opacity: 0.55;
+    text-decoration: line-through;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const insignias = document.querySelectorAll(".insignia");
+
+insignias.forEach((insignia) =&gt; {
+    const cantidad = Number(insignia.textContent);
+
+    if (cantidad === 0) {
+        insignia.classList.add("agotado");
+        insignia.textContent = "Agotado";
+    } else if (cantidad &lt;= 3) {
+        insignia.classList.add("pocas");
+        insignia.textContent = `¡Últimas ${cantidad}!`;
+    } else {
+        insignia.classList.add("disponible");
+        insignia.textContent = `${cantidad} disponibles`;
+    }
+
+    if (insignia.classList.contains("agotado")) {
+        insignia.parentElement.classList.add("sin-stock");
+    }
+});</pre>
+                </figure>
+            </div>
+            <p><code>classList</code> no borra las clases que ya tenía el elemento, a diferencia de <code>className = "…"</code>, que las reemplaza todas. <code>contains</code> responde <code>true</code> o <code>false</code>.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Insignias de stock con classList según la cantidad&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .inventario {
+            display: grid;
+            gap: 8px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .inventario li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border: 1px solid #dfe3ec;
+            border-radius: 8px;
+        }
+
+        .insignia {
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .disponible {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .pocas {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .agotado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .sin-stock {
+            opacity: 0.55;
+            text-decoration: line-through;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;ul class="inventario"&gt;
+        &lt;li&gt;Audífonos Sonar &lt;span class="insignia"&gt;12&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;Teclado Kappa &lt;span class="insignia"&gt;3&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;Mouse Orbe &lt;span class="insignia"&gt;0&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;Monitor Vista &lt;span class="insignia"&gt;1&lt;/span&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;script&gt;
+        const insignias = document.querySelectorAll(".insignia");
+
+        insignias.forEach((insignia) =&gt; {
+            const cantidad = Number(insignia.textContent);
+
+            if (cantidad === 0) {
+                insignia.classList.add("agotado");
+                insignia.textContent = "Agotado";
+            } else if (cantidad &lt;= 3) {
+                insignia.classList.add("pocas");
+                insignia.textContent = `¡Últimas ${cantidad}!`;
+            } else {
+                insignia.classList.add("disponible");
+                insignia.textContent = `${cantidad} disponibles`;
+            }
+
+            if (insignia.classList.contains("agotado")) {
+                insignia.parentElement.classList.add("sin-stock");
+            }
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-oscuro" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Modo oscuro con classList.toggle</h2>
+            <p><code>toggle</code> pone la clase si no está y la quita si está. Una sola clase en el contenedor cambia todo el tema, porque el CSS hace el resto.</p>
+            <div class="resultado">
+                <div class="app-notas" id="app-notas">
+                    <div class="app-barra">
+                        <strong>Notas Kiwi</strong>
+                        <button type="button" id="boton-tema">🌙 Modo oscuro</button>
+                    </div>
+                    <ul>
+                        <li>Comprar café en grano</li>
+                        <li>Llamar a Marta por el presupuesto</li>
+                        <li>Terminar el informe del viernes</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="app-notas" id="app-notas"&gt;
+    &lt;div class="app-barra"&gt;
+        &lt;strong&gt;Notas Kiwi&lt;/strong&gt;
+        &lt;button type="button" id="boton-tema"&gt;🌙 Modo oscuro&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;ul&gt;
+        &lt;li&gt;Comprar café en grano&lt;/li&gt;
+        &lt;li&gt;Llamar a Marta por el presupuesto&lt;/li&gt;
+        &lt;li&gt;Terminar el informe del viernes&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.app-notas {
+    padding: 16px;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #1f2430;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 0.12);
+    transition: background 0.3s, color 0.3s;
+}
+
+.app-notas.oscuro {
+    background: #111827;
+    color: #e5e7eb;
+}
+
+.app-barra {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app-barra button {
+    padding: 6px 12px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const app = document.querySelector("#app-notas");
+const botonTema = document.querySelector("#boton-tema");
+
+botonTema.addEventListener("click", () =&gt; {
+    app.classList.toggle("oscuro");
+
+    if (app.classList.contains("oscuro")) {
+        botonTema.textContent = "☀️ Modo claro";
+    } else {
+        botonTema.textContent = "🌙 Modo oscuro";
+    }
+});</pre>
+                </figure>
+            </div>
+            <p>En la lección 16 cambiamos el tema con variables CSS; esta es la pieza que faltaba: JavaScript solo pone o quita <code>oscuro</code>. En la lección 25 recordaremos la elección con <code>localStorage</code>.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Modo oscuro con classList.toggle&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .app-notas {
+            padding: 16px;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #1f2430;
+            box-shadow: 0 2px 10px rgb(0 0 0 / 0.12);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .app-notas.oscuro {
+            background: #111827;
+            color: #e5e7eb;
+        }
+
+        .app-barra {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-barra button {
+            padding: 6px 12px;
+            border: 1px solid currentColor;
+            border-radius: 999px;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="app-notas" id="app-notas"&gt;
+        &lt;div class="app-barra"&gt;
+            &lt;strong&gt;Notas Kiwi&lt;/strong&gt;
+            &lt;button type="button" id="boton-tema"&gt;🌙 Modo oscuro&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;ul&gt;
+            &lt;li&gt;Comprar café en grano&lt;/li&gt;
+            &lt;li&gt;Llamar a Marta por el presupuesto&lt;/li&gt;
+            &lt;li&gt;Terminar el informe del viernes&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const app = document.querySelector("#app-notas");
+        const botonTema = document.querySelector("#boton-tema");
+
+        botonTema.addEventListener("click", () =&gt; {
+            app.classList.toggle("oscuro");
+
+            if (app.classList.contains("oscuro")) {
+                botonTema.textContent = "☀️ Modo claro";
+            } else {
+                botonTema.textContent = "🌙 Modo oscuro";
+            }
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-progreso" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Barra de progreso con style.width</h2>
+            <p>Cuando el valor sale de un cálculo (un porcentaje, una posición), se usa <code>style</code>. Cuando es un estado (completo, activo, error), se usa una clase.</p>
+            <div class="resultado">
+                <div class="curso">
+                    <p><strong>Curso de JavaScript</strong> · <span id="progreso-texto"></span></p>
+                    <div class="barra">
+                        <div class="barra-relleno" id="barra-relleno"></div>
+                    </div>
+                    <button type="button" id="completar-leccion">Completar lección</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="curso"&gt;
+    &lt;p&gt;&lt;strong&gt;Curso de JavaScript&lt;/strong&gt; · &lt;span id="progreso-texto"&gt;&lt;/span&gt;&lt;/p&gt;
+    &lt;div class="barra"&gt;
+        &lt;div class="barra-relleno" id="barra-relleno"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;button type="button" id="completar-leccion"&gt;Completar lección&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const relleno = document.querySelector("#barra-relleno");
+const texto = document.querySelector("#progreso-texto");
+const botonCompletar = document.querySelector("#completar-leccion");
+const total = 10;
+let completadas = 3;
+
+const actualizar = () =&gt; {
+    const porcentaje = (completadas / total) * 100;
+    relleno.style.width = `${porcentaje}%`;
+    texto.textContent = `${completadas} de ${total} lecciones (${porcentaje}%)`;
+    relleno.classList.toggle("completo", completadas === total);
+    botonCompletar.disabled = completadas === total;
+};
+
+actualizar();
+
+botonCompletar.addEventListener("click", () =&gt; {
+    completadas++;
+    actualizar();
+});</pre>
+                </figure>
+            </div>
+            <p><code>toggle("completo", condicion)</code> recibe un segundo argumento: si es <code>true</code> pone la clase y si es <code>false</code> la quita. Evita escribir un <code>if</code> con <code>add</code> y <code>remove</code>. Las propiedades de <code>style</code> van en camelCase: <code>style.backgroundColor</code>, <code>style.fontSize</code>.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Barra de progreso con style.width&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .barra {
+            height: 14px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e5e7eb;
+        }
+
+        .barra-relleno {
+            width: 0;
+            height: 100%;
+            background: #f7df1e;
+            transition: width 0.4s;
+        }
+
+        .barra-relleno.completo {
+            background: #22c55e;
+        }
+
+        .curso button {
+            margin-top: 12px;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .curso button:disabled {
+            opacity: 0.5;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="curso"&gt;
+        &lt;p&gt;&lt;strong&gt;Curso de JavaScript&lt;/strong&gt; · &lt;span id="progreso-texto"&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;div class="barra"&gt;
+            &lt;div class="barra-relleno" id="barra-relleno"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;button type="button" id="completar-leccion"&gt;Completar lección&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const relleno = document.querySelector("#barra-relleno");
+        const texto = document.querySelector("#progreso-texto");
+        const botonCompletar = document.querySelector("#completar-leccion");
+        const total = 10;
+        let completadas = 3;
+
+        const actualizar = () =&gt; {
+            const porcentaje = (completadas / total) * 100;
+            relleno.style.width = `${porcentaje}%`;
+            texto.textContent = `${completadas} de ${total} lecciones (${porcentaje}%)`;
+            relleno.classList.toggle("completo", completadas === total);
+            botonCompletar.disabled = completadas === total;
+        };
+
+        actualizar();
+
+        botonCompletar.addEventListener("click", () =&gt; {
+            completadas++;
+            actualizar();
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-atributos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Mostrar u ocultar la contraseña con getAttribute y setAttribute</h2>
+            <p>El botón del ojito de los formularios de login no hace magia: cambia el atributo <code>type</code> del input de <code>password</code> a <code>text</code> y viceversa.</p>
+            <div class="resultado">
+                <div class="campo-clave">
+                    <label for="clave">Contraseña</label>
+                    <div class="clave-fila">
+                        <input type="password" id="clave" value="kiwi-2026">
+                        <button type="button" id="ver-clave" aria-pressed="false">Mostrar</button>
+                    </div>
+                    <p>Atributo type actual: <code id="tipo-actual">password</code></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="campo-clave"&gt;
+    &lt;label for="clave"&gt;Contraseña&lt;/label&gt;
+    &lt;div class="clave-fila"&gt;
+        &lt;input type="password" id="clave" value="kiwi-2026"&gt;
+        &lt;button type="button" id="ver-clave" aria-pressed="false"&gt;Mostrar&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p&gt;Atributo type actual: &lt;code id="tipo-actual"&gt;password&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const campoClave = document.querySelector("#clave");
+const verClave = document.querySelector("#ver-clave");
+const tipoActual = document.querySelector("#tipo-actual");
+
+verClave.addEventListener("click", () =&gt; {
+    const visible = campoClave.getAttribute("type") === "text";
+
+    if (visible) {
+        campoClave.setAttribute("type", "password");
+        verClave.setAttribute("aria-pressed", "false");
+        verClave.textContent = "Mostrar";
+    } else {
+        campoClave.setAttribute("type", "text");
+        verClave.setAttribute("aria-pressed", "true");
+        verClave.textContent = "Ocultar";
+    }
+
+    tipoActual.textContent = campoClave.getAttribute("type");
+});</pre>
+                </figure>
+            </div>
+            <p><code>aria-pressed</code> le dice al lector de pantalla si el botón está activado. <code>getAttribute</code> siempre devuelve texto (o <code>null</code> si el atributo no existe); para quitarlo del todo existe <code>removeAttribute</code>.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Mostrar u ocultar la contraseña con getAttribute y setAttribute&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .campo-clave label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .clave-fila {
+            display: flex;
+            max-width: 320px;
+        }
+
+        .clave-fila input {
+            flex: 1;
+            min-width: 0;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px 0 0 8px;
+            font: inherit;
+        }
+
+        .clave-fila button {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-left: none;
+            border-radius: 0 8px 8px 0;
+            background: #f1f5f9;
+            cursor: pointer;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="campo-clave"&gt;
+        &lt;label for="clave"&gt;Contraseña&lt;/label&gt;
+        &lt;div class="clave-fila"&gt;
+            &lt;input type="password" id="clave" value="kiwi-2026"&gt;
+            &lt;button type="button" id="ver-clave" aria-pressed="false"&gt;Mostrar&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Atributo type actual: &lt;code id="tipo-actual"&gt;password&lt;/code&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const campoClave = document.querySelector("#clave");
+        const verClave = document.querySelector("#ver-clave");
+        const tipoActual = document.querySelector("#tipo-actual");
+
+        verClave.addEventListener("click", () =&gt; {
+            const visible = campoClave.getAttribute("type") === "text";
+
+            if (visible) {
+                campoClave.setAttribute("type", "password");
+                verClave.setAttribute("aria-pressed", "false");
+                verClave.textContent = "Mostrar";
+            } else {
+                campoClave.setAttribute("type", "text");
+                verClave.setAttribute("aria-pressed", "true");
+                verClave.textContent = "Ocultar";
+            }
+
+            tipoActual.textContent = campoClave.getAttribute("type");
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-notificaciones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Contador de notificaciones con createElement y prepend</h2>
+            <p>Cada notificación nueva se <strong>crea</strong> con <code>createElement</code>, se rellena con <code>textContent</code> y se coloca <strong>arriba</strong> con <code>prepend</code>. La burbuja roja cuenta cuántas llegaron.</p>
+            <div class="resultado">
+                <div class="bandeja">
+                    <div class="bandeja-cabecera">
+                        <strong>Notificaciones</strong>
+                        <span class="burbuja" id="burbuja-notis">0</span>
+                    </div>
+                    <ul class="lista-notis" id="lista-notis"></ul>
+                    <button type="button" id="nueva-noti">Simular notificación</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="bandeja"&gt;
+    &lt;div class="bandeja-cabecera"&gt;
+        &lt;strong&gt;Notificaciones&lt;/strong&gt;
+        &lt;span class="burbuja" id="burbuja-notis"&gt;0&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;ul class="lista-notis" id="lista-notis"&gt;&lt;/ul&gt;
+    &lt;button type="button" id="nueva-noti"&gt;Simular notificación&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const listaNotis = document.querySelector("#lista-notis");
+const burbuja = document.querySelector("#burbuja-notis");
+const botonNueva = document.querySelector("#nueva-noti");
+const mensajes = [
+    "Marta comentó tu foto",
+    "Tu pedido #4821 salió a reparto",
+    "Nuevo inicio de sesión desde Lima",
+    "Bruno te envió una solicitud",
+    "Quedan 2 días de tu prueba gratis",
+];
+let cantidad = 0;
+
+botonNueva.addEventListener("click", () =&gt; {
+    const item = document.createElement("li");
+    item.textContent = mensajes[cantidad % mensajes.length];
+    listaNotis.prepend(item);
+
+    cantidad++;
+    burbuja.textContent = cantidad &gt; 9 ? "9+" : cantidad;
+    burbuja.classList.add("activa");
+});</pre>
+                </figure>
+            </div>
+            <p><code>createElement</code> crea el elemento <em>en memoria</em>: no se ve hasta que lo metes en la página con <code>append</code> (al final) o <code>prepend</code> (al principio). El operador <code>%</code> hace que los mensajes vuelvan a empezar cuando se acaban.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Contador de notificaciones con createElement y prepend&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .bandeja {
+            max-width: 360px;
+            padding: 14px;
+            border: 1px solid #dfe3ec;
+            border-radius: 12px;
+        }
+
+        .bandeja-cabecera {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .burbuja {
+            min-width: 24px;
+            padding: 2px 6px;
+            border-radius: 999px;
+            background: #cbd5e1;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .burbuja.activa {
+            background: #ef4444;
+        }
+
+        .lista-notis {
+            max-height: 170px;
+            margin: 10px 0;
+            padding: 0;
+            overflow-y: auto;
+            list-style: none;
+        }
+
+        .lista-notis li {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .lista-notis li:first-child {
+            background: #fffbea;
+        }
+
+        .bandeja button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #f7df1e;
+            color: #1f2430;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="bandeja"&gt;
+        &lt;div class="bandeja-cabecera"&gt;
+            &lt;strong&gt;Notificaciones&lt;/strong&gt;
+            &lt;span class="burbuja" id="burbuja-notis"&gt;0&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;ul class="lista-notis" id="lista-notis"&gt;&lt;/ul&gt;
+        &lt;button type="button" id="nueva-noti"&gt;Simular notificación&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const listaNotis = document.querySelector("#lista-notis");
+        const burbuja = document.querySelector("#burbuja-notis");
+        const botonNueva = document.querySelector("#nueva-noti");
+        const mensajes = [
+            "Marta comentó tu foto",
+            "Tu pedido #4821 salió a reparto",
+            "Nuevo inicio de sesión desde Lima",
+            "Bruno te envió una solicitud",
+            "Quedan 2 días de tu prueba gratis",
+        ];
+        let cantidad = 0;
+
+        botonNueva.addEventListener("click", () =&gt; {
+            const item = document.createElement("li");
+            item.textContent = mensajes[cantidad % mensajes.length];
+            listaNotis.prepend(item);
+
+            cantidad++;
+            burbuja.textContent = cantidad &gt; 9 ? "9+" : cantidad;
+            burbuja.classList.add("activa");
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-tarjetas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Tarjetas de productos generadas desde un array de objetos</h2>
+            <p>Lo habitual en una tienda real: los productos llegan como datos y JavaScript fabrica una tarjeta por cada uno. El HTML solo tiene el contenedor vacío.</p>
+            <div class="resultado">
+                <div class="grilla-productos" id="grilla-productos"></div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="grilla-productos" id="grilla-productos"&gt;&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const productos = [
+    { nombre: "Taza Nubo", precio: 18, foto: 30, nuevo: false },
+    { nombre: "Té Andino", precio: 12.5, foto: 225, nuevo: true },
+    { nombre: "Café Altura", precio: 24, foto: 431, nuevo: false },
+    { nombre: "Cafetera Gota", precio: 59.9, foto: 1060, nuevo: true },
+];
+const grilla = document.querySelector("#grilla-productos");
+
+productos.forEach((producto) =&gt; {
+    const tarjeta = document.createElement("article");
+    tarjeta.className = "tarjeta-producto";
+
+    const imagen = document.createElement("img");
+    imagen.src = `https://picsum.photos/id/${producto.foto}/240/160`;
+    imagen.alt = producto.nombre;
+
+    const titulo = document.createElement("h3");
+    titulo.textContent = producto.nombre;
+
+    const precio = document.createElement("p");
+    precio.className = "precio";
+    precio.textContent = `$ ${producto.precio.toFixed(2)}`;
+
+    tarjeta.append(imagen, titulo, precio);
+
+    if (producto.nuevo) {
+        const etiqueta = document.createElement("span");
+        etiqueta.className = "etiqueta-nuevo";
+        etiqueta.textContent = "Nuevo";
+        tarjeta.prepend(etiqueta);
+    }
+
+    grilla.append(tarjeta);
+});</pre>
+                </figure>
+            </div>
+            <p><code>append</code> acepta varios elementos a la vez. Si mañana hay 200 productos, el código es el mismo: solo cambia el array. En la lección 26 estos datos llegarán de una API con <code>fetch</code>.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Tarjetas de productos generadas desde un array de objetos&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .grilla-productos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px;
+        }
+
+        .tarjeta-producto {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #dfe3ec;
+            border-radius: 12px;
+        }
+
+        .tarjeta-producto img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 3 / 2;
+            object-fit: cover;
+        }
+
+        .tarjeta-producto h3 {
+            margin: 8px 10px 0;
+            font-size: 1rem;
+        }
+
+        .tarjeta-producto .precio {
+            margin: 2px 10px 10px;
+            font-weight: 700;
+        }
+
+        .etiqueta-nuevo {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: #f7df1e;
+            color: #1f2430;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="grilla-productos" id="grilla-productos"&gt;&lt;/div&gt;
+    &lt;script&gt;
+        const productos = [
+            { nombre: "Taza Nubo", precio: 18, foto: 30, nuevo: false },
+            { nombre: "Té Andino", precio: 12.5, foto: 225, nuevo: true },
+            { nombre: "Café Altura", precio: 24, foto: 431, nuevo: false },
+            { nombre: "Cafetera Gota", precio: 59.9, foto: 1060, nuevo: true },
+        ];
+        const grilla = document.querySelector("#grilla-productos");
+
+        productos.forEach((producto) =&gt; {
+            const tarjeta = document.createElement("article");
+            tarjeta.className = "tarjeta-producto";
+
+            const imagen = document.createElement("img");
+            imagen.src = `https://picsum.photos/id/${producto.foto}/240/160`;
+            imagen.alt = producto.nombre;
+
+            const titulo = document.createElement("h3");
+            titulo.textContent = producto.nombre;
+
+            const precio = document.createElement("p");
+            precio.className = "precio";
+            precio.textContent = `$ ${producto.precio.toFixed(2)}`;
+
+            tarjeta.append(imagen, titulo, precio);
+
+            if (producto.nuevo) {
+                const etiqueta = document.createElement("span");
+                etiqueta.className = "etiqueta-nuevo";
+                etiqueta.textContent = "Nuevo";
+                tarjeta.prepend(etiqueta);
+            }
+
+            grilla.append(tarjeta);
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-galeria" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Galería generada con atributos data-* (dataset)</h2>
+            <p>Los atributos <code>data-algo</code> guardan información propia dentro del HTML. En JavaScript se leen y escriben con <code>dataset.algo</code>. Cada miniatura guarda el id de su foto y su autor.</p>
+            <div class="resultado">
+                <div class="galeria">
+                    <img id="galeria-grande" src="https://picsum.photos/id/1015/480/300" alt="Río entre montañas" width="480" height="300">
+                    <p id="galeria-pie">Río entre montañas · Foto de Ana Ríos</p>
+                    <div class="miniaturas" id="miniaturas"></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="galeria"&gt;
+    &lt;img id="galeria-grande" src="https://picsum.photos/id/1015/480/300" alt="Río entre montañas" width="480" height="300"&gt;
+    &lt;p id="galeria-pie"&gt;Río entre montañas · Foto de Ana Ríos&lt;/p&gt;
+    &lt;div class="miniaturas" id="miniaturas"&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const fotos = [
+    { id: 1015, titulo: "Río entre montañas", autor: "Ana Ríos" },
+    { id: 1016, titulo: "Cañón al atardecer", autor: "Bruno Sol" },
+    { id: 1018, titulo: "Valle verde", autor: "Carla Núñez" },
+    { id: 1039, titulo: "Cascada escondida", autor: "Diego Mar" },
+];
+const grande = document.querySelector("#galeria-grande");
+const pie = document.querySelector("#galeria-pie");
+const miniaturas = document.querySelector("#miniaturas");
+
+fotos.forEach((foto) =&gt; {
+    const boton = document.createElement("button");
+    boton.type = "button";
+    boton.className = "miniatura";
+    boton.dataset.foto = foto.id;
+    boton.dataset.autor = foto.autor;
+
+    const imagen = document.createElement("img");
+    imagen.src = `https://picsum.photos/id/${foto.id}/120/80`;
+    imagen.alt = foto.titulo;
+
+    boton.append(imagen);
+    miniaturas.append(boton);
+
+    boton.addEventListener("click", () =&gt; {
+        grande.src = `https://picsum.photos/id/${boton.dataset.foto}/480/300`;
+        grande.alt = imagen.alt;
+        pie.textContent = `${imagen.alt} · Foto de ${boton.dataset.autor}`;
+
+        document.querySelectorAll(".miniatura").forEach((otra) =&gt; {
+            otra.classList.remove("activa");
+        });
+        boton.classList.add("activa");
+    });
+});
+
+miniaturas.firstElementChild.classList.add("activa");</pre>
+                </figure>
+            </div>
+            <p>Abre las herramientas de desarrollo (F12) y mira el HTML de una miniatura: verás <code>data-foto="1016"</code> y <code>data-autor="Bruno Sol"</code>. <code>dataset</code> siempre guarda texto, y <code>data-precio-final</code> se lee como <code>dataset.precioFinal</code>.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Galería generada con atributos data-* (dataset)&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .galeria &gt; img {
+            display: block;
+            border-radius: 10px;
+        }
+
+        .galeria p {
+            margin: 6px 0 10px;
+            color: #5b6275;
+        }
+
+        .miniaturas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .miniatura {
+            padding: 0;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            background: none;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+
+        .miniatura img {
+            display: block;
+            width: 90px;
+            border-radius: 5px;
+        }
+
+        .miniatura.activa {
+            border-color: #f7df1e;
+            opacity: 1;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="galeria"&gt;
+        &lt;img id="galeria-grande" src="https://picsum.photos/id/1015/480/300" alt="Río entre montañas" width="480" height="300"&gt;
+        &lt;p id="galeria-pie"&gt;Río entre montañas · Foto de Ana Ríos&lt;/p&gt;
+        &lt;div class="miniaturas" id="miniaturas"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const fotos = [
+            { id: 1015, titulo: "Río entre montañas", autor: "Ana Ríos" },
+            { id: 1016, titulo: "Cañón al atardecer", autor: "Bruno Sol" },
+            { id: 1018, titulo: "Valle verde", autor: "Carla Núñez" },
+            { id: 1039, titulo: "Cascada escondida", autor: "Diego Mar" },
+        ];
+        const grande = document.querySelector("#galeria-grande");
+        const pie = document.querySelector("#galeria-pie");
+        const miniaturas = document.querySelector("#miniaturas");
+
+        fotos.forEach((foto) =&gt; {
+            const boton = document.createElement("button");
+            boton.type = "button";
+            boton.className = "miniatura";
+            boton.dataset.foto = foto.id;
+            boton.dataset.autor = foto.autor;
+
+            const imagen = document.createElement("img");
+            imagen.src = `https://picsum.photos/id/${foto.id}/120/80`;
+            imagen.alt = foto.titulo;
+
+            boton.append(imagen);
+            miniaturas.append(boton);
+
+            boton.addEventListener("click", () =&gt; {
+                grande.src = `https://picsum.photos/id/${boton.dataset.foto}/480/300`;
+                grande.alt = imagen.alt;
+                pie.textContent = `${imagen.alt} · Foto de ${boton.dataset.autor}`;
+
+                document.querySelectorAll(".miniatura").forEach((otra) =&gt; {
+                    otra.classList.remove("activa");
+                });
+                boton.classList.add("activa");
+            });
+        });
+
+        miniaturas.firstElementChild.classList.add("activa");
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-calificaciones" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Tabla de calificaciones con template literals</h2>
+            <p>Para estructuras con mucho HTML, a veces es más cómodo escribir cada fila como texto con <code>`…${}…`</code>, unirlas y asignarlas con <code>innerHTML</code> de una sola vez.</p>
+            <div class="resultado">
+                <table class="tabla-notas">
+                    <thead>
+                        <tr><th>Estudiante</th><th>Parcial</th><th>Final</th><th>Promedio</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody id="cuerpo-notas"></tbody>
+                    <tfoot>
+                        <tr><td colspan="3">Promedio del curso</td><td id="promedio-curso"></td><td></td></tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table class="tabla-notas"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;&lt;th&gt;Estudiante&lt;/th&gt;&lt;th&gt;Parcial&lt;/th&gt;&lt;th&gt;Final&lt;/th&gt;&lt;th&gt;Promedio&lt;/th&gt;&lt;th&gt;Estado&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody id="cuerpo-notas"&gt;&lt;/tbody&gt;
+    &lt;tfoot&gt;
+        &lt;tr&gt;&lt;td colspan="3"&gt;Promedio del curso&lt;/td&gt;&lt;td id="promedio-curso"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tfoot&gt;
+&lt;/table&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const estudiantes = [
+    { nombre: "Lucía Paredes", parcial: 16, final: 18 },
+    { nombre: "Mateo Quispe", parcial: 9, final: 11 },
+    { nombre: "Sofía Linares", parcial: 14, final: 12 },
+    { nombre: "Tomás Vera", parcial: 8, final: 9 },
+    { nombre: "Valeria Soto", parcial: 19, final: 20 },
+];
+
+const promedios = estudiantes.map((estudiante) =&gt; (estudiante.parcial + estudiante.final) / 2);
+
+const filas = estudiantes.map((estudiante, indice) =&gt; {
+    const promedio = promedios[indice];
+    const estado = promedio &gt;= 11 ? "aprobado" : "desaprobado";
+
+    return `
+        &lt;tr class="${estado}"&gt;
+            &lt;td&gt;${estudiante.nombre}&lt;/td&gt;
+            &lt;td&gt;${estudiante.parcial}&lt;/td&gt;
+            &lt;td&gt;${estudiante.final}&lt;/td&gt;
+            &lt;td&gt;${promedio.toFixed(1)}&lt;/td&gt;
+            &lt;td&gt;${estado}&lt;/td&gt;
+        &lt;/tr&gt;
+    `;
+});
+
+document.querySelector("#cuerpo-notas").innerHTML = filas.join("");
+
+const suma = promedios.reduce((total, promedio) =&gt; total + promedio, 0);
+document.querySelector("#promedio-curso").textContent = (suma / promedios.length).toFixed(1);</pre>
+                </figure>
+            </div>
+            <p>Usar <code>innerHTML</code> aquí es seguro porque los datos son nuestros. Si los nombres los escribiera el público, volveríamos a <code>createElement</code> + <code>textContent</code> (ejemplo 3). Evita <code>innerHTML +=</code> dentro de un bucle: reconstruye todo el contenido en cada vuelta.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Tabla de calificaciones con template literals&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .tabla-notas {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tabla-notas th,
+        .tabla-notas td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        .tabla-notas thead {
+            background: #1f2430;
+            color: #f7df1e;
+        }
+
+        .tabla-notas tfoot {
+            font-weight: 700;
+        }
+
+        .aprobado td:last-child {
+            color: #15803d;
+            font-weight: 700;
+        }
+
+        .desaprobado {
+            background: #fef2f2;
+        }
+
+        .desaprobado td:last-child {
+            color: #b91c1c;
+            font-weight: 700;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;table class="tabla-notas"&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;&lt;th&gt;Estudiante&lt;/th&gt;&lt;th&gt;Parcial&lt;/th&gt;&lt;th&gt;Final&lt;/th&gt;&lt;th&gt;Promedio&lt;/th&gt;&lt;th&gt;Estado&lt;/th&gt;&lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody id="cuerpo-notas"&gt;&lt;/tbody&gt;
+        &lt;tfoot&gt;
+            &lt;tr&gt;&lt;td colspan="3"&gt;Promedio del curso&lt;/td&gt;&lt;td id="promedio-curso"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tfoot&gt;
+    &lt;/table&gt;
+    &lt;script&gt;
+        const estudiantes = [
+            { nombre: "Lucía Paredes", parcial: 16, final: 18 },
+            { nombre: "Mateo Quispe", parcial: 9, final: 11 },
+            { nombre: "Sofía Linares", parcial: 14, final: 12 },
+            { nombre: "Tomás Vera", parcial: 8, final: 9 },
+            { nombre: "Valeria Soto", parcial: 19, final: 20 },
+        ];
+
+        const promedios = estudiantes.map((estudiante) =&gt; (estudiante.parcial + estudiante.final) / 2);
+
+        const filas = estudiantes.map((estudiante, indice) =&gt; {
+            const promedio = promedios[indice];
+            const estado = promedio &gt;= 11 ? "aprobado" : "desaprobado";
+
+            return `
+                &lt;tr class="${estado}"&gt;
+                    &lt;td&gt;${estudiante.nombre}&lt;/td&gt;
+                    &lt;td&gt;${estudiante.parcial}&lt;/td&gt;
+                    &lt;td&gt;${estudiante.final}&lt;/td&gt;
+                    &lt;td&gt;${promedio.toFixed(1)}&lt;/td&gt;
+                    &lt;td&gt;${estado}&lt;/td&gt;
+                &lt;/tr&gt;
+            `;
+        });
+
+        document.querySelector("#cuerpo-notas").innerHTML = filas.join("");
+
+        const suma = promedios.reduce((total, promedio) =&gt; total + promedio, 0);
+        document.querySelector("#promedio-curso").textContent = (suma / promedios.length).toFixed(1);
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-contactos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Lista de contactos con avatar de iniciales</h2>
+            <p>Como en las apps de correo: si no hay foto, se muestran las iniciales sobre un color. Se ordena el array, se calculan las iniciales y el color se aplica con <code>style</code>.</p>
+            <div class="resultado">
+                <p id="total-contactos"></p>
+                <ul class="contactos" id="lista-contactos"></ul>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p id="total-contactos"&gt;&lt;/p&gt;
+&lt;ul class="contactos" id="lista-contactos"&gt;&lt;/ul&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const contactos = [
+    { nombre: "Rosa Delgado", correo: "rosa@correo.test", color: "#8b5cf6" },
+    { nombre: "Andrés Molina", correo: "andres@correo.test", color: "#f97316" },
+    { nombre: "Carla Núñez", correo: "carla@correo.test", color: "#0ea5e9" },
+    { nombre: "Bruno Sol", correo: "bruno@correo.test", color: "#22c55e" },
+];
+const listaContactos = document.querySelector("#lista-contactos");
+
+contactos.sort((a, b) =&gt; a.nombre.localeCompare(b.nombre));
+
+contactos.forEach((contacto) =&gt; {
+    const iniciales = contacto.nombre
+        .split(" ")
+        .map((parte) =&gt; parte[0])
+        .join("")
+        .toUpperCase();
+
+    const item = document.createElement("li");
+
+    const avatar = document.createElement("span");
+    avatar.className = "avatar";
+    avatar.textContent = iniciales;
+    avatar.style.backgroundColor = contacto.color;
+
+    const nombre = document.createElement("strong");
+    nombre.textContent = contacto.nombre;
+
+    const correo = document.createElement("small");
+    correo.textContent = contacto.correo;
+
+    const datos = document.createElement("div");
+    datos.append(nombre, correo);
+
+    item.append(avatar, datos);
+    listaContactos.append(item);
+});
+
+document.querySelector("#total-contactos").textContent = `${contactos.length} contactos`;</pre>
+                </figure>
+            </div>
+            <p>Encadenar métodos de arrays (lección 21) es muy común en el DOM: <code>split</code> separa el nombre, <code>map</code> toma la primera letra y <code>join</code> las une.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Lista de contactos con avatar de iniciales&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .contactos {
+            max-width: 380px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .contactos li {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .contactos div {
+            display: grid;
+        }
+
+        .contactos small {
+            color: #5b6275;
+        }
+
+        .avatar {
+            display: grid;
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            place-items: center;
+            border-radius: 50%;
+            color: #ffffff;
+            font-weight: 700;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p id="total-contactos"&gt;&lt;/p&gt;
+    &lt;ul class="contactos" id="lista-contactos"&gt;&lt;/ul&gt;
+    &lt;script&gt;
+        const contactos = [
+            { nombre: "Rosa Delgado", correo: "rosa@correo.test", color: "#8b5cf6" },
+            { nombre: "Andrés Molina", correo: "andres@correo.test", color: "#f97316" },
+            { nombre: "Carla Núñez", correo: "carla@correo.test", color: "#0ea5e9" },
+            { nombre: "Bruno Sol", correo: "bruno@correo.test", color: "#22c55e" },
+        ];
+        const listaContactos = document.querySelector("#lista-contactos");
+
+        contactos.sort((a, b) =&gt; a.nombre.localeCompare(b.nombre));
+
+        contactos.forEach((contacto) =&gt; {
+            const iniciales = contacto.nombre
+                .split(" ")
+                .map((parte) =&gt; parte[0])
+                .join("")
+                .toUpperCase();
+
+            const item = document.createElement("li");
+
+            const avatar = document.createElement("span");
+            avatar.className = "avatar";
+            avatar.textContent = iniciales;
+            avatar.style.backgroundColor = contacto.color;
+
+            const nombre = document.createElement("strong");
+            nombre.textContent = contacto.nombre;
+
+            const correo = document.createElement("small");
+            correo.textContent = contacto.correo;
+
+            const datos = document.createElement("div");
+            datos.append(nombre, correo);
+
+            item.append(avatar, datos);
+            listaContactos.append(item);
+        });
+
+        document.querySelector("#total-contactos").textContent = `${contactos.length} contactos`;
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-menu" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Menú de navegación generado desde datos</h2>
+            <p>Muchos sitios guardan el menú como datos para poder cambiarlo sin tocar el HTML. Aquí se marca la página actual con <code>aria-current</code> y las secciones nuevas con una clase.</p>
+            <div class="resultado">
+                <nav class="menu-datos" aria-label="Menú de la tienda">
+                    <ul id="menu-principal"></ul>
+                </nav>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;nav class="menu-datos" aria-label="Menú de la tienda"&gt;
+    &lt;ul id="menu-principal"&gt;&lt;/ul&gt;
+&lt;/nav&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const secciones = [
+    { texto: "Inicio", url: "#inicio" },
+    { texto: "Tienda", url: "#tienda" },
+    { texto: "Ofertas", url: "#ofertas", nuevo: true },
+    { texto: "Blog", url: "#blog" },
+    { texto: "Contacto", url: "#contacto" },
+];
+const paginaActual = "#tienda";
+const menu = document.querySelector("#menu-principal");
+
+secciones.forEach((seccion) =&gt; {
+    const enlace = document.createElement("a");
+    enlace.href = seccion.url;
+    enlace.textContent = seccion.texto;
+
+    if (seccion.url === paginaActual) {
+        enlace.setAttribute("aria-current", "page");
+    }
+
+    if (seccion.nuevo) {
+        enlace.classList.add("con-novedad");
+    }
+
+    const item = document.createElement("li");
+    item.append(enlace);
+    menu.append(item);
+});</pre>
+                </figure>
+            </div>
+            <p>El CSS puede seleccionar el enlace activo por su atributo (<code>a[aria-current="page"]</code>), así no hace falta una clase extra y el lector de pantalla anuncia “página actual”.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Menú de navegación generado desde datos&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .menu-datos {
+            padding: 10px;
+            border-radius: 12px;
+            background: #1f2430;
+        }
+
+        .menu-datos ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .menu-datos a {
+            position: relative;
+            display: block;
+            padding: 8px 14px;
+            border-radius: 8px;
+            color: #e5e7eb;
+            text-decoration: none;
+        }
+
+        .menu-datos a:hover {
+            background: #374151;
+        }
+
+        .menu-datos a[aria-current="page"] {
+            background: #f7df1e;
+            color: #1f2430;
+            font-weight: 700;
+        }
+
+        .con-novedad::after {
+            content: "";
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav class="menu-datos" aria-label="Menú de la tienda"&gt;
+        &lt;ul id="menu-principal"&gt;&lt;/ul&gt;
+    &lt;/nav&gt;
+    &lt;script&gt;
+        const secciones = [
+            { texto: "Inicio", url: "#inicio" },
+            { texto: "Tienda", url: "#tienda" },
+            { texto: "Ofertas", url: "#ofertas", nuevo: true },
+            { texto: "Blog", url: "#blog" },
+            { texto: "Contacto", url: "#contacto" },
+        ];
+        const paginaActual = "#tienda";
+        const menu = document.querySelector("#menu-principal");
+
+        secciones.forEach((seccion) =&gt; {
+            const enlace = document.createElement("a");
+            enlace.href = seccion.url;
+            enlace.textContent = seccion.texto;
+
+            if (seccion.url === paginaActual) {
+                enlace.setAttribute("aria-current", "page");
+            }
+
+            if (seccion.nuevo) {
+                enlace.classList.add("con-novedad");
+            }
+
+            const item = document.createElement("li");
+            item.append(enlace);
+            menu.append(item);
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-resaltar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Resaltar los resultados de una búsqueda</h2>
+            <p>Se recorren las preguntas frecuentes y se marca con <code>classList.toggle</code> las que contienen el término. Cambia el texto y pulsa Buscar.</p>
+            <div class="resultado">
+                <div class="buscador-faq">
+                    <div class="buscador-fila">
+                        <label for="buscar-faq">Buscar en la ayuda</label>
+                        <input type="search" id="buscar-faq" value="envío">
+                        <button type="button" id="boton-buscar-faq">Buscar</button>
+                    </div>
+                    <p id="faq-resumen"></p>
+                    <ul class="faq">
+                        <li>¿Cuánto cuesta el envío a provincias?</li>
+                        <li>¿Puedo cambiar la talla de mi pedido?</li>
+                        <li>El envío express llega en 24 horas</li>
+                        <li>¿Cómo pido factura?</li>
+                        <li>Seguimiento del envío paso a paso</li>
+                        <li>Devoluciones y reembolsos</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="buscador-faq"&gt;
+    &lt;div class="buscador-fila"&gt;
+        &lt;label for="buscar-faq"&gt;Buscar en la ayuda&lt;/label&gt;
+        &lt;input type="search" id="buscar-faq" value="envío"&gt;
+        &lt;button type="button" id="boton-buscar-faq"&gt;Buscar&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p id="faq-resumen"&gt;&lt;/p&gt;
+    &lt;ul class="faq"&gt;
+        &lt;li&gt;¿Cuánto cuesta el envío a provincias?&lt;/li&gt;
+        &lt;li&gt;¿Puedo cambiar la talla de mi pedido?&lt;/li&gt;
+        &lt;li&gt;El envío express llega en 24 horas&lt;/li&gt;
+        &lt;li&gt;¿Cómo pido factura?&lt;/li&gt;
+        &lt;li&gt;Seguimiento del envío paso a paso&lt;/li&gt;
+        &lt;li&gt;Devoluciones y reembolsos&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const campoBusqueda = document.querySelector("#buscar-faq");
+const botonBuscar = document.querySelector("#boton-buscar-faq");
+const preguntas = document.querySelectorAll(".faq li");
+const resumen = document.querySelector("#faq-resumen");
+
+const resaltar = () =&gt; {
+    const termino = campoBusqueda.value.trim().toLowerCase();
+    let coincidencias = 0;
+
+    preguntas.forEach((pregunta) =&gt; {
+        const coincide = termino !== "" &amp;&amp; pregunta.textContent.toLowerCase().includes(termino);
+        pregunta.classList.toggle("resaltado", coincide);
+
+        if (coincide) {
+            coincidencias++;
+        }
+    });
+
+    resumen.textContent = `${coincidencias} resultado(s) para "${termino}"`;
+};
+
+resaltar();
+botonBuscar.addEventListener("click", resaltar);</pre>
+                </figure>
+            </div>
+            <p>Con <code>toLowerCase()</code> en los dos lados, “Envío” y “envío” coinciden. En la lección 23 haremos que se resalte mientras se escribe, sin pulsar el botón.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Resaltar los resultados de una búsqueda&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .buscador-fila {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .buscador-fila input {
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        .buscador-fila button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .faq {
+            padding: 0;
+            list-style: none;
+        }
+
+        .faq li {
+            margin-bottom: 4px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .faq li.resaltado {
+            background: #fef08a;
+            font-weight: 700;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="buscador-faq"&gt;
+        &lt;div class="buscador-fila"&gt;
+            &lt;label for="buscar-faq"&gt;Buscar en la ayuda&lt;/label&gt;
+            &lt;input type="search" id="buscar-faq" value="envío"&gt;
+            &lt;button type="button" id="boton-buscar-faq"&gt;Buscar&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;p id="faq-resumen"&gt;&lt;/p&gt;
+        &lt;ul class="faq"&gt;
+            &lt;li&gt;¿Cuánto cuesta el envío a provincias?&lt;/li&gt;
+            &lt;li&gt;¿Puedo cambiar la talla de mi pedido?&lt;/li&gt;
+            &lt;li&gt;El envío express llega en 24 horas&lt;/li&gt;
+            &lt;li&gt;¿Cómo pido factura?&lt;/li&gt;
+            &lt;li&gt;Seguimiento del envío paso a paso&lt;/li&gt;
+            &lt;li&gt;Devoluciones y reembolsos&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const campoBusqueda = document.querySelector("#buscar-faq");
+        const botonBuscar = document.querySelector("#boton-buscar-faq");
+        const preguntas = document.querySelectorAll(".faq li");
+        const resumen = document.querySelector("#faq-resumen");
+
+        const resaltar = () =&gt; {
+            const termino = campoBusqueda.value.trim().toLowerCase();
+            let coincidencias = 0;
+
+            preguntas.forEach((pregunta) =&gt; {
+                const coincide = termino !== "" &amp;&amp; pregunta.textContent.toLowerCase().includes(termino);
+                pregunta.classList.toggle("resaltado", coincide);
+
+                if (coincide) {
+                    coincidencias++;
+                }
+            });
+
+            resumen.textContent = `${coincidencias} resultado(s) para "${termino}"`;
+        };
+
+        resaltar();
+        botonBuscar.addEventListener("click", resaltar);
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-eliminar" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Eliminar elementos con remove()</h2>
+            <p>Una lista de archivos subidos: unos fallaron (en rojo). Cada botón elimina elementos de forma distinta y el texto de abajo cuenta cuántos quedan con <code>children.length</code>.</p>
+            <div class="resultado">
+                <div class="archivos">
+                    <ul id="lista-archivos">
+                        <li class="archivo">informe-ventas.pdf</li>
+                        <li class="archivo error">foto-perfil.heic</li>
+                        <li class="archivo">presupuesto.xlsx</li>
+                        <li class="archivo error">video-demo.mov</li>
+                        <li class="archivo">contrato.docx</li>
+                    </ul>
+                    <div class="acciones-archivos">
+                        <button type="button" id="quitar-errores">Quitar los que fallaron</button>
+                        <button type="button" id="quitar-primero">Quitar el primero</button>
+                        <button type="button" id="vaciar-archivos">Vaciar todo</button>
+                    </div>
+                    <p id="estado-archivos"></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="archivos"&gt;
+    &lt;ul id="lista-archivos"&gt;
+        &lt;li class="archivo"&gt;informe-ventas.pdf&lt;/li&gt;
+        &lt;li class="archivo error"&gt;foto-perfil.heic&lt;/li&gt;
+        &lt;li class="archivo"&gt;presupuesto.xlsx&lt;/li&gt;
+        &lt;li class="archivo error"&gt;video-demo.mov&lt;/li&gt;
+        &lt;li class="archivo"&gt;contrato.docx&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;div class="acciones-archivos"&gt;
+        &lt;button type="button" id="quitar-errores"&gt;Quitar los que fallaron&lt;/button&gt;
+        &lt;button type="button" id="quitar-primero"&gt;Quitar el primero&lt;/button&gt;
+        &lt;button type="button" id="vaciar-archivos"&gt;Vaciar todo&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p id="estado-archivos"&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const listaArchivos = document.querySelector("#lista-archivos");
+const estadoArchivos = document.querySelector("#estado-archivos");
+
+const contar = () =&gt; {
+    estadoArchivos.textContent = `${listaArchivos.children.length} archivo(s) en la lista`;
+};
+
+contar();
+
+document.querySelector("#quitar-errores").addEventListener("click", () =&gt; {
+    document.querySelectorAll(".archivo.error").forEach((archivo) =&gt; {
+        archivo.remove();
+    });
+    contar();
+});
+
+document.querySelector("#quitar-primero").addEventListener("click", () =&gt; {
+    const primero = listaArchivos.firstElementChild;
+
+    if (primero) {
+        primero.remove();
+    }
+    contar();
+});
+
+document.querySelector("#vaciar-archivos").addEventListener("click", () =&gt; {
+    listaArchivos.replaceChildren();
+    contar();
+});</pre>
+                </figure>
+            </div>
+            <p><code>remove()</code> se llama sobre el elemento que quieres borrar. <code>replaceChildren()</code> sin argumentos deja al padre vacío; es más claro y seguro que <code>innerHTML = ""</code>.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Eliminar elementos con remove()&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .archivos ul {
+            display: grid;
+            gap: 6px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .archivo {
+            padding: 8px 12px;
+            border: 1px solid #dfe3ec;
+            border-radius: 8px;
+        }
+
+        .archivo::before {
+            content: "📄 ";
+        }
+
+        .archivo.error {
+            border-color: #fca5a5;
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .acciones-archivos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .acciones-archivos button {
+            padding: 6px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            cursor: pointer;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="archivos"&gt;
+        &lt;ul id="lista-archivos"&gt;
+            &lt;li class="archivo"&gt;informe-ventas.pdf&lt;/li&gt;
+            &lt;li class="archivo error"&gt;foto-perfil.heic&lt;/li&gt;
+            &lt;li class="archivo"&gt;presupuesto.xlsx&lt;/li&gt;
+            &lt;li class="archivo error"&gt;video-demo.mov&lt;/li&gt;
+            &lt;li class="archivo"&gt;contrato.docx&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;div class="acciones-archivos"&gt;
+            &lt;button type="button" id="quitar-errores"&gt;Quitar los que fallaron&lt;/button&gt;
+            &lt;button type="button" id="quitar-primero"&gt;Quitar el primero&lt;/button&gt;
+            &lt;button type="button" id="vaciar-archivos"&gt;Vaciar todo&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;p id="estado-archivos"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const listaArchivos = document.querySelector("#lista-archivos");
+        const estadoArchivos = document.querySelector("#estado-archivos");
+
+        const contar = () =&gt; {
+            estadoArchivos.textContent = `${listaArchivos.children.length} archivo(s) en la lista`;
+        };
+
+        contar();
+
+        document.querySelector("#quitar-errores").addEventListener("click", () =&gt; {
+            document.querySelectorAll(".archivo.error").forEach((archivo) =&gt; {
+                archivo.remove();
+            });
+            contar();
+        });
+
+        document.querySelector("#quitar-primero").addEventListener("click", () =&gt; {
+            const primero = listaArchivos.firstElementChild;
+
+            if (primero) {
+                primero.remove();
+            }
+            contar();
+        });
+
+        document.querySelector("#vaciar-archivos").addEventListener("click", () =&gt; {
+            listaArchivos.replaceChildren();
+            contar();
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-template" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Reseñas clonadas desde un &lt;template&gt;</h2>
+            <p>El contenido de <code>&lt;template&gt;</code> no se muestra: es un molde. JavaScript lo copia con <code>cloneNode(true)</code>, rellena cada copia y la agrega. Así el HTML de la tarjeta sigue estando en el HTML.</p>
+            <div class="resultado">
+                <div id="lista-resenas" class="lista-resenas"></div>
+
+                <template id="plantilla-resena">
+                    <article class="resena">
+                        <header>
+                            <strong class="resena-autor"></strong>
+                            <span class="resena-estrellas"></span>
+                        </header>
+                        <p class="resena-texto"></p>
+                    </article>
+                </template>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div id="lista-resenas" class="lista-resenas"&gt;&lt;/div&gt;
+
+&lt;template id="plantilla-resena"&gt;
+    &lt;article class="resena"&gt;
+        &lt;header&gt;
+            &lt;strong class="resena-autor"&gt;&lt;/strong&gt;
+            &lt;span class="resena-estrellas"&gt;&lt;/span&gt;
+        &lt;/header&gt;
+        &lt;p class="resena-texto"&gt;&lt;/p&gt;
+    &lt;/article&gt;
+&lt;/template&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const resenas = [
+    { autor: "Paula G.", estrellas: 5, texto: "Llegó en dos días y la calidad es excelente." },
+    { autor: "Iván R.", estrellas: 3, texto: "Buen producto, pero la caja vino golpeada." },
+    { autor: "Rocío M.", estrellas: 4, texto: "Cumple lo que promete. Lo volvería a comprar." },
+];
+const plantilla = document.querySelector("#plantilla-resena");
+const contenedorResenas = document.querySelector("#lista-resenas");
+
+resenas.forEach((resena) =&gt; {
+    const copia = plantilla.content.cloneNode(true);
+
+    copia.querySelector(".resena-autor").textContent = resena.autor;
+    copia.querySelector(".resena-estrellas").textContent = "★".repeat(resena.estrellas) + "☆".repeat(5 - resena.estrellas);
+    copia.querySelector(".resena-texto").textContent = resena.texto;
+
+    contenedorResenas.append(copia);
+});</pre>
+                </figure>
+            </div>
+            <p>Ventaja frente al ejemplo 9: el diseño de la tarjeta se lee como HTML normal y JavaScript solo rellena huecos. Y como usamos <code>textContent</code>, sigue siendo seguro con textos del público.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Reseñas clonadas desde un &lt;template&gt;&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .lista-resenas {
+            display: grid;
+            gap: 10px;
+        }
+
+        .resena {
+            padding: 12px 14px;
+            border: 1px solid #dfe3ec;
+            border-radius: 10px;
+        }
+
+        .resena header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .resena-estrellas {
+            color: #eab308;
+            letter-spacing: 2px;
+        }
+
+        .resena p {
+            margin: 6px 0 0;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="lista-resenas" class="lista-resenas"&gt;&lt;/div&gt;
+
+    &lt;template id="plantilla-resena"&gt;
+        &lt;article class="resena"&gt;
+            &lt;header&gt;
+                &lt;strong class="resena-autor"&gt;&lt;/strong&gt;
+                &lt;span class="resena-estrellas"&gt;&lt;/span&gt;
+            &lt;/header&gt;
+            &lt;p class="resena-texto"&gt;&lt;/p&gt;
+        &lt;/article&gt;
+    &lt;/template&gt;
+    &lt;script&gt;
+        const resenas = [
+            { autor: "Paula G.", estrellas: 5, texto: "Llegó en dos días y la calidad es excelente." },
+            { autor: "Iván R.", estrellas: 3, texto: "Buen producto, pero la caja vino golpeada." },
+            { autor: "Rocío M.", estrellas: 4, texto: "Cumple lo que promete. Lo volvería a comprar." },
+        ];
+        const plantilla = document.querySelector("#plantilla-resena");
+        const contenedorResenas = document.querySelector("#lista-resenas");
+
+        resenas.forEach((resena) =&gt; {
+            const copia = plantilla.content.cloneNode(true);
+
+            copia.querySelector(".resena-autor").textContent = resena.autor;
+            copia.querySelector(".resena-estrellas").textContent = "★".repeat(resena.estrellas) + "☆".repeat(5 - resena.estrellas);
+            copia.querySelector(".resena-texto").textContent = resena.texto;
+
+            contenedorResenas.append(copia);
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-recorrer" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Recorrer el árbol: parentElement, children y closest</h2>
+            <p>Desde un elemento puedes subir a su padre, bajar a sus hijos o moverte entre hermanos. <code>closest</code> sube hasta encontrar el primer ancestro que cumple un selector; es la herramienta estrella de la lección 23.</p>
+            <div class="resultado">
+                <div class="pedido" data-numero="4821">
+                    <h3>Pedido #4821</h3>
+                    <ul class="pedido-items">
+                        <li><span class="nombre-item">Taza Nubo</span> <span class="cantidad-item">x2</span></li>
+                        <li><span class="nombre-item">Té Andino</span> <span class="cantidad-item">x1</span></li>
+                        <li><span class="nombre-item">Café Altura</span> <span class="cantidad-item">x3</span></li>
+                    </ul>
+                </div>
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="pedido" data-numero="4821"&gt;
+    &lt;h3&gt;Pedido #4821&lt;/h3&gt;
+    &lt;ul class="pedido-items"&gt;
+        &lt;li&gt;&lt;span class="nombre-item"&gt;Taza Nubo&lt;/span&gt; &lt;span class="cantidad-item"&gt;x2&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span class="nombre-item"&gt;Té Andino&lt;/span&gt; &lt;span class="cantidad-item"&gt;x1&lt;/span&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;span class="nombre-item"&gt;Café Altura&lt;/span&gt; &lt;span class="cantidad-item"&gt;x3&lt;/span&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const cantidad = document.querySelector(".cantidad-item");
+console.log("Empiezo en:", cantidad.tagName, cantidad.textContent);
+
+const item = cantidad.parentElement;
+console.log("Su padre es un", item.tagName);
+
+const lista = item.parentElement;
+console.log("La lista tiene", lista.children.length, "productos");
+
+for (const hijo of lista.children) {
+    console.log(" -", hijo.querySelector(".nombre-item").textContent);
+}
+
+console.log("Último:", lista.lastElementChild.textContent);
+console.log("Hermano siguiente:", item.nextElementSibling.textContent);
+
+const pedido = cantidad.closest(".pedido");
+console.log("Número de pedido:", pedido.dataset.numero);
+console.log("¿Está dentro de un .carrito?", cantidad.closest(".carrito"));</pre>
+                </figure>
+            </div>
+            <p>Usa <code>children</code>, <code>firstElementChild</code> y <code>nextElementSibling</code>, que solo cuentan elementos. Sus primos <code>childNodes</code>, <code>firstChild</code> y <code>nextSibling</code> también cuentan los saltos de línea como nodos de texto, y suelen sorprender.</p>
+        </section>
+
+        <section id="ej-migas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Breadcrumbs (migas de pan) generados desde la ruta</h2>
+            <p>A partir de una ruta como <code>/tienda/hogar/cocina/…</code> se construye la navegación “Inicio › Tienda › Hogar…”. El último nivel no es enlace: es la página actual.</p>
+            <div class="resultado">
+                <nav class="migas" aria-label="Ruta de navegación">
+                    <ol id="migas">
+                        <li><a href="/">Inicio</a></li>
+                    </ol>
+                </nav>
+                <p>Ruta: <code id="ruta-actual"></code></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;nav class="migas" aria-label="Ruta de navegación"&gt;
+    &lt;ol id="migas"&gt;
+        &lt;li&gt;&lt;a href="/"&gt;Inicio&lt;/a&gt;&lt;/li&gt;
+    &lt;/ol&gt;
+&lt;/nav&gt;
+&lt;p&gt;Ruta: &lt;code id="ruta-actual"&gt;&lt;/code&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const ruta = "/tienda/hogar/cocina/sartenes-antiadherentes";
+const partes = ruta.split("/").filter((parte) =&gt; parte !== "");
+const migas = document.querySelector("#migas");
+let acumulado = "";
+
+document.querySelector("#ruta-actual").textContent = ruta;
+
+partes.forEach((parte, indice) =&gt; {
+    acumulado += `/${parte}`;
+    const texto = parte.replaceAll("-", " ");
+    const nombre = texto[0].toUpperCase() + texto.slice(1);
+    const item = document.createElement("li");
+
+    if (indice === partes.length - 1) {
+        const actual = document.createElement("span");
+        actual.textContent = nombre;
+        actual.setAttribute("aria-current", "page");
+        item.append(actual);
+    } else {
+        const enlace = document.createElement("a");
+        enlace.href = acumulado;
+        enlace.textContent = nombre;
+        item.append(enlace);
+    }
+
+    migas.append(item);
+});</pre>
+                </figure>
+            </div>
+            <p>En un sitio real la ruta saldría de <code>location.pathname</code>, que contiene la ruta de la página actual. Los separadores “›” los pone el CSS con <code>li + li::before</code>, no JavaScript.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Breadcrumbs (migas de pan) generados desde la ruta&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .migas ol {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .migas li + li::before {
+            content: "›";
+            margin: 0 8px;
+            color: #94a3b8;
+        }
+
+        .migas a {
+            color: #2563eb;
+        }
+
+        .migas [aria-current="page"] {
+            color: #5b6275;
+            font-weight: 700;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav class="migas" aria-label="Ruta de navegación"&gt;
+        &lt;ol id="migas"&gt;
+            &lt;li&gt;&lt;a href="/"&gt;Inicio&lt;/a&gt;&lt;/li&gt;
+        &lt;/ol&gt;
+    &lt;/nav&gt;
+    &lt;p&gt;Ruta: &lt;code id="ruta-actual"&gt;&lt;/code&gt;&lt;/p&gt;
+    &lt;script&gt;
+        const ruta = "/tienda/hogar/cocina/sartenes-antiadherentes";
+        const partes = ruta.split("/").filter((parte) =&gt; parte !== "");
+        const migas = document.querySelector("#migas");
+        let acumulado = "";
+
+        document.querySelector("#ruta-actual").textContent = ruta;
+
+        partes.forEach((parte, indice) =&gt; {
+            acumulado += `/${parte}`;
+            const texto = parte.replaceAll("-", " ");
+            const nombre = texto[0].toUpperCase() + texto.slice(1);
+            const item = document.createElement("li");
+
+            if (indice === partes.length - 1) {
+                const actual = document.createElement("span");
+                actual.textContent = nombre;
+                actual.setAttribute("aria-current", "page");
+                item.append(actual);
+            } else {
+                const enlace = document.createElement("a");
+                enlace.href = acumulado;
+                enlace.textContent = nombre;
+                item.append(enlace);
+            }
+
+            migas.append(item);
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="21-js-arrays-objetos.html">Anterior: arrays y objetos</a> |
+            <a href="index.html">Índice</a> |
+            <a href="23-js-eventos.html">Siguiente: eventos</a>
+        </nav>
+    </footer>
+</body>
+</html>

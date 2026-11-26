@@ -1,0 +1,3811 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>25. JavaScript: localStorage</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <script src="js/consola.js" defer></script>
+    <link rel="stylesheet" href="css/25-js-localstorage.css">
+    <script src="js/25-js-localstorage.js" defer></script>
+</head>
+<body class="leccion-js">
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>25. JavaScript: localStorage</h1>
+        <p>Hasta ahora todo lo que hacía la página se perdía al recargar. Con <code>localStorage</code> el navegador recuerda datos entre visitas: el tema elegido, una lista de tareas, el carrito, un borrador, el récord de un juego. En cada ejemplo haz algo y <strong>recarga la página para comprobarlo</strong>.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-basico">setItem y getItem</a></li>
+            <li><a href="#ej-json">JSON</a></li>
+            <li><a href="#ej-visitas">Contador de visitas</a></li>
+            <li><a href="#ej-session">sessionStorage</a></li>
+            <li><a href="#ej-tema">Tema recordado</a></li>
+            <li><a href="#ej-preferencias">Letra e idioma</a></li>
+            <li><a href="#ej-cookies">Banner de cookies</a></li>
+            <li><a href="#ej-notas">Notas con autoguardado</a></li>
+            <li><a href="#ej-borrador">Borrador de formulario</a></li>
+            <li><a href="#ej-tareas">Lista de tareas</a></li>
+            <li><a href="#ej-compras">Lista de compras</a></li>
+            <li><a href="#ej-carrito">Carrito</a></li>
+            <li><a href="#ej-favoritos">Favoritos</a></li>
+            <li><a href="#ej-historial">Vistos recientemente</a></li>
+            <li><a href="#ej-record">Récord del minijuego</a></li>
+            <li><a href="#ej-pomodoro">Pomodoro</a></li>
+            <li><a href="#ej-pestanas">Evento storage</a></li>
+            <li><a href="#ej-borrar-todo">Ver y borrar todo</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Guardar datos en el navegador</h2>
+            <p>Todo lo que hicimos hasta ahora se pierde al recargar la página. <code>localStorage</code> es un pequeño «cajón» de pares <strong>clave → valor</strong> que el navegador guarda para cada sitio y que <strong>sobrevive a recargas, pestañas cerradas y reinicios</strong>. Sirve para preferencias, borradores, carritos y listas; no es una base de datos ni un lugar seguro.</p>
+            <table>
+                <thead>
+                    <tr><th>Método / propiedad</th><th>Qué hace</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>localStorage.setItem("clave", valor)</code></td><td>guarda (o reemplaza) un valor. Lo convierte a texto</td></tr>
+                    <tr><td><code>localStorage.getItem("clave")</code></td><td>devuelve el texto guardado, o <code>null</code> si la clave no existe</td></tr>
+                    <tr><td><code>localStorage.removeItem("clave")</code></td><td>borra esa clave</td></tr>
+                    <tr><td><code>localStorage.clear()</code></td><td>borra <strong>todas</strong> las claves del sitio (¡también las de otras páginas del mismo sitio!)</td></tr>
+                    <tr><td><code>localStorage.length</code> / <code>localStorage.key(i)</code></td><td>cuántas claves hay / el nombre de la clave número <code>i</code></td></tr>
+                    <tr><td><code>Object.keys(localStorage)</code></td><td>un array con todas las claves</td></tr>
+                    <tr><td><code>JSON.stringify(dato)</code></td><td>convierte un objeto o array en texto para poder guardarlo</td></tr>
+                    <tr><td><code>JSON.parse(texto)</code></td><td>convierte ese texto de vuelta en objeto o array</td></tr>
+                    <tr><td><code>window.addEventListener("storage", …)</code></td><td>avisa cuando <strong>otra pestaña</strong> del mismo sitio cambió algo</td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th></th><th><code>localStorage</code></th><th><code>sessionStorage</code></th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Dura</td><td>hasta que se borre (por código o por la persona)</td><td>hasta cerrar la pestaña</td></tr>
+                    <tr><td>Se comparte</td><td>entre todas las pestañas del mismo sitio</td><td>solo dentro de esa pestaña</td></tr>
+                    <tr><td>Métodos</td><td colspan="2">los mismos: <code>setItem</code>, <code>getItem</code>, <code>removeItem</code>, <code>clear</code></td></tr>
+                    <tr><td>Espacio</td><td colspan="2">unos 5 MB por sitio. Si se llena, <code>setItem</code> lanza <code>QuotaExceededError</code></td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>Todo se guarda como texto</figcaption>
+<pre>localStorage.setItem("curso-edad", 29);
+localStorage.getItem("curso-edad")     → "29"
+
+localStorage.setItem("curso-perfil", { nombre: "Ana" });
+localStorage.getItem("curso-perfil")   → "[object Object]"
+
+Para objetos y arrays, siempre JSON:
+localStorage.setItem("curso-perfil", JSON.stringify(perfil));
+const perfil = JSON.parse(localStorage.getItem("curso-perfil"));</pre>
+                </figure>
+                <figure>
+                    <figcaption>Valor por defecto con ??</figcaption>
+<pre>const tema = localStorage.getItem("curso-tema") ?? "claro";
+
+const tareas = JSON.parse(localStorage.getItem("curso-tareas")) ?? [];
+
+?? usa el valor de la derecha solo si el de
+la izquierda es null o undefined.
+La primera vez la clave no existe → null
+→ se usa el valor por defecto.
+JSON.parse(null) también da null.</pre>
+                </figure>
+                <figure>
+                    <figcaption>Verlo en DevTools</figcaption>
+<pre>F12 (o clic derecho → Inspeccionar)
+  → pestaña Application (Aplicación)
+  → Storage → Local Storage
+  → la dirección del sitio
+
+Ahí ves cada clave y su valor, puedes
+editarlos con doble clic y borrarlos
+con la tecla Supr o el botón 🚫.
+En Firefox está en la pestaña Almacenamiento.</pre>
+                </figure>
+                <figure>
+                    <figcaption>Lo que NO se guarda en localStorage</figcaption>
+<pre>✗ Contraseñas
+✗ Tokens de sesión o claves de API
+✗ Números de tarjeta, documentos, datos médicos
+
+Cualquier script que corra en la página
+(una librería, un anuncio, un ataque XSS)
+puede leer todo localStorage. Y queda en
+texto plano en el disco de la computadora.
+
+✓ Preferencias, borradores, listas,
+  el carrito, el último producto visto.</pre>
+                </figure>
+            </div>
+            <p>Todas las claves de esta lección empiezan con <code>curso-</code> para no chocar con otras páginas. Si abres las lecciones como archivos (<code>file://</code>), el navegador puede tratar a todas como el mismo sitio y compartir el mismo localStorage: por eso los nombres de clave deben ser únicos. El ejemplo 18 te deja ver y borrar todo lo que guardó el curso.</p>
+        </section>
+
+        <section id="ej-basico" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2><code>setItem</code>, <code>getItem</code>, <code>removeItem</code>: todo es texto</h2>
+            <p>Pulsa <strong>Ejecutar</strong>. Lo que guardas con <code>setItem</code> vuelve siempre como <strong>string</strong>: el 29 vuelve como "29" y el <code>true</code> como "true". Una clave que no existe devuelve <code>null</code>. Recarga la página para comprobarlo: abre DevTools → Application → Local Storage y verás que <code>curso-nombre</code> y <code>curso-edad</code> siguen ahí.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>localStorage.setItem("curso-nombre", "Ana");
+localStorage.setItem("curso-edad", 29);
+localStorage.setItem("curso-premium", true);
+
+console.log(localStorage.getItem("curso-nombre"));
+
+const edad = localStorage.getItem("curso-edad");
+console.log(edad, typeof edad);
+console.log("edad + 1 =", edad + 1);
+console.log("Number(edad) + 1 =", Number(edad) + 1);
+
+const premium = localStorage.getItem("curso-premium");
+console.log(premium, typeof premium);
+console.log("¿es premium?", premium === "true");
+
+console.log("clave inexistente:", localStorage.getItem("curso-no-existe"));
+
+localStorage.removeItem("curso-premium");
+console.log("después de removeItem:", localStorage.getItem("curso-premium"));
+console.log("claves guardadas en el sitio:", localStorage.length);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-json" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Objetos y arrays: <code>JSON.stringify</code> y <code>JSON.parse</code></h2>
+            <p>Si guardas un objeto tal cual, se guarda el texto inútil <code>"[object Object]"</code>. Hay que convertirlo a texto JSON al guardar y volver a convertirlo al leer. Ejecuta varias veces y recarga la página para comprobarlo: la lista de cursos sigue creciendo porque cada vez se lee lo guardado, se agrega uno y se vuelve a guardar.</p>
+            <div class="resultado">
+                <button type="button" class="ejecutar">Ejecutar</button>
+                <output class="consola"></output>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const usuario = { nombre: "Ana", nivel: 3, cursos: ["HTML", "CSS"] };
+
+localStorage.setItem("curso-usuario-mal", usuario);
+console.log("sin JSON:", localStorage.getItem("curso-usuario-mal"));
+localStorage.removeItem("curso-usuario-mal");
+
+if (localStorage.getItem("curso-usuario") === null) {
+    localStorage.setItem("curso-usuario", JSON.stringify(usuario));
+}
+
+const texto = localStorage.getItem("curso-usuario");
+console.log("guardado:", texto, "→", typeof texto);
+
+const recuperado = JSON.parse(texto);
+console.log("nombre:", recuperado.nombre, "· cursos:", recuperado.cursos.length);
+
+recuperado.cursos.push(`Curso ${recuperado.cursos.length + 1}`);
+localStorage.setItem("curso-usuario", JSON.stringify(recuperado));
+console.log("ahora:", JSON.parse(localStorage.getItem("curso-usuario")).cursos);</pre>
+                </figure>
+            </div>
+            <p>El ciclo es siempre el mismo: <strong>leer → <code>JSON.parse</code> → modificar → <code>JSON.stringify</code> → guardar</strong>. Modificar el objeto en memoria no cambia nada en localStorage hasta que vuelves a llamar a <code>setItem</code>.</p>
+        </section>
+
+        <section id="ej-visitas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Contador de visitas con valor por defecto <code>??</code></h2>
+            <p>La primera vez la clave no existe y <code>getItem</code> devuelve <code>null</code>: con <code>??</code> elegimos qué usar en ese caso. Recarga la página para comprobarlo: el número sube en cada visita y se recuerda la fecha de la anterior.</p>
+            <div class="resultado">
+                <p class="visitas">Has visitado esta página <strong id="visitas-total">0</strong> veces.</p>
+                <p id="visitas-anterior" class="ayuda"></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;p class="visitas"&gt;Has visitado esta página &lt;strong id="visitas-total"&gt;0&lt;/strong&gt; veces.&lt;/p&gt;
+&lt;p id="visitas-anterior" class="ayuda"&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const visitas = Number(localStorage.getItem("curso-visitas") ?? 0) + 1;
+localStorage.setItem("curso-visitas", visitas);
+document.querySelector("#visitas-total").textContent = visitas;
+
+const visitaAnterior = localStorage.getItem("curso-ultima-visita") ?? "nunca: ¡es tu primera vez aquí!";
+document.querySelector("#visitas-anterior").textContent = `Visita anterior: ${visitaAnterior}`;
+localStorage.setItem("curso-ultima-visita", new Date().toLocaleString("es"));</pre>
+                </figure>
+            </div>
+            <p>Primero se lee la visita anterior y <strong>después</strong> se guarda la fecha de ahora; al revés, siempre mostraría la fecha de este mismo momento.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Contador de visitas con valor por defecto ??&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .ayuda {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .visitas strong {
+            color: #a16207;
+            font-size: 2rem;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p class="visitas"&gt;Has visitado esta página &lt;strong id="visitas-total"&gt;0&lt;/strong&gt; veces.&lt;/p&gt;
+    &lt;p id="visitas-anterior" class="ayuda"&gt;&lt;/p&gt;
+    &lt;script&gt;
+        const visitas = Number(localStorage.getItem("curso-visitas") ?? 0) + 1;
+        localStorage.setItem("curso-visitas", visitas);
+        document.querySelector("#visitas-total").textContent = visitas;
+
+        const visitaAnterior = localStorage.getItem("curso-ultima-visita") ?? "nunca: ¡es tu primera vez aquí!";
+        document.querySelector("#visitas-anterior").textContent = `Visita anterior: ${visitaAnterior}`;
+        localStorage.setItem("curso-ultima-visita", new Date().toLocaleString("es"));
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-session" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2><code>localStorage</code> vs <code>sessionStorage</code></h2>
+            <p>Pulsa el botón unas veces: los dos contadores suben igual. Recarga la página para comprobarlo: los dos se mantienen. Ahora <strong>cierra esta pestaña</strong> y vuelve a abrir la lección: <code>localStorage</code> sigue igual y <code>sessionStorage</code> volvió a 0.</p>
+            <div class="resultado">
+                <div class="comparar-almacen">
+                    <div>
+                        <p>localStorage</p>
+                        <strong id="almacen-local">0</strong>
+                    </div>
+                    <div>
+                        <p>sessionStorage</p>
+                        <strong id="almacen-sesion">0</strong>
+                    </div>
+                </div>
+                <button type="button" id="almacen-sumar">Sumar 1 a los dos</button>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="comparar-almacen"&gt;
+    &lt;div&gt;
+        &lt;p&gt;localStorage&lt;/p&gt;
+        &lt;strong id="almacen-local"&gt;0&lt;/strong&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;p&gt;sessionStorage&lt;/p&gt;
+        &lt;strong id="almacen-sesion"&gt;0&lt;/strong&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;button type="button" id="almacen-sumar"&gt;Sumar 1 a los dos&lt;/button&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const almacenLocal = document.querySelector("#almacen-local");
+const almacenSesion = document.querySelector("#almacen-sesion");
+const almacenSumar = document.querySelector("#almacen-sumar");
+
+const mostrarAlmacenes = () =&gt; {
+    almacenLocal.textContent = localStorage.getItem("curso-clics") ?? 0;
+    almacenSesion.textContent = sessionStorage.getItem("curso-clics") ?? 0;
+};
+
+almacenSumar.addEventListener("click", () =&gt; {
+    localStorage.setItem("curso-clics", Number(localStorage.getItem("curso-clics") ?? 0) + 1);
+    sessionStorage.setItem("curso-clics", Number(sessionStorage.getItem("curso-clics") ?? 0) + 1);
+    mostrarAlmacenes();
+});
+
+mostrarAlmacenes();</pre>
+                </figure>
+            </div>
+            <p><code>sessionStorage</code> es ideal para cosas de «esta visita»: el paso en el que va un formulario largo, un filtro elegido o un aviso que no debe repetirse mientras navegas. Si abres la misma página en otra pestaña, esa pestaña tiene su propio sessionStorage vacío.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;localStorage vs sessionStorage&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .comparar-almacen {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            max-width: 480px;
+            margin-bottom: 12px;
+        }
+
+        .comparar-almacen &gt; div {
+            padding: 16px;
+            border-radius: 10px;
+            background: #fefce8;
+            text-align: center;
+        }
+
+        .comparar-almacen p {
+            margin: 0;
+            font-family: "Courier New", monospace;
+        }
+
+        .comparar-almacen strong {
+            font-size: 2.2rem;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="comparar-almacen"&gt;
+        &lt;div&gt;
+            &lt;p&gt;localStorage&lt;/p&gt;
+            &lt;strong id="almacen-local"&gt;0&lt;/strong&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+            &lt;p&gt;sessionStorage&lt;/p&gt;
+            &lt;strong id="almacen-sesion"&gt;0&lt;/strong&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;button type="button" id="almacen-sumar"&gt;Sumar 1 a los dos&lt;/button&gt;
+    &lt;script&gt;
+        const almacenLocal = document.querySelector("#almacen-local");
+        const almacenSesion = document.querySelector("#almacen-sesion");
+        const almacenSumar = document.querySelector("#almacen-sumar");
+
+        const mostrarAlmacenes = () =&gt; {
+            almacenLocal.textContent = localStorage.getItem("curso-clics") ?? 0;
+            almacenSesion.textContent = sessionStorage.getItem("curso-clics") ?? 0;
+        };
+
+        almacenSumar.addEventListener("click", () =&gt; {
+            localStorage.setItem("curso-clics", Number(localStorage.getItem("curso-clics") ?? 0) + 1);
+            sessionStorage.setItem("curso-clics", Number(sessionStorage.getItem("curso-clics") ?? 0) + 1);
+            mostrarAlmacenes();
+        });
+
+        mostrarAlmacenes();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-tema" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Tema claro u oscuro recordado</h2>
+            <p>El clásico de cualquier app. Si nunca elegiste, se usa el tema del sistema operativo (<code>prefers-color-scheme</code>); si elegiste, se respeta tu elección. Recarga la página para comprobarlo.</p>
+            <div class="resultado">
+                <div id="tema-panel" class="tema-panel">
+                    <h3>Panel de Nubeazul</h3>
+                    <p>Tus preferencias de color se recuerdan aunque cierres el navegador.</p>
+                    <button type="button" id="tema-boton">🌙 Modo oscuro</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div id="tema-panel" class="tema-panel"&gt;
+    &lt;h3&gt;Panel de Nubeazul&lt;/h3&gt;
+    &lt;p&gt;Tus preferencias de color se recuerdan aunque cierres el navegador.&lt;/p&gt;
+    &lt;button type="button" id="tema-boton"&gt;🌙 Modo oscuro&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tema-panel {
+    max-width: 420px;
+    padding: 20px;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #1f2430;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.tema-panel[data-tema="oscuro"] {
+    background: #0f172a;
+    color: #e2e8f0;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const temaPanel = document.querySelector("#tema-panel");
+const temaBoton = document.querySelector("#tema-boton");
+const temaDelSistema = matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro";
+
+const aplicarTema = (tema) =&gt; {
+    temaPanel.dataset.tema = tema;
+    temaBoton.textContent = tema === "oscuro" ? "☀️ Modo claro" : "🌙 Modo oscuro";
+};
+
+temaBoton.addEventListener("click", () =&gt; {
+    const nuevoTema = temaPanel.dataset.tema === "oscuro" ? "claro" : "oscuro";
+    aplicarTema(nuevoTema);
+    localStorage.setItem("curso-tema", nuevoTema);
+});
+
+aplicarTema(localStorage.getItem("curso-tema") ?? temaDelSistema);</pre>
+                </figure>
+            </div>
+            <p>En un sitio real se pone el atributo en <code>document.documentElement</code> (la etiqueta <code>&lt;html&gt;</code>) para que el tema cambie toda la página, y el script va en el <code>&lt;head&gt;</code> para que no se vea un parpadeo del tema claro al cargar.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Tema claro u oscuro recordado&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .tema-panel {
+            max-width: 420px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #f8fafc;
+            color: #1f2430;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .tema-panel[data-tema="oscuro"] {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="tema-panel" class="tema-panel"&gt;
+        &lt;h3&gt;Panel de Nubeazul&lt;/h3&gt;
+        &lt;p&gt;Tus preferencias de color se recuerdan aunque cierres el navegador.&lt;/p&gt;
+        &lt;button type="button" id="tema-boton"&gt;🌙 Modo oscuro&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const temaPanel = document.querySelector("#tema-panel");
+        const temaBoton = document.querySelector("#tema-boton");
+        const temaDelSistema = matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro";
+
+        const aplicarTema = (tema) =&gt; {
+            temaPanel.dataset.tema = tema;
+            temaBoton.textContent = tema === "oscuro" ? "☀️ Modo claro" : "🌙 Modo oscuro";
+        };
+
+        temaBoton.addEventListener("click", () =&gt; {
+            const nuevoTema = temaPanel.dataset.tema === "oscuro" ? "claro" : "oscuro";
+            aplicarTema(nuevoTema);
+            localStorage.setItem("curso-tema", nuevoTema);
+        });
+
+        aplicarTema(localStorage.getItem("curso-tema") ?? temaDelSistema);
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-preferencias" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Preferencias: tamaño de letra e idioma</h2>
+            <p>Varias preferencias juntas se guardan como <strong>un solo objeto</strong> en una sola clave. Cambia el tamaño o el idioma y recarga la página para comprobarlo.</p>
+            <div class="resultado">
+                <div class="fila">
+                    <label for="pref-tamano">Tamaño de letra</label>
+                    <input type="range" id="pref-tamano" min="14" max="26" value="16">
+                    <output id="pref-tamano-valor" for="pref-tamano">16 px</output>
+                </div>
+                <div class="fila">
+                    <label for="pref-idioma">Idioma</label>
+                    <select id="pref-idioma">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                        <option value="pt">Português</option>
+                    </select>
+                </div>
+                <article id="pref-articulo" class="articulo">
+                    <h3 id="pref-titulo"></h3>
+                    <p id="pref-texto"></p>
+                </article>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="fila"&gt;
+    &lt;label for="pref-tamano"&gt;Tamaño de letra&lt;/label&gt;
+    &lt;input type="range" id="pref-tamano" min="14" max="26" value="16"&gt;
+    &lt;output id="pref-tamano-valor" for="pref-tamano"&gt;16 px&lt;/output&gt;
+&lt;/div&gt;
+&lt;div class="fila"&gt;
+    &lt;label for="pref-idioma"&gt;Idioma&lt;/label&gt;
+    &lt;select id="pref-idioma"&gt;
+        &lt;option value="es"&gt;Español&lt;/option&gt;
+        &lt;option value="en"&gt;English&lt;/option&gt;
+        &lt;option value="pt"&gt;Português&lt;/option&gt;
+    &lt;/select&gt;
+&lt;/div&gt;
+&lt;article id="pref-articulo" class="articulo"&gt;
+    &lt;h3 id="pref-titulo"&gt;&lt;/h3&gt;
+    &lt;p id="pref-texto"&gt;&lt;/p&gt;
+&lt;/article&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const textosPorIdioma = {
+    es: { titulo: "Bienvenida", texto: "Gracias por leer nuestro boletín semanal de recetas." },
+    en: { titulo: "Welcome", texto: "Thanks for reading our weekly recipe newsletter." },
+    pt: { titulo: "Boas-vindas", texto: "Obrigado por ler nosso boletim semanal de receitas." },
+};
+const prefTamano = document.querySelector("#pref-tamano");
+const prefIdioma = document.querySelector("#pref-idioma");
+const prefArticulo = document.querySelector("#pref-articulo");
+const preferencias = JSON.parse(localStorage.getItem("curso-preferencias")) ?? { tamano: 16, idioma: "es" };
+
+const aplicarPreferencias = () =&gt; {
+    const textos = textosPorIdioma[preferencias.idioma];
+    prefTamano.value = preferencias.tamano;
+    prefIdioma.value = preferencias.idioma;
+    document.querySelector("#pref-tamano-valor").textContent = `${preferencias.tamano} px`;
+    document.querySelector("#pref-titulo").textContent = textos.titulo;
+    document.querySelector("#pref-texto").textContent = textos.texto;
+    prefArticulo.style.fontSize = `${preferencias.tamano}px`;
+    prefArticulo.lang = preferencias.idioma;
+    localStorage.setItem("curso-preferencias", JSON.stringify(preferencias));
+};
+
+prefTamano.addEventListener("input", () =&gt; {
+    preferencias.tamano = prefTamano.valueAsNumber;
+    aplicarPreferencias();
+});
+
+prefIdioma.addEventListener("change", () =&gt; {
+    preferencias.idioma = prefIdioma.value;
+    aplicarPreferencias();
+});
+
+aplicarPreferencias();</pre>
+                </figure>
+            </div>
+            <p>Al cargar, los controles se ajustan a lo guardado (<code>prefTamano.value = …</code>): si no, el slider mostraría 16 aunque la letra esté en 22. <code>lang</code> en el artículo ayuda al lector de pantalla a pronunciar el idioma correcto.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Preferencias: tamaño de letra e idioma&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .fila {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .fila select {
+            width: auto;
+        }
+
+        .articulo {
+            max-width: 480px;
+            padding: 16px;
+            border-left: 4px solid #f7df1e;
+            background: #f8fafc;
+        }
+
+        .articulo h3 {
+            margin-top: 0;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="fila"&gt;
+        &lt;label for="pref-tamano"&gt;Tamaño de letra&lt;/label&gt;
+        &lt;input type="range" id="pref-tamano" min="14" max="26" value="16"&gt;
+        &lt;output id="pref-tamano-valor" for="pref-tamano"&gt;16 px&lt;/output&gt;
+    &lt;/div&gt;
+    &lt;div class="fila"&gt;
+        &lt;label for="pref-idioma"&gt;Idioma&lt;/label&gt;
+        &lt;select id="pref-idioma"&gt;
+            &lt;option value="es"&gt;Español&lt;/option&gt;
+            &lt;option value="en"&gt;English&lt;/option&gt;
+            &lt;option value="pt"&gt;Português&lt;/option&gt;
+        &lt;/select&gt;
+    &lt;/div&gt;
+    &lt;article id="pref-articulo" class="articulo"&gt;
+        &lt;h3 id="pref-titulo"&gt;&lt;/h3&gt;
+        &lt;p id="pref-texto"&gt;&lt;/p&gt;
+    &lt;/article&gt;
+    &lt;script&gt;
+        const textosPorIdioma = {
+            es: { titulo: "Bienvenida", texto: "Gracias por leer nuestro boletín semanal de recetas." },
+            en: { titulo: "Welcome", texto: "Thanks for reading our weekly recipe newsletter." },
+            pt: { titulo: "Boas-vindas", texto: "Obrigado por ler nosso boletim semanal de receitas." },
+        };
+        const prefTamano = document.querySelector("#pref-tamano");
+        const prefIdioma = document.querySelector("#pref-idioma");
+        const prefArticulo = document.querySelector("#pref-articulo");
+        const preferencias = JSON.parse(localStorage.getItem("curso-preferencias")) ?? { tamano: 16, idioma: "es" };
+
+        const aplicarPreferencias = () =&gt; {
+            const textos = textosPorIdioma[preferencias.idioma];
+            prefTamano.value = preferencias.tamano;
+            prefIdioma.value = preferencias.idioma;
+            document.querySelector("#pref-tamano-valor").textContent = `${preferencias.tamano} px`;
+            document.querySelector("#pref-titulo").textContent = textos.titulo;
+            document.querySelector("#pref-texto").textContent = textos.texto;
+            prefArticulo.style.fontSize = `${preferencias.tamano}px`;
+            prefArticulo.lang = preferencias.idioma;
+            localStorage.setItem("curso-preferencias", JSON.stringify(preferencias));
+        };
+
+        prefTamano.addEventListener("input", () =&gt; {
+            preferencias.tamano = prefTamano.valueAsNumber;
+            aplicarPreferencias();
+        });
+
+        prefIdioma.addEventListener("change", () =&gt; {
+            preferencias.idioma = prefIdioma.value;
+            aplicarPreferencias();
+        });
+
+        aplicarPreferencias();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-cookies" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Aviso de cookies que no vuelve a salir</h2>
+            <p>Elige una opción y el aviso desaparece. Recarga la página para comprobarlo: ya no aparece, porque tu decisión quedó guardada. El botón de abajo la borra para que puedas volver a probar.</p>
+            <div class="resultado">
+                <div class="sitio-falso">
+                    <h3>Tienda Tucán</h3>
+                    <p>Ofertas de la semana en té, café y accesorios.</p>
+                    <div id="cookies-banner" class="cookies-banner" role="region" aria-label="Aviso de cookies" hidden>
+                        <p>🍪 Usamos cookies para recordar tu carrito y mejorar el sitio.</p>
+                        <button type="button" id="cookies-aceptar">Aceptar todas</button>
+                        <button type="button" id="cookies-rechazar">Solo las necesarias</button>
+                    </div>
+                </div>
+                <p id="cookies-estado" class="aviso"></p>
+                <button type="button" id="cookies-reiniciar" class="boton-secundario">Volver a mostrar el aviso</button>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="sitio-falso"&gt;
+    &lt;h3&gt;Tienda Tucán&lt;/h3&gt;
+    &lt;p&gt;Ofertas de la semana en té, café y accesorios.&lt;/p&gt;
+    &lt;div id="cookies-banner" class="cookies-banner" role="region" aria-label="Aviso de cookies" hidden&gt;
+        &lt;p&gt;🍪 Usamos cookies para recordar tu carrito y mejorar el sitio.&lt;/p&gt;
+        &lt;button type="button" id="cookies-aceptar"&gt;Aceptar todas&lt;/button&gt;
+        &lt;button type="button" id="cookies-rechazar"&gt;Solo las necesarias&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;p id="cookies-estado" class="aviso"&gt;&lt;/p&gt;
+&lt;button type="button" id="cookies-reiniciar" class="boton-secundario"&gt;Volver a mostrar el aviso&lt;/button&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const cookiesBanner = document.querySelector("#cookies-banner");
+const cookiesEstado = document.querySelector("#cookies-estado");
+
+const mostrarAvisoCookies = () =&gt; {
+    const decision = localStorage.getItem("curso-cookies");
+    cookiesBanner.hidden = decision !== null;
+    cookiesEstado.textContent = decision ? `Elección guardada: ${decision}` : "Todavía no elegiste.";
+};
+
+const guardarDecision = (decision) =&gt; {
+    localStorage.setItem("curso-cookies", decision);
+    mostrarAvisoCookies();
+};
+
+document.querySelector("#cookies-aceptar").addEventListener("click", () =&gt; {
+    guardarDecision("todas");
+});
+
+document.querySelector("#cookies-rechazar").addEventListener("click", () =&gt; {
+    guardarDecision("solo necesarias");
+});
+
+document.querySelector("#cookies-reiniciar").addEventListener("click", () =&gt; {
+    localStorage.removeItem("curso-cookies");
+    mostrarAvisoCookies();
+});
+
+mostrarAvisoCookies();</pre>
+                </figure>
+            </div>
+            <p>El aviso empieza con <code>hidden</code> en el HTML y JavaScript decide si mostrarlo: así no «parpadea» en las visitas en que ya está aceptado.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Aviso de cookies que no vuelve a salir&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .sitio-falso {
+            position: relative;
+            min-height: 180px;
+            padding: 16px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .cookies-banner {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            left: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            padding: 14px;
+            border-radius: 10px;
+            background: #1f2430;
+            color: #f8fafc;
+        }
+
+        .cookies-banner p {
+            flex: 1 1 220px;
+            margin: 0;
+        }
+
+        .cookies-banner button {
+            background: #f7df1e;
+            color: #1f2430;
+        }
+
+        .cookies-banner button + button {
+            background: transparent;
+            color: #f8fafc;
+            outline: 1px solid #64748b;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="sitio-falso"&gt;
+        &lt;h3&gt;Tienda Tucán&lt;/h3&gt;
+        &lt;p&gt;Ofertas de la semana en té, café y accesorios.&lt;/p&gt;
+        &lt;div id="cookies-banner" class="cookies-banner" role="region" aria-label="Aviso de cookies" hidden&gt;
+            &lt;p&gt;🍪 Usamos cookies para recordar tu carrito y mejorar el sitio.&lt;/p&gt;
+            &lt;button type="button" id="cookies-aceptar"&gt;Aceptar todas&lt;/button&gt;
+            &lt;button type="button" id="cookies-rechazar"&gt;Solo las necesarias&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p id="cookies-estado" class="aviso"&gt;&lt;/p&gt;
+    &lt;button type="button" id="cookies-reiniciar" class="boton-secundario"&gt;Volver a mostrar el aviso&lt;/button&gt;
+    &lt;script&gt;
+        const cookiesBanner = document.querySelector("#cookies-banner");
+        const cookiesEstado = document.querySelector("#cookies-estado");
+
+        const mostrarAvisoCookies = () =&gt; {
+            const decision = localStorage.getItem("curso-cookies");
+            cookiesBanner.hidden = decision !== null;
+            cookiesEstado.textContent = decision ? `Elección guardada: ${decision}` : "Todavía no elegiste.";
+        };
+
+        const guardarDecision = (decision) =&gt; {
+            localStorage.setItem("curso-cookies", decision);
+            mostrarAvisoCookies();
+        };
+
+        document.querySelector("#cookies-aceptar").addEventListener("click", () =&gt; {
+            guardarDecision("todas");
+        });
+
+        document.querySelector("#cookies-rechazar").addEventListener("click", () =&gt; {
+            guardarDecision("solo necesarias");
+        });
+
+        document.querySelector("#cookies-reiniciar").addEventListener("click", () =&gt; {
+            localStorage.removeItem("curso-cookies");
+            mostrarAvisoCookies();
+        });
+
+        mostrarAvisoCookies();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-notas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Notas rápidas con autoguardado</h2>
+            <p>Escribe lo que quieras: se guarda solo medio segundo después de que dejas de escribir (no en cada tecla). Recarga la página para comprobarlo: el texto sigue ahí.</p>
+            <div class="resultado">
+                <div class="campo">
+                    <label for="notas-texto">Notas rápidas</label>
+                    <textarea id="notas-texto" rows="6" placeholder="Escribe algo… se guarda solo."></textarea>
+                    <p id="notas-estado" class="ayuda" aria-live="polite"></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="campo"&gt;
+    &lt;label for="notas-texto"&gt;Notas rápidas&lt;/label&gt;
+    &lt;textarea id="notas-texto" rows="6" placeholder="Escribe algo… se guarda solo."&gt;&lt;/textarea&gt;
+    &lt;p id="notas-estado" class="ayuda" aria-live="polite"&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const notasTexto = document.querySelector("#notas-texto");
+const notasEstado = document.querySelector("#notas-estado");
+let notasEspera;
+
+notasTexto.value = localStorage.getItem("curso-notas") ?? "";
+notasEstado.textContent = notasTexto.value ? "Notas recuperadas." : "Sin notas todavía.";
+
+notasTexto.addEventListener("input", () =&gt; {
+    notasEstado.textContent = "Escribiendo…";
+    clearTimeout(notasEspera);
+    notasEspera = setTimeout(() =&gt; {
+        localStorage.setItem("curso-notas", notasTexto.value);
+        notasEstado.textContent = `✓ Guardado a las ${new Date().toLocaleTimeString("es")}`;
+    }, 500);
+});</pre>
+                </figure>
+            </div>
+            <p>Cada tecla cancela la espera anterior con <code>clearTimeout</code> y empieza una nueva: solo se guarda cuando hay una pausa. Así funcionan los «Guardado» de Google Docs o Notion.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Notas rápidas con autoguardado&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .campo label {
+            font-weight: 600;
+        }
+
+        .campo {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .ayuda {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="campo"&gt;
+        &lt;label for="notas-texto"&gt;Notas rápidas&lt;/label&gt;
+        &lt;textarea id="notas-texto" rows="6" placeholder="Escribe algo… se guarda solo."&gt;&lt;/textarea&gt;
+        &lt;p id="notas-estado" class="ayuda" aria-live="polite"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const notasTexto = document.querySelector("#notas-texto");
+        const notasEstado = document.querySelector("#notas-estado");
+        let notasEspera;
+
+        notasTexto.value = localStorage.getItem("curso-notas") ?? "";
+        notasEstado.textContent = notasTexto.value ? "Notas recuperadas." : "Sin notas todavía.";
+
+        notasTexto.addEventListener("input", () =&gt; {
+            notasEstado.textContent = "Escribiendo…";
+            clearTimeout(notasEspera);
+            notasEspera = setTimeout(() =&gt; {
+                localStorage.setItem("curso-notas", notasTexto.value);
+                notasEstado.textContent = `✓ Guardado a las ${new Date().toLocaleTimeString("es")}`;
+            }, 500);
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-borrador" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Borrador de formulario recuperado</h2>
+            <p>Empieza a llenar la postulación y recarga la página para comprobarlo (o cierra la pestaña sin querer): todo vuelve a aparecer. Al enviar o descartar, el borrador se borra.</p>
+            <div class="resultado">
+                <form id="postulacion" class="formulario">
+                    <label for="post-nombre">Nombre</label>
+                    <input type="text" id="post-nombre" name="nombre" required>
+                    <label for="post-correo">Correo</label>
+                    <input type="email" id="post-correo" name="correo" required>
+                    <label for="post-puesto">Puesto</label>
+                    <select id="post-puesto" name="puesto">
+                        <option>Diseño</option>
+                        <option>Desarrollo</option>
+                        <option>Marketing</option>
+                    </select>
+                    <label for="post-carta">¿Por qué quieres trabajar con nosotros?</label>
+                    <textarea id="post-carta" name="carta" rows="4"></textarea>
+                    <div class="botones">
+                        <button type="submit">Enviar postulación</button>
+                        <button type="button" id="post-descartar" class="boton-secundario">Descartar borrador</button>
+                    </div>
+                    <p id="post-estado" class="aviso" role="status"></p>
+                </form>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="postulacion" class="formulario"&gt;
+    &lt;label for="post-nombre"&gt;Nombre&lt;/label&gt;
+    &lt;input type="text" id="post-nombre" name="nombre" required&gt;
+    &lt;label for="post-correo"&gt;Correo&lt;/label&gt;
+    &lt;input type="email" id="post-correo" name="correo" required&gt;
+    &lt;label for="post-puesto"&gt;Puesto&lt;/label&gt;
+    &lt;select id="post-puesto" name="puesto"&gt;
+        &lt;option&gt;Diseño&lt;/option&gt;
+        &lt;option&gt;Desarrollo&lt;/option&gt;
+        &lt;option&gt;Marketing&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;label for="post-carta"&gt;¿Por qué quieres trabajar con nosotros?&lt;/label&gt;
+    &lt;textarea id="post-carta" name="carta" rows="4"&gt;&lt;/textarea&gt;
+    &lt;div class="botones"&gt;
+        &lt;button type="submit"&gt;Enviar postulación&lt;/button&gt;
+        &lt;button type="button" id="post-descartar" class="boton-secundario"&gt;Descartar borrador&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p id="post-estado" class="aviso" role="status"&gt;&lt;/p&gt;
+&lt;/form&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const postulacion = document.querySelector("#postulacion");
+const postEstado = document.querySelector("#post-estado");
+const borrador = JSON.parse(localStorage.getItem("curso-borrador"));
+
+if (borrador) {
+    for (const [campo, valor] of Object.entries(borrador)) {
+        postulacion.elements[campo].value = valor;
+    }
+    postEstado.textContent = "✍️ Recuperamos tu borrador.";
+}
+
+postulacion.addEventListener("input", () =&gt; {
+    const datos = Object.fromEntries(new FormData(postulacion));
+    localStorage.setItem("curso-borrador", JSON.stringify(datos));
+});
+
+postulacion.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    localStorage.removeItem("curso-borrador");
+    postulacion.reset();
+    postEstado.textContent = "¡Postulación enviada! El borrador se borró.";
+});
+
+document.querySelector("#post-descartar").addEventListener("click", () =&gt; {
+    localStorage.removeItem("curso-borrador");
+    postulacion.reset();
+    postEstado.textContent = "Borrador descartado.";
+});</pre>
+                </figure>
+            </div>
+            <p>Se juntan las piezas de la lección anterior: <code>FormData</code> + <code>Object.fromEntries</code> dan un objeto que se guarda con <code>JSON.stringify</code>; al volver, <code>form.elements[campo]</code> encuentra cada campo por su <code>name</code>.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Borrador de formulario recuperado&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .formulario {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .formulario label,
+        .campo label {
+            font-weight: 600;
+        }
+
+        .formulario fieldset {
+            display: grid;
+            gap: 4px;
+            margin: 8px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .campo {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .botones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="postulacion" class="formulario"&gt;
+        &lt;label for="post-nombre"&gt;Nombre&lt;/label&gt;
+        &lt;input type="text" id="post-nombre" name="nombre" required&gt;
+        &lt;label for="post-correo"&gt;Correo&lt;/label&gt;
+        &lt;input type="email" id="post-correo" name="correo" required&gt;
+        &lt;label for="post-puesto"&gt;Puesto&lt;/label&gt;
+        &lt;select id="post-puesto" name="puesto"&gt;
+            &lt;option&gt;Diseño&lt;/option&gt;
+            &lt;option&gt;Desarrollo&lt;/option&gt;
+            &lt;option&gt;Marketing&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;label for="post-carta"&gt;¿Por qué quieres trabajar con nosotros?&lt;/label&gt;
+        &lt;textarea id="post-carta" name="carta" rows="4"&gt;&lt;/textarea&gt;
+        &lt;div class="botones"&gt;
+            &lt;button type="submit"&gt;Enviar postulación&lt;/button&gt;
+            &lt;button type="button" id="post-descartar" class="boton-secundario"&gt;Descartar borrador&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;p id="post-estado" class="aviso" role="status"&gt;&lt;/p&gt;
+    &lt;/form&gt;
+    &lt;script&gt;
+        const postulacion = document.querySelector("#postulacion");
+        const postEstado = document.querySelector("#post-estado");
+        const borrador = JSON.parse(localStorage.getItem("curso-borrador"));
+
+        if (borrador) {
+            for (const [campo, valor] of Object.entries(borrador)) {
+                postulacion.elements[campo].value = valor;
+            }
+            postEstado.textContent = "✍️ Recuperamos tu borrador.";
+        }
+
+        postulacion.addEventListener("input", () =&gt; {
+            const datos = Object.fromEntries(new FormData(postulacion));
+            localStorage.setItem("curso-borrador", JSON.stringify(datos));
+        });
+
+        postulacion.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            localStorage.removeItem("curso-borrador");
+            postulacion.reset();
+            postEstado.textContent = "¡Postulación enviada! El borrador se borró.";
+        });
+
+        document.querySelector("#post-descartar").addEventListener("click", () =&gt; {
+            localStorage.removeItem("curso-borrador");
+            postulacion.reset();
+            postEstado.textContent = "Borrador descartado.";
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-tareas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Lista de tareas que persiste</h2>
+            <p>Agrega tareas, márcalas como hechas o bórralas. Todo vive en un array de objetos que se guarda con cada cambio. Recarga la página para comprobarlo.</p>
+            <div class="resultado">
+                <form id="tareas-form" class="fila-agregar">
+                    <input type="text" id="tareas-nueva" placeholder="Nueva tarea…" aria-label="Nueva tarea" required>
+                    <button type="submit">Agregar</button>
+                </form>
+                <ul id="tareas-lista" class="lista-simple"></ul>
+                <p id="tareas-resumen" class="ayuda"></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="tareas-form" class="fila-agregar"&gt;
+    &lt;input type="text" id="tareas-nueva" placeholder="Nueva tarea…" aria-label="Nueva tarea" required&gt;
+    &lt;button type="submit"&gt;Agregar&lt;/button&gt;
+&lt;/form&gt;
+&lt;ul id="tareas-lista" class="lista-simple"&gt;&lt;/ul&gt;
+&lt;p id="tareas-resumen" class="ayuda"&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const tareasForm = document.querySelector("#tareas-form");
+const tareasNueva = document.querySelector("#tareas-nueva");
+const tareasLista = document.querySelector("#tareas-lista");
+const tareas = JSON.parse(localStorage.getItem("curso-tareas")) ?? [
+    { texto: "Repasar FormData", hecha: true },
+    { texto: "Probar localStorage", hecha: false },
+];
+
+const guardarTareas = () =&gt; {
+    localStorage.setItem("curso-tareas", JSON.stringify(tareas));
+};
+
+const pintarTareas = () =&gt; {
+    tareasLista.innerHTML = "";
+    tareas.forEach((tarea, posicion) =&gt; {
+        const item = document.createElement("li");
+        item.className = "tarea";
+        item.classList.toggle("hecha", tarea.hecha);
+
+        const etiqueta = document.createElement("label");
+        const casilla = document.createElement("input");
+        casilla.type = "checkbox";
+        casilla.checked = tarea.hecha;
+        casilla.addEventListener("change", () =&gt; {
+            tarea.hecha = casilla.checked;
+            guardarTareas();
+            pintarTareas();
+        });
+        etiqueta.append(casilla, tarea.texto);
+
+        const borrar = document.createElement("button");
+        borrar.type = "button";
+        borrar.textContent = "✕";
+        borrar.setAttribute("aria-label", `Borrar «${tarea.texto}»`);
+        borrar.addEventListener("click", () =&gt; {
+            tareas.splice(posicion, 1);
+            guardarTareas();
+            pintarTareas();
+        });
+
+        item.append(etiqueta, borrar);
+        tareasLista.append(item);
+    });
+    const pendientes = tareas.filter((tarea) =&gt; !tarea.hecha).length;
+    document.querySelector("#tareas-resumen").textContent = `${pendientes} pendiente(s) de ${tareas.length}`;
+};
+
+tareasForm.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    tareas.push({ texto: tareasNueva.value.trim(), hecha: false });
+    guardarTareas();
+    pintarTareas();
+    tareasForm.reset();
+});
+
+pintarTareas();</pre>
+                </figure>
+            </div>
+            <p>El patrón de casi toda app con datos: un <strong>array como fuente de verdad</strong>, una función que lo <strong>pinta</strong> en el DOM y otra que lo <strong>guarda</strong>. Cada acción cambia el array, guarda y vuelve a pintar.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Lista de tareas que persiste&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .ayuda {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .fila-agregar {
+            display: flex;
+            gap: 8px;
+            max-width: 480px;
+        }
+
+        .fila-agregar input[type="number"] {
+            width: 90px;
+        }
+
+        .lista-simple {
+            max-width: 480px;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .lista-simple li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .lista-simple li &gt; :first-child {
+            flex: 1;
+        }
+
+        .lista-simple button {
+            padding: 4px 12px;
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        .tarea label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tarea.hecha label {
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="tareas-form" class="fila-agregar"&gt;
+        &lt;input type="text" id="tareas-nueva" placeholder="Nueva tarea…" aria-label="Nueva tarea" required&gt;
+        &lt;button type="submit"&gt;Agregar&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;ul id="tareas-lista" class="lista-simple"&gt;&lt;/ul&gt;
+    &lt;p id="tareas-resumen" class="ayuda"&gt;&lt;/p&gt;
+    &lt;script&gt;
+        const tareasForm = document.querySelector("#tareas-form");
+        const tareasNueva = document.querySelector("#tareas-nueva");
+        const tareasLista = document.querySelector("#tareas-lista");
+        const tareas = JSON.parse(localStorage.getItem("curso-tareas")) ?? [
+            { texto: "Repasar FormData", hecha: true },
+            { texto: "Probar localStorage", hecha: false },
+        ];
+
+        const guardarTareas = () =&gt; {
+            localStorage.setItem("curso-tareas", JSON.stringify(tareas));
+        };
+
+        const pintarTareas = () =&gt; {
+            tareasLista.innerHTML = "";
+            tareas.forEach((tarea, posicion) =&gt; {
+                const item = document.createElement("li");
+                item.className = "tarea";
+                item.classList.toggle("hecha", tarea.hecha);
+
+                const etiqueta = document.createElement("label");
+                const casilla = document.createElement("input");
+                casilla.type = "checkbox";
+                casilla.checked = tarea.hecha;
+                casilla.addEventListener("change", () =&gt; {
+                    tarea.hecha = casilla.checked;
+                    guardarTareas();
+                    pintarTareas();
+                });
+                etiqueta.append(casilla, tarea.texto);
+
+                const borrar = document.createElement("button");
+                borrar.type = "button";
+                borrar.textContent = "✕";
+                borrar.setAttribute("aria-label", `Borrar «${tarea.texto}»`);
+                borrar.addEventListener("click", () =&gt; {
+                    tareas.splice(posicion, 1);
+                    guardarTareas();
+                    pintarTareas();
+                });
+
+                item.append(etiqueta, borrar);
+                tareasLista.append(item);
+            });
+            const pendientes = tareas.filter((tarea) =&gt; !tarea.hecha).length;
+            document.querySelector("#tareas-resumen").textContent = `${pendientes} pendiente(s) de ${tareas.length}`;
+        };
+
+        tareasForm.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            tareas.push({ texto: tareasNueva.value.trim(), hecha: false });
+            guardarTareas();
+            pintarTareas();
+            tareasForm.reset();
+        });
+
+        pintarTareas();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-compras" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Lista de compras con cantidades</h2>
+            <p>Aquí los datos son un objeto <code>{ producto: cantidad }</code>. Si agregas un producto que ya está, se suma a la cantidad; con <strong>−</strong> hasta 0 desaparece. Recarga la página para comprobarlo.</p>
+            <div class="resultado">
+                <form id="compras-form" class="fila-agregar">
+                    <input type="text" id="compras-producto" placeholder="Producto" aria-label="Producto" required>
+                    <input type="number" id="compras-cantidad" value="1" min="1" aria-label="Cantidad" required>
+                    <button type="submit">Agregar</button>
+                </form>
+                <ul id="compras-lista" class="lista-simple"></ul>
+                <p id="compras-total" class="ayuda"></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;form id="compras-form" class="fila-agregar"&gt;
+    &lt;input type="text" id="compras-producto" placeholder="Producto" aria-label="Producto" required&gt;
+    &lt;input type="number" id="compras-cantidad" value="1" min="1" aria-label="Cantidad" required&gt;
+    &lt;button type="submit"&gt;Agregar&lt;/button&gt;
+&lt;/form&gt;
+&lt;ul id="compras-lista" class="lista-simple"&gt;&lt;/ul&gt;
+&lt;p id="compras-total" class="ayuda"&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const comprasForm = document.querySelector("#compras-form");
+const comprasProducto = document.querySelector("#compras-producto");
+const comprasCantidad = document.querySelector("#compras-cantidad");
+const comprasLista = document.querySelector("#compras-lista");
+const compras = JSON.parse(localStorage.getItem("curso-compras")) ?? { Pan: 2, Manzanas: 6 };
+
+const guardarCompras = () =&gt; {
+    localStorage.setItem("curso-compras", JSON.stringify(compras));
+};
+
+const botonCantidad = (producto, cambio) =&gt; {
+    const boton = document.createElement("button");
+    boton.type = "button";
+    boton.textContent = cambio &gt; 0 ? "+" : "−";
+    boton.setAttribute("aria-label", `${cambio &gt; 0 ? "Uno más de" : "Uno menos de"} ${producto}`);
+    boton.addEventListener("click", () =&gt; {
+        compras[producto] += cambio;
+        if (compras[producto] &lt;= 0) {
+            delete compras[producto];
+        }
+        guardarCompras();
+        pintarCompras();
+    });
+    return boton;
+};
+
+const pintarCompras = () =&gt; {
+    comprasLista.innerHTML = "";
+    for (const [producto, cantidad] of Object.entries(compras)) {
+        const item = document.createElement("li");
+        const nombre = document.createElement("span");
+        nombre.textContent = producto;
+        const numero = document.createElement("strong");
+        numero.textContent = cantidad;
+        item.append(nombre, botonCantidad(producto, -1), numero, botonCantidad(producto, 1));
+        comprasLista.append(item);
+    }
+    const unidades = Object.values(compras).reduce((suma, cantidad) =&gt; suma + cantidad, 0);
+    document.querySelector("#compras-total").textContent = `${Object.keys(compras).length} productos · ${unidades} unidades`;
+};
+
+comprasForm.addEventListener("submit", (event) =&gt; {
+    event.preventDefault();
+    const producto = comprasProducto.value.trim();
+    compras[producto] = (compras[producto] ?? 0) + comprasCantidad.valueAsNumber;
+    guardarCompras();
+    pintarCompras();
+    comprasForm.reset();
+    comprasProducto.focus();
+});
+
+pintarCompras();</pre>
+                </figure>
+            </div>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Lista de compras con cantidades&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .ayuda {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .fila-agregar {
+            display: flex;
+            gap: 8px;
+            max-width: 480px;
+        }
+
+        .fila-agregar input[type="number"] {
+            width: 90px;
+        }
+
+        .lista-simple {
+            max-width: 480px;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .lista-simple li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .lista-simple li &gt; :first-child {
+            flex: 1;
+        }
+
+        .lista-simple button {
+            padding: 4px 12px;
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="compras-form" class="fila-agregar"&gt;
+        &lt;input type="text" id="compras-producto" placeholder="Producto" aria-label="Producto" required&gt;
+        &lt;input type="number" id="compras-cantidad" value="1" min="1" aria-label="Cantidad" required&gt;
+        &lt;button type="submit"&gt;Agregar&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;ul id="compras-lista" class="lista-simple"&gt;&lt;/ul&gt;
+    &lt;p id="compras-total" class="ayuda"&gt;&lt;/p&gt;
+    &lt;script&gt;
+        const comprasForm = document.querySelector("#compras-form");
+        const comprasProducto = document.querySelector("#compras-producto");
+        const comprasCantidad = document.querySelector("#compras-cantidad");
+        const comprasLista = document.querySelector("#compras-lista");
+        const compras = JSON.parse(localStorage.getItem("curso-compras")) ?? { Pan: 2, Manzanas: 6 };
+
+        const guardarCompras = () =&gt; {
+            localStorage.setItem("curso-compras", JSON.stringify(compras));
+        };
+
+        const botonCantidad = (producto, cambio) =&gt; {
+            const boton = document.createElement("button");
+            boton.type = "button";
+            boton.textContent = cambio &gt; 0 ? "+" : "−";
+            boton.setAttribute("aria-label", `${cambio &gt; 0 ? "Uno más de" : "Uno menos de"} ${producto}`);
+            boton.addEventListener("click", () =&gt; {
+                compras[producto] += cambio;
+                if (compras[producto] &lt;= 0) {
+                    delete compras[producto];
+                }
+                guardarCompras();
+                pintarCompras();
+            });
+            return boton;
+        };
+
+        const pintarCompras = () =&gt; {
+            comprasLista.innerHTML = "";
+            for (const [producto, cantidad] of Object.entries(compras)) {
+                const item = document.createElement("li");
+                const nombre = document.createElement("span");
+                nombre.textContent = producto;
+                const numero = document.createElement("strong");
+                numero.textContent = cantidad;
+                item.append(nombre, botonCantidad(producto, -1), numero, botonCantidad(producto, 1));
+                comprasLista.append(item);
+            }
+            const unidades = Object.values(compras).reduce((suma, cantidad) =&gt; suma + cantidad, 0);
+            document.querySelector("#compras-total").textContent = `${Object.keys(compras).length} productos · ${unidades} unidades`;
+        };
+
+        comprasForm.addEventListener("submit", (event) =&gt; {
+            event.preventDefault();
+            const producto = comprasProducto.value.trim();
+            compras[producto] = (compras[producto] ?? 0) + comprasCantidad.valueAsNumber;
+            guardarCompras();
+            pintarCompras();
+            comprasForm.reset();
+            comprasProducto.focus();
+        });
+
+        pintarCompras();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-carrito" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Carrito que sobrevive a las recargas</h2>
+            <p>Agrega productos y recarga la página para comprobarlo: el carrito, el contador y el total siguen ahí. Por eso en muchas tiendas puedes cerrar la pestaña y volver al día siguiente.</p>
+            <div class="resultado">
+                <div class="tienda">
+                    <ul class="productos">
+                        <li>
+                            <img src="https://picsum.photos/id/225/144/108" alt="" width="72" height="54">
+                            <span>Té verde Montaña</span>
+                            <strong>$8.50</strong>
+                            <button type="button" class="agregar-carrito" data-id="te" data-nombre="Té verde Montaña" data-precio="8.5">Agregar</button>
+                        </li>
+                        <li>
+                            <img src="https://picsum.photos/id/30/144/108" alt="" width="72" height="54">
+                            <span>Taza de cerámica</span>
+                            <strong>$12.00</strong>
+                            <button type="button" class="agregar-carrito" data-id="taza" data-nombre="Taza de cerámica" data-precio="12">Agregar</button>
+                        </li>
+                        <li>
+                            <img src="https://picsum.photos/id/431/144/108" alt="" width="72" height="54">
+                            <span>Café de altura 500 g</span>
+                            <strong>$14.90</strong>
+                            <button type="button" class="agregar-carrito" data-id="cafe" data-nombre="Café de altura 500 g" data-precio="14.9">Agregar</button>
+                        </li>
+                    </ul>
+                    <aside class="carrito" aria-live="polite">
+                        <h3>🛒 Carrito (<span id="carrito-cantidad">0</span>)</h3>
+                        <ul id="carrito-lista"></ul>
+                        <p>Total: <strong id="carrito-total">$0.00</strong></p>
+                        <button type="button" id="carrito-vaciar" class="boton-secundario">Vaciar carrito</button>
+                    </aside>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="tienda"&gt;
+    &lt;ul class="productos"&gt;
+        &lt;li&gt;
+            &lt;img src="https://picsum.photos/id/225/144/108" alt="" width="72" height="54"&gt;
+            &lt;span&gt;Té verde Montaña&lt;/span&gt;
+            &lt;strong&gt;$8.50&lt;/strong&gt;
+            &lt;button type="button" class="agregar-carrito" data-id="te" data-nombre="Té verde Montaña" data-precio="8.5"&gt;Agregar&lt;/button&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+            &lt;img src="https://picsum.photos/id/30/144/108" alt="" width="72" height="54"&gt;
+            &lt;span&gt;Taza de cerámica&lt;/span&gt;
+            &lt;strong&gt;$12.00&lt;/strong&gt;
+            &lt;button type="button" class="agregar-carrito" data-id="taza" data-nombre="Taza de cerámica" data-precio="12"&gt;Agregar&lt;/button&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+            &lt;img src="https://picsum.photos/id/431/144/108" alt="" width="72" height="54"&gt;
+            &lt;span&gt;Café de altura 500 g&lt;/span&gt;
+            &lt;strong&gt;$14.90&lt;/strong&gt;
+            &lt;button type="button" class="agregar-carrito" data-id="cafe" data-nombre="Café de altura 500 g" data-precio="14.9"&gt;Agregar&lt;/button&gt;
+        &lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;aside class="carrito" aria-live="polite"&gt;
+        &lt;h3&gt;🛒 Carrito (&lt;span id="carrito-cantidad"&gt;0&lt;/span&gt;)&lt;/h3&gt;
+        &lt;ul id="carrito-lista"&gt;&lt;/ul&gt;
+        &lt;p&gt;Total: &lt;strong id="carrito-total"&gt;$0.00&lt;/strong&gt;&lt;/p&gt;
+        &lt;button type="button" id="carrito-vaciar" class="boton-secundario"&gt;Vaciar carrito&lt;/button&gt;
+    &lt;/aside&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const carritoLista = document.querySelector("#carrito-lista");
+const carrito = JSON.parse(localStorage.getItem("curso-carrito")) ?? [];
+
+const pintarCarrito = () =&gt; {
+    carritoLista.innerHTML = "";
+    for (const item of carrito) {
+        const fila = document.createElement("li");
+        fila.textContent = `${item.cantidad} × ${item.nombre} — $${(item.precio * item.cantidad).toFixed(2)}`;
+        carritoLista.append(fila);
+    }
+    const unidades = carrito.reduce((suma, item) =&gt; suma + item.cantidad, 0);
+    const total = carrito.reduce((suma, item) =&gt; suma + item.precio * item.cantidad, 0);
+    document.querySelector("#carrito-cantidad").textContent = unidades;
+    document.querySelector("#carrito-total").textContent = `$${total.toFixed(2)}`;
+    localStorage.setItem("curso-carrito", JSON.stringify(carrito));
+};
+
+document.querySelectorAll(".agregar-carrito").forEach((boton) =&gt; {
+    boton.addEventListener("click", () =&gt; {
+        const enCarrito = carrito.find((item) =&gt; item.id === boton.dataset.id);
+        if (enCarrito) {
+            enCarrito.cantidad++;
+        } else {
+            carrito.push({
+                id: boton.dataset.id,
+                nombre: boton.dataset.nombre,
+                precio: Number(boton.dataset.precio),
+                cantidad: 1,
+            });
+        }
+        pintarCarrito();
+    });
+});
+
+document.querySelector("#carrito-vaciar").addEventListener("click", () =&gt; {
+    carrito.length = 0;
+    pintarCarrito();
+});
+
+pintarCarrito();</pre>
+                </figure>
+            </div>
+            <p>Los datos del producto viajan en atributos <code>data-*</code> del botón. Guardar dentro de <code>pintarCarrito</code> asegura que lo que se ve y lo que está guardado nunca se desincronicen. En una tienda real, el precio se vuelve a comprobar en el servidor al pagar: lo guardado en el navegador se puede editar desde DevTools.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Carrito que sobrevive a las recargas&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .tienda {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .productos {
+            display: grid;
+            gap: 10px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .productos li {
+            display: grid;
+            grid-template-columns: 72px 1fr auto;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .productos img {
+            width: 72px;
+            height: 54px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .productos span {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .productos strong {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .productos button {
+            grid-column: 3;
+            grid-row: 1 / 3;
+        }
+
+        .carrito {
+            padding: 16px;
+            border-radius: 10px;
+            background: #fefce8;
+        }
+
+        .carrito h3 {
+            margin-top: 0;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="tienda"&gt;
+        &lt;ul class="productos"&gt;
+            &lt;li&gt;
+                &lt;img src="https://picsum.photos/id/225/144/108" alt="" width="72" height="54"&gt;
+                &lt;span&gt;Té verde Montaña&lt;/span&gt;
+                &lt;strong&gt;$8.50&lt;/strong&gt;
+                &lt;button type="button" class="agregar-carrito" data-id="te" data-nombre="Té verde Montaña" data-precio="8.5"&gt;Agregar&lt;/button&gt;
+            &lt;/li&gt;
+            &lt;li&gt;
+                &lt;img src="https://picsum.photos/id/30/144/108" alt="" width="72" height="54"&gt;
+                &lt;span&gt;Taza de cerámica&lt;/span&gt;
+                &lt;strong&gt;$12.00&lt;/strong&gt;
+                &lt;button type="button" class="agregar-carrito" data-id="taza" data-nombre="Taza de cerámica" data-precio="12"&gt;Agregar&lt;/button&gt;
+            &lt;/li&gt;
+            &lt;li&gt;
+                &lt;img src="https://picsum.photos/id/431/144/108" alt="" width="72" height="54"&gt;
+                &lt;span&gt;Café de altura 500 g&lt;/span&gt;
+                &lt;strong&gt;$14.90&lt;/strong&gt;
+                &lt;button type="button" class="agregar-carrito" data-id="cafe" data-nombre="Café de altura 500 g" data-precio="14.9"&gt;Agregar&lt;/button&gt;
+            &lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;aside class="carrito" aria-live="polite"&gt;
+            &lt;h3&gt;🛒 Carrito (&lt;span id="carrito-cantidad"&gt;0&lt;/span&gt;)&lt;/h3&gt;
+            &lt;ul id="carrito-lista"&gt;&lt;/ul&gt;
+            &lt;p&gt;Total: &lt;strong id="carrito-total"&gt;$0.00&lt;/strong&gt;&lt;/p&gt;
+            &lt;button type="button" id="carrito-vaciar" class="boton-secundario"&gt;Vaciar carrito&lt;/button&gt;
+        &lt;/aside&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const carritoLista = document.querySelector("#carrito-lista");
+        const carrito = JSON.parse(localStorage.getItem("curso-carrito")) ?? [];
+
+        const pintarCarrito = () =&gt; {
+            carritoLista.innerHTML = "";
+            for (const item of carrito) {
+                const fila = document.createElement("li");
+                fila.textContent = `${item.cantidad} × ${item.nombre} — $${(item.precio * item.cantidad).toFixed(2)}`;
+                carritoLista.append(fila);
+            }
+            const unidades = carrito.reduce((suma, item) =&gt; suma + item.cantidad, 0);
+            const total = carrito.reduce((suma, item) =&gt; suma + item.precio * item.cantidad, 0);
+            document.querySelector("#carrito-cantidad").textContent = unidades;
+            document.querySelector("#carrito-total").textContent = `$${total.toFixed(2)}`;
+            localStorage.setItem("curso-carrito", JSON.stringify(carrito));
+        };
+
+        document.querySelectorAll(".agregar-carrito").forEach((boton) =&gt; {
+            boton.addEventListener("click", () =&gt; {
+                const enCarrito = carrito.find((item) =&gt; item.id === boton.dataset.id);
+                if (enCarrito) {
+                    enCarrito.cantidad++;
+                } else {
+                    carrito.push({
+                        id: boton.dataset.id,
+                        nombre: boton.dataset.nombre,
+                        precio: Number(boton.dataset.precio),
+                        cantidad: 1,
+                    });
+                }
+                pintarCarrito();
+            });
+        });
+
+        document.querySelector("#carrito-vaciar").addEventListener("click", () =&gt; {
+            carrito.length = 0;
+            pintarCarrito();
+        });
+
+        pintarCarrito();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-favoritos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Favoritos con corazón</h2>
+            <p>Toca el corazón de las recetas que te gusten. Se guarda un array con los identificadores de las favoritas. Recarga la página para comprobarlo.</p>
+            <div class="resultado">
+                <ul class="recetas">
+                    <li class="receta">
+                        <img src="https://picsum.photos/id/292/320/200" alt="" width="320" height="200">
+                        <h3>Ensalada de quinua</h3>
+                        <button type="button" class="corazon" data-receta="quinua" aria-pressed="false" aria-label="Favorita: Ensalada de quinua">♡</button>
+                    </li>
+                    <li class="receta">
+                        <img src="https://picsum.photos/id/1080/320/200" alt="" width="320" height="200">
+                        <h3>Tarta de fresas</h3>
+                        <button type="button" class="corazon" data-receta="tarta" aria-pressed="false" aria-label="Favorita: Tarta de fresas">♡</button>
+                    </li>
+                    <li class="receta">
+                        <img src="https://picsum.photos/id/429/320/200" alt="" width="320" height="200">
+                        <h3>Batido de frutos rojos</h3>
+                        <button type="button" class="corazon" data-receta="batido" aria-pressed="false" aria-label="Favorita: Batido de frutos rojos">♡</button>
+                    </li>
+                    <li class="receta">
+                        <img src="https://picsum.photos/id/493/320/200" alt="" width="320" height="200">
+                        <h3>Pan de masa madre</h3>
+                        <button type="button" class="corazon" data-receta="pan" aria-pressed="false" aria-label="Favorita: Pan de masa madre">♡</button>
+                    </li>
+                </ul>
+                <p id="favoritos-resumen" class="aviso"></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;ul class="recetas"&gt;
+    &lt;li class="receta"&gt;
+        &lt;img src="https://picsum.photos/id/292/320/200" alt="" width="320" height="200"&gt;
+        &lt;h3&gt;Ensalada de quinua&lt;/h3&gt;
+        &lt;button type="button" class="corazon" data-receta="quinua" aria-pressed="false" aria-label="Favorita: Ensalada de quinua"&gt;♡&lt;/button&gt;
+    &lt;/li&gt;
+    &lt;li class="receta"&gt;
+        &lt;img src="https://picsum.photos/id/1080/320/200" alt="" width="320" height="200"&gt;
+        &lt;h3&gt;Tarta de fresas&lt;/h3&gt;
+        &lt;button type="button" class="corazon" data-receta="tarta" aria-pressed="false" aria-label="Favorita: Tarta de fresas"&gt;♡&lt;/button&gt;
+    &lt;/li&gt;
+    &lt;li class="receta"&gt;
+        &lt;img src="https://picsum.photos/id/429/320/200" alt="" width="320" height="200"&gt;
+        &lt;h3&gt;Batido de frutos rojos&lt;/h3&gt;
+        &lt;button type="button" class="corazon" data-receta="batido" aria-pressed="false" aria-label="Favorita: Batido de frutos rojos"&gt;♡&lt;/button&gt;
+    &lt;/li&gt;
+    &lt;li class="receta"&gt;
+        &lt;img src="https://picsum.photos/id/493/320/200" alt="" width="320" height="200"&gt;
+        &lt;h3&gt;Pan de masa madre&lt;/h3&gt;
+        &lt;button type="button" class="corazon" data-receta="pan" aria-pressed="false" aria-label="Favorita: Pan de masa madre"&gt;♡&lt;/button&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p id="favoritos-resumen" class="aviso"&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const corazones = document.querySelectorAll(".corazon");
+const favoritos = JSON.parse(localStorage.getItem("curso-favoritos")) ?? [];
+
+const pintarFavoritos = () =&gt; {
+    corazones.forEach((corazon) =&gt; {
+        const esFavorita = favoritos.includes(corazon.dataset.receta);
+        corazon.setAttribute("aria-pressed", esFavorita);
+        corazon.textContent = esFavorita ? "♥" : "♡";
+    });
+    const resumen = document.querySelector("#favoritos-resumen");
+    resumen.textContent = favoritos.length &gt; 0 ? `Tienes ${favoritos.length} receta(s) en favoritos.` : "Aún no tienes favoritas.";
+};
+
+corazones.forEach((corazon) =&gt; {
+    corazon.addEventListener("click", () =&gt; {
+        const receta = corazon.dataset.receta;
+        const posicion = favoritos.indexOf(receta);
+        if (posicion === -1) {
+            favoritos.push(receta);
+        } else {
+            favoritos.splice(posicion, 1);
+        }
+        localStorage.setItem("curso-favoritos", JSON.stringify(favoritos));
+        pintarFavoritos();
+    });
+});
+
+pintarFavoritos();</pre>
+                </figure>
+            </div>
+            <p>Se guarda solo el identificador (<code>"tarta"</code>), no toda la receta: ocupa menos y, si la receta cambia de nombre o foto, el favorito sigue funcionando. <code>aria-pressed</code> le dice al lector de pantalla si el botón está activado.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Favoritos con corazón&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .recetas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .receta {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .receta img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .receta h3 {
+            margin: 8px 12px 12px;
+            font-size: 1rem;
+        }
+
+        .corazon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #dc2626;
+            font-size: 1.3rem;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;ul class="recetas"&gt;
+        &lt;li class="receta"&gt;
+            &lt;img src="https://picsum.photos/id/292/320/200" alt="" width="320" height="200"&gt;
+            &lt;h3&gt;Ensalada de quinua&lt;/h3&gt;
+            &lt;button type="button" class="corazon" data-receta="quinua" aria-pressed="false" aria-label="Favorita: Ensalada de quinua"&gt;♡&lt;/button&gt;
+        &lt;/li&gt;
+        &lt;li class="receta"&gt;
+            &lt;img src="https://picsum.photos/id/1080/320/200" alt="" width="320" height="200"&gt;
+            &lt;h3&gt;Tarta de fresas&lt;/h3&gt;
+            &lt;button type="button" class="corazon" data-receta="tarta" aria-pressed="false" aria-label="Favorita: Tarta de fresas"&gt;♡&lt;/button&gt;
+        &lt;/li&gt;
+        &lt;li class="receta"&gt;
+            &lt;img src="https://picsum.photos/id/429/320/200" alt="" width="320" height="200"&gt;
+            &lt;h3&gt;Batido de frutos rojos&lt;/h3&gt;
+            &lt;button type="button" class="corazon" data-receta="batido" aria-pressed="false" aria-label="Favorita: Batido de frutos rojos"&gt;♡&lt;/button&gt;
+        &lt;/li&gt;
+        &lt;li class="receta"&gt;
+            &lt;img src="https://picsum.photos/id/493/320/200" alt="" width="320" height="200"&gt;
+            &lt;h3&gt;Pan de masa madre&lt;/h3&gt;
+            &lt;button type="button" class="corazon" data-receta="pan" aria-pressed="false" aria-label="Favorita: Pan de masa madre"&gt;♡&lt;/button&gt;
+        &lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;p id="favoritos-resumen" class="aviso"&gt;&lt;/p&gt;
+    &lt;script&gt;
+        const corazones = document.querySelectorAll(".corazon");
+        const favoritos = JSON.parse(localStorage.getItem("curso-favoritos")) ?? [];
+
+        const pintarFavoritos = () =&gt; {
+            corazones.forEach((corazon) =&gt; {
+                const esFavorita = favoritos.includes(corazon.dataset.receta);
+                corazon.setAttribute("aria-pressed", esFavorita);
+                corazon.textContent = esFavorita ? "♥" : "♡";
+            });
+            const resumen = document.querySelector("#favoritos-resumen");
+            resumen.textContent = favoritos.length &gt; 0 ? `Tienes ${favoritos.length} receta(s) en favoritos.` : "Aún no tienes favoritas.";
+        };
+
+        corazones.forEach((corazon) =&gt; {
+            corazon.addEventListener("click", () =&gt; {
+                const receta = corazon.dataset.receta;
+                const posicion = favoritos.indexOf(receta);
+                if (posicion === -1) {
+                    favoritos.push(receta);
+                } else {
+                    favoritos.splice(posicion, 1);
+                }
+                localStorage.setItem("curso-favoritos", JSON.stringify(favoritos));
+                pintarFavoritos();
+            });
+        });
+
+        pintarFavoritos();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-historial" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Último producto visto e historial reciente</h2>
+            <p>Haz clic en algunos productos. Arriba aparece el que estás viendo y abajo los 4 últimos, del más nuevo al más viejo y sin repetir. Recarga la página para comprobarlo: te recibe con el último que viste.</p>
+            <div class="resultado">
+                <div class="catalogo">
+                    <button type="button" class="ver-producto" data-producto="🎧 Audífonos Zumba">🎧 Audífonos Zumba</button>
+                    <button type="button" class="ver-producto" data-producto="⌚ Reloj Pulso">⌚ Reloj Pulso</button>
+                    <button type="button" class="ver-producto" data-producto="📷 Cámara Lince">📷 Cámara Lince</button>
+                    <button type="button" class="ver-producto" data-producto="🎒 Mochila Andes">🎒 Mochila Andes</button>
+                    <button type="button" class="ver-producto" data-producto="💡 Lámpara Brillo">💡 Lámpara Brillo</button>
+                    <button type="button" class="ver-producto" data-producto="⌨️ Teclado Tecla">⌨️ Teclado Tecla</button>
+                </div>
+                <p id="historial-actual" class="aviso"></p>
+                <h3>Vistos recientemente</h3>
+                <ol id="historial-lista"></ol>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="catalogo"&gt;
+    &lt;button type="button" class="ver-producto" data-producto="🎧 Audífonos Zumba"&gt;🎧 Audífonos Zumba&lt;/button&gt;
+    &lt;button type="button" class="ver-producto" data-producto="⌚ Reloj Pulso"&gt;⌚ Reloj Pulso&lt;/button&gt;
+    &lt;button type="button" class="ver-producto" data-producto="📷 Cámara Lince"&gt;📷 Cámara Lince&lt;/button&gt;
+    &lt;button type="button" class="ver-producto" data-producto="🎒 Mochila Andes"&gt;🎒 Mochila Andes&lt;/button&gt;
+    &lt;button type="button" class="ver-producto" data-producto="💡 Lámpara Brillo"&gt;💡 Lámpara Brillo&lt;/button&gt;
+    &lt;button type="button" class="ver-producto" data-producto="⌨️ Teclado Tecla"&gt;⌨️ Teclado Tecla&lt;/button&gt;
+&lt;/div&gt;
+&lt;p id="historial-actual" class="aviso"&gt;&lt;/p&gt;
+&lt;h3&gt;Vistos recientemente&lt;/h3&gt;
+&lt;ol id="historial-lista"&gt;&lt;/ol&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const historialActual = document.querySelector("#historial-actual");
+const historialLista = document.querySelector("#historial-lista");
+let historial = JSON.parse(localStorage.getItem("curso-historial")) ?? [];
+
+const pintarHistorial = () =&gt; {
+    historialLista.innerHTML = "";
+    for (const producto of historial) {
+        const item = document.createElement("li");
+        item.textContent = producto;
+        historialLista.append(item);
+    }
+};
+
+document.querySelectorAll(".ver-producto").forEach((boton) =&gt; {
+    boton.addEventListener("click", () =&gt; {
+        const producto = boton.dataset.producto;
+        historialActual.textContent = `Estás viendo: ${producto}`;
+        historial = [producto, ...historial.filter((visto) =&gt; visto !== producto)].slice(0, 4);
+        localStorage.setItem("curso-historial", JSON.stringify(historial));
+        pintarHistorial();
+    });
+});
+
+historialActual.textContent = historial.length &gt; 0 ? `La última vez viste: ${historial[0]}` : "Elige un producto para verlo.";
+pintarHistorial();</pre>
+                </figure>
+            </div>
+            <p>La línea clave: se pone el producto al principio, se quitan sus repeticiones con <code>filter</code> y se cortan los 4 primeros con <code>slice</code>. Sin el límite, el historial crecería para siempre.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Último producto visto e historial reciente&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .catalogo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .catalogo button {
+            background: #f1f5f9;
+            color: #1f2430;
+            font-weight: 400;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="catalogo"&gt;
+        &lt;button type="button" class="ver-producto" data-producto="🎧 Audífonos Zumba"&gt;🎧 Audífonos Zumba&lt;/button&gt;
+        &lt;button type="button" class="ver-producto" data-producto="⌚ Reloj Pulso"&gt;⌚ Reloj Pulso&lt;/button&gt;
+        &lt;button type="button" class="ver-producto" data-producto="📷 Cámara Lince"&gt;📷 Cámara Lince&lt;/button&gt;
+        &lt;button type="button" class="ver-producto" data-producto="🎒 Mochila Andes"&gt;🎒 Mochila Andes&lt;/button&gt;
+        &lt;button type="button" class="ver-producto" data-producto="💡 Lámpara Brillo"&gt;💡 Lámpara Brillo&lt;/button&gt;
+        &lt;button type="button" class="ver-producto" data-producto="⌨️ Teclado Tecla"&gt;⌨️ Teclado Tecla&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p id="historial-actual" class="aviso"&gt;&lt;/p&gt;
+    &lt;h3&gt;Vistos recientemente&lt;/h3&gt;
+    &lt;ol id="historial-lista"&gt;&lt;/ol&gt;
+    &lt;script&gt;
+        const historialActual = document.querySelector("#historial-actual");
+        const historialLista = document.querySelector("#historial-lista");
+        let historial = JSON.parse(localStorage.getItem("curso-historial")) ?? [];
+
+        const pintarHistorial = () =&gt; {
+            historialLista.innerHTML = "";
+            for (const producto of historial) {
+                const item = document.createElement("li");
+                item.textContent = producto;
+                historialLista.append(item);
+            }
+        };
+
+        document.querySelectorAll(".ver-producto").forEach((boton) =&gt; {
+            boton.addEventListener("click", () =&gt; {
+                const producto = boton.dataset.producto;
+                historialActual.textContent = `Estás viendo: ${producto}`;
+                historial = [producto, ...historial.filter((visto) =&gt; visto !== producto)].slice(0, 4);
+                localStorage.setItem("curso-historial", JSON.stringify(historial));
+                pintarHistorial();
+            });
+        });
+
+        historialActual.textContent = historial.length &gt; 0 ? `La última vez viste: ${historial[0]}` : "Elige un producto para verlo.";
+        pintarHistorial();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-record" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Récord de un minijuego de clics</h2>
+            <p>Pulsa <strong>Empezar</strong> y haz todos los clics que puedas en 5 segundos. Si superas tu récord, se guarda. Recarga la página para comprobarlo: el récord sigue ahí esperando que lo superes.</p>
+            <div class="resultado">
+                <div class="juego">
+                    <p>Tiempo: <strong id="juego-tiempo">5.0</strong> s · Clics: <strong id="juego-clics">0</strong> · Récord: <strong id="juego-record">0</strong></p>
+                    <button type="button" id="juego-boton" class="juego-boton">Empezar</button>
+                    <p id="juego-mensaje" class="aviso" aria-live="polite"></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="juego"&gt;
+    &lt;p&gt;Tiempo: &lt;strong id="juego-tiempo"&gt;5.0&lt;/strong&gt; s · Clics: &lt;strong id="juego-clics"&gt;0&lt;/strong&gt; · Récord: &lt;strong id="juego-record"&gt;0&lt;/strong&gt;&lt;/p&gt;
+    &lt;button type="button" id="juego-boton" class="juego-boton"&gt;Empezar&lt;/button&gt;
+    &lt;p id="juego-mensaje" class="aviso" aria-live="polite"&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const juegoTiempo = document.querySelector("#juego-tiempo");
+const juegoClicsTexto = document.querySelector("#juego-clics");
+const juegoRecordTexto = document.querySelector("#juego-record");
+const juegoBoton = document.querySelector("#juego-boton");
+const juegoMensaje = document.querySelector("#juego-mensaje");
+let juegoRecord = Number(localStorage.getItem("curso-record") ?? 0);
+let juegoClics = 0;
+let jugando = false;
+
+juegoRecordTexto.textContent = juegoRecord;
+
+const terminarJuego = () =&gt; {
+    jugando = false;
+    juegoBoton.disabled = true;
+    if (juegoClics &gt; juegoRecord) {
+        juegoRecord = juegoClics;
+        localStorage.setItem("curso-record", juegoRecord);
+        juegoRecordTexto.textContent = juegoRecord;
+        juegoMensaje.textContent = `🏆 ¡Nuevo récord: ${juegoClics} clics!`;
+    } else {
+        juegoMensaje.textContent = `Hiciste ${juegoClics} clics. Tu récord sigue en ${juegoRecord}.`;
+    }
+    setTimeout(() =&gt; {
+        juegoBoton.disabled = false;
+        juegoBoton.textContent = "Jugar otra vez";
+    }, 1000);
+};
+
+juegoBoton.addEventListener("click", () =&gt; {
+    if (jugando) {
+        juegoClics++;
+        juegoClicsTexto.textContent = juegoClics;
+        return;
+    }
+    jugando = true;
+    juegoClics = 0;
+    juegoClicsTexto.textContent = 0;
+    juegoMensaje.textContent = "";
+    juegoBoton.textContent = "¡Clic! ¡Clic! ¡Clic!";
+    const inicio = Date.now();
+    const reloj = setInterval(() =&gt; {
+        const restante = Math.max(0, 5000 - (Date.now() - inicio));
+        juegoTiempo.textContent = (restante / 1000).toFixed(1);
+        if (restante === 0) {
+            clearInterval(reloj);
+            terminarJuego();
+        }
+    }, 100);
+});</pre>
+                </figure>
+            </div>
+            <p>El tiempo se calcula con <code>Date.now()</code> y no contando vueltas de <code>setInterval</code>, porque el intervalo puede atrasarse unos milisegundos. El botón se desactiva un segundo al terminar para que un clic de más no empiece otra partida sin querer.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Récord de un minijuego de clics&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .juego {
+            max-width: 420px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #1f2430;
+            color: #f8fafc;
+            text-align: center;
+        }
+
+        .juego strong {
+            color: #f7df1e;
+        }
+
+        .juego-boton {
+            width: 100%;
+            padding: 28px;
+            background: #f7df1e;
+            color: #1f2430;
+            font-size: 1.4rem;
+        }
+
+        .aviso {
+            color: #a6e3a1;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="juego"&gt;
+        &lt;p&gt;Tiempo: &lt;strong id="juego-tiempo"&gt;5.0&lt;/strong&gt; s · Clics: &lt;strong id="juego-clics"&gt;0&lt;/strong&gt; · Récord: &lt;strong id="juego-record"&gt;0&lt;/strong&gt;&lt;/p&gt;
+        &lt;button type="button" id="juego-boton" class="juego-boton"&gt;Empezar&lt;/button&gt;
+        &lt;p id="juego-mensaje" class="aviso" aria-live="polite"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const juegoTiempo = document.querySelector("#juego-tiempo");
+        const juegoClicsTexto = document.querySelector("#juego-clics");
+        const juegoRecordTexto = document.querySelector("#juego-record");
+        const juegoBoton = document.querySelector("#juego-boton");
+        const juegoMensaje = document.querySelector("#juego-mensaje");
+        let juegoRecord = Number(localStorage.getItem("curso-record") ?? 0);
+        let juegoClics = 0;
+        let jugando = false;
+
+        juegoRecordTexto.textContent = juegoRecord;
+
+        const terminarJuego = () =&gt; {
+            jugando = false;
+            juegoBoton.disabled = true;
+            if (juegoClics &gt; juegoRecord) {
+                juegoRecord = juegoClics;
+                localStorage.setItem("curso-record", juegoRecord);
+                juegoRecordTexto.textContent = juegoRecord;
+                juegoMensaje.textContent = `🏆 ¡Nuevo récord: ${juegoClics} clics!`;
+            } else {
+                juegoMensaje.textContent = `Hiciste ${juegoClics} clics. Tu récord sigue en ${juegoRecord}.`;
+            }
+            setTimeout(() =&gt; {
+                juegoBoton.disabled = false;
+                juegoBoton.textContent = "Jugar otra vez";
+            }, 1000);
+        };
+
+        juegoBoton.addEventListener("click", () =&gt; {
+            if (jugando) {
+                juegoClics++;
+                juegoClicsTexto.textContent = juegoClics;
+                return;
+            }
+            jugando = true;
+            juegoClics = 0;
+            juegoClicsTexto.textContent = 0;
+            juegoMensaje.textContent = "";
+            juegoBoton.textContent = "¡Clic! ¡Clic! ¡Clic!";
+            const inicio = Date.now();
+            const reloj = setInterval(() =&gt; {
+                const restante = Math.max(0, 5000 - (Date.now() - inicio));
+                juegoTiempo.textContent = (restante / 1000).toFixed(1);
+                if (restante === 0) {
+                    clearInterval(reloj);
+                    terminarJuego();
+                }
+            }, 100);
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-pomodoro" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Temporizador pomodoro que recuerda las sesiones del día</h2>
+            <p>Cada sesión completada suma un 🍅. Se guarda el número de sesiones <strong>junto con la fecha</strong>: mañana el contador empieza de cero solo. Usa «Probar con 5 segundos» y recarga la página para comprobarlo.</p>
+            <div class="resultado">
+                <div class="pomodoro">
+                    <p id="pomo-reloj" class="pomo-reloj" aria-live="polite">25:00</p>
+                    <div class="botones">
+                        <button type="button" id="pomo-iniciar">Iniciar 25 min</button>
+                        <button type="button" id="pomo-demo">Probar con 5 segundos</button>
+                    </div>
+                    <p>Sesiones de hoy: <strong id="pomo-sesiones">0</strong></p>
+                    <p id="pomo-tomates" class="aviso"></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="pomodoro"&gt;
+    &lt;p id="pomo-reloj" class="pomo-reloj" aria-live="polite"&gt;25:00&lt;/p&gt;
+    &lt;div class="botones"&gt;
+        &lt;button type="button" id="pomo-iniciar"&gt;Iniciar 25 min&lt;/button&gt;
+        &lt;button type="button" id="pomo-demo"&gt;Probar con 5 segundos&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p&gt;Sesiones de hoy: &lt;strong id="pomo-sesiones"&gt;0&lt;/strong&gt;&lt;/p&gt;
+    &lt;p id="pomo-tomates" class="aviso"&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const pomoReloj = document.querySelector("#pomo-reloj");
+const pomoHoy = new Date().toLocaleDateString("es");
+const pomoGuardado = JSON.parse(localStorage.getItem("curso-pomodoro")) ?? { fecha: pomoHoy, sesiones: 0 };
+const pomoDia = pomoGuardado.fecha === pomoHoy ? pomoGuardado : { fecha: pomoHoy, sesiones: 0 };
+let pomoIntervalo;
+
+const formatearReloj = (segundos) =&gt; {
+    const minutos = String(Math.floor(segundos / 60)).padStart(2, "0");
+    const resto = String(segundos % 60).padStart(2, "0");
+    return `${minutos}:${resto}`;
+};
+
+const pintarSesiones = () =&gt; {
+    document.querySelector("#pomo-sesiones").textContent = pomoDia.sesiones;
+    document.querySelector("#pomo-tomates").textContent = "🍅".repeat(pomoDia.sesiones);
+};
+
+const empezarPomodoro = (segundos) =&gt; {
+    clearInterval(pomoIntervalo);
+    let restantes = segundos;
+    pomoReloj.textContent = formatearReloj(restantes);
+    pomoIntervalo = setInterval(() =&gt; {
+        restantes--;
+        pomoReloj.textContent = formatearReloj(restantes);
+        if (restantes === 0) {
+            clearInterval(pomoIntervalo);
+            pomoDia.sesiones++;
+            localStorage.setItem("curso-pomodoro", JSON.stringify(pomoDia));
+            pintarSesiones();
+            pomoReloj.textContent = "¡Descanso! ☕";
+        }
+    }, 1000);
+};
+
+document.querySelector("#pomo-iniciar").addEventListener("click", () =&gt; {
+    empezarPomodoro(25 * 60);
+});
+
+document.querySelector("#pomo-demo").addEventListener("click", () =&gt; {
+    empezarPomodoro(5);
+});
+
+pintarSesiones();</pre>
+                </figure>
+            </div>
+            <p>Guardar la fecha junto al dato es la forma simple de que algo «caduque»: al cargar, si la fecha guardada no es la de hoy, se empieza de nuevo. localStorage no tiene fecha de vencimiento propia.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Temporizador pomodoro que recuerda las sesiones del día&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .botones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .pomodoro {
+            max-width: 420px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #1f2430;
+            color: #f8fafc;
+            text-align: center;
+        }
+
+        .aviso {
+            color: #a6e3a1;
+        }
+
+        .pomo-reloj {
+            margin: 0;
+            color: #f7df1e;
+            font-family: "Courier New", monospace;
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .botones {
+            justify-content: center;
+        }
+
+        button {
+            background: #f7df1e;
+            color: #1f2430;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="pomodoro"&gt;
+        &lt;p id="pomo-reloj" class="pomo-reloj" aria-live="polite"&gt;25:00&lt;/p&gt;
+        &lt;div class="botones"&gt;
+            &lt;button type="button" id="pomo-iniciar"&gt;Iniciar 25 min&lt;/button&gt;
+            &lt;button type="button" id="pomo-demo"&gt;Probar con 5 segundos&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;p&gt;Sesiones de hoy: &lt;strong id="pomo-sesiones"&gt;0&lt;/strong&gt;&lt;/p&gt;
+        &lt;p id="pomo-tomates" class="aviso"&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const pomoReloj = document.querySelector("#pomo-reloj");
+        const pomoHoy = new Date().toLocaleDateString("es");
+        const pomoGuardado = JSON.parse(localStorage.getItem("curso-pomodoro")) ?? { fecha: pomoHoy, sesiones: 0 };
+        const pomoDia = pomoGuardado.fecha === pomoHoy ? pomoGuardado : { fecha: pomoHoy, sesiones: 0 };
+        let pomoIntervalo;
+
+        const formatearReloj = (segundos) =&gt; {
+            const minutos = String(Math.floor(segundos / 60)).padStart(2, "0");
+            const resto = String(segundos % 60).padStart(2, "0");
+            return `${minutos}:${resto}`;
+        };
+
+        const pintarSesiones = () =&gt; {
+            document.querySelector("#pomo-sesiones").textContent = pomoDia.sesiones;
+            document.querySelector("#pomo-tomates").textContent = "🍅".repeat(pomoDia.sesiones);
+        };
+
+        const empezarPomodoro = (segundos) =&gt; {
+            clearInterval(pomoIntervalo);
+            let restantes = segundos;
+            pomoReloj.textContent = formatearReloj(restantes);
+            pomoIntervalo = setInterval(() =&gt; {
+                restantes--;
+                pomoReloj.textContent = formatearReloj(restantes);
+                if (restantes === 0) {
+                    clearInterval(pomoIntervalo);
+                    pomoDia.sesiones++;
+                    localStorage.setItem("curso-pomodoro", JSON.stringify(pomoDia));
+                    pintarSesiones();
+                    pomoReloj.textContent = "¡Descanso! ☕";
+                }
+            }, 1000);
+        };
+
+        document.querySelector("#pomo-iniciar").addEventListener("click", () =&gt; {
+            empezarPomodoro(25 * 60);
+        });
+
+        document.querySelector("#pomo-demo").addEventListener("click", () =&gt; {
+            empezarPomodoro(5);
+        });
+
+        pintarSesiones();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-pestanas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Sincronizar pestañas con el evento <code>storage</code></h2>
+            <p>Abre esta misma lección en <strong>otra pestaña</strong> (con el enlace de abajo), ponlas lado a lado y escribe en una: el texto aparece en la otra al instante. Recarga la página para comprobarlo: el texto también quedó guardado.</p>
+            <div class="resultado">
+                <div class="campo">
+                    <label for="pizarra-texto">Pizarra compartida</label>
+                    <input type="text" id="pizarra-texto" placeholder="Escribe aquí y mira la otra pestaña">
+                    <p id="pizarra-aviso" class="aviso" aria-live="polite">Esperando cambios de otras pestañas…</p>
+                </div>
+                <p><a href="" target="_blank">Abrir esta página en otra pestaña</a></p>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="campo"&gt;
+    &lt;label for="pizarra-texto"&gt;Pizarra compartida&lt;/label&gt;
+    &lt;input type="text" id="pizarra-texto" placeholder="Escribe aquí y mira la otra pestaña"&gt;
+    &lt;p id="pizarra-aviso" class="aviso" aria-live="polite"&gt;Esperando cambios de otras pestañas…&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a href="" target="_blank"&gt;Abrir esta página en otra pestaña&lt;/a&gt;&lt;/p&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const pizarraTexto = document.querySelector("#pizarra-texto");
+const pizarraAviso = document.querySelector("#pizarra-aviso");
+
+pizarraTexto.value = localStorage.getItem("curso-pizarra") ?? "";
+
+pizarraTexto.addEventListener("input", () =&gt; {
+    localStorage.setItem("curso-pizarra", pizarraTexto.value);
+});
+
+window.addEventListener("storage", (event) =&gt; {
+    if (event.key !== "curso-pizarra") {
+        return;
+    }
+    pizarraTexto.value = event.newValue ?? "";
+    pizarraAviso.textContent = `Cambio recibido de otra pestaña a las ${new Date().toLocaleTimeString("es")}`;
+});</pre>
+                </figure>
+            </div>
+            <p>El evento <code>storage</code> llega a las <strong>otras</strong> pestañas, nunca a la que hizo el cambio. Trae <code>event.key</code>, <code>event.oldValue</code> y <code>event.newValue</code>. Así una tienda actualiza el carrito en todas las pestañas o una app cierra sesión en todas a la vez. Si abres las lecciones como archivo y no funciona, prueba con Live Server.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Sincronizar pestañas con el evento storage&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .campo label {
+            font-weight: 600;
+        }
+
+        .campo {
+            display: grid;
+            gap: 6px;
+            max-width: 480px;
+        }
+
+        .aviso {
+            margin: 8px 0 0;
+            color: #0f766e;
+            font-weight: 600;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="campo"&gt;
+        &lt;label for="pizarra-texto"&gt;Pizarra compartida&lt;/label&gt;
+        &lt;input type="text" id="pizarra-texto" placeholder="Escribe aquí y mira la otra pestaña"&gt;
+        &lt;p id="pizarra-aviso" class="aviso" aria-live="polite"&gt;Esperando cambios de otras pestañas…&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;p&gt;&lt;a href="" target="_blank"&gt;Abrir esta página en otra pestaña&lt;/a&gt;&lt;/p&gt;
+    &lt;script&gt;
+        const pizarraTexto = document.querySelector("#pizarra-texto");
+        const pizarraAviso = document.querySelector("#pizarra-aviso");
+
+        pizarraTexto.value = localStorage.getItem("curso-pizarra") ?? "";
+
+        pizarraTexto.addEventListener("input", () =&gt; {
+            localStorage.setItem("curso-pizarra", pizarraTexto.value);
+        });
+
+        window.addEventListener("storage", (event) =&gt; {
+            if (event.key !== "curso-pizarra") {
+                return;
+            }
+            pizarraTexto.value = event.newValue ?? "";
+            pizarraAviso.textContent = `Cambio recibido de otra pestaña a las ${new Date().toLocaleTimeString("es")}`;
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+
+        <section id="ej-borrar-todo" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Inspector: ver y borrar todo lo guardado</h2>
+            <p>Una mini versión de la pestaña Application de DevTools: lista todas las claves del curso (las que empiezan con <code>curso-</code>) con su tamaño, y permite borrarlas una por una o todas. Después de borrar, recarga la página para comprobarlo: todos los ejemplos vuelven a empezar.</p>
+            <div class="resultado">
+                <table class="tabla-claves">
+                    <thead>
+                        <tr><th>Clave</th><th>Valor</th><th>Tamaño</th><th>Acción</th></tr>
+                    </thead>
+                    <tbody id="inspector-filas"></tbody>
+                </table>
+                <p id="inspector-total" class="ayuda"></p>
+                <div class="botones">
+                    <button type="button" id="inspector-actualizar" class="boton-secundario">Actualizar</button>
+                    <button type="button" id="inspector-borrar" class="peligro">Borrar todo lo guardado del curso</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;table class="tabla-claves"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;&lt;th&gt;Clave&lt;/th&gt;&lt;th&gt;Valor&lt;/th&gt;&lt;th&gt;Tamaño&lt;/th&gt;&lt;th&gt;Acción&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody id="inspector-filas"&gt;&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p id="inspector-total" class="ayuda"&gt;&lt;/p&gt;
+&lt;div class="botones"&gt;
+    &lt;button type="button" id="inspector-actualizar" class="boton-secundario"&gt;Actualizar&lt;/button&gt;
+    &lt;button type="button" id="inspector-borrar" class="peligro"&gt;Borrar todo lo guardado del curso&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const inspectorFilas = document.querySelector("#inspector-filas");
+const inspectorTotal = document.querySelector("#inspector-total");
+
+const clavesDelCurso = () =&gt; Object.keys(localStorage).filter((clave) =&gt; clave.startsWith("curso-")).sort();
+
+const pintarInspector = () =&gt; {
+    inspectorFilas.innerHTML = "";
+    let caracteres = 0;
+    for (const clave of clavesDelCurso()) {
+        const valor = localStorage.getItem(clave);
+        caracteres += clave.length + valor.length;
+
+        const fila = inspectorFilas.insertRow();
+        fila.insertCell().textContent = clave;
+        fila.insertCell().textContent = valor.length &gt; 40 ? `${valor.slice(0, 40)}…` : valor;
+        fila.insertCell().textContent = `${valor.length} car.`;
+
+        const borrar = document.createElement("button");
+        borrar.type = "button";
+        borrar.textContent = "Borrar";
+        borrar.setAttribute("aria-label", `Borrar ${clave}`);
+        borrar.addEventListener("click", () =&gt; {
+            localStorage.removeItem(clave);
+            pintarInspector();
+        });
+        fila.insertCell().append(borrar);
+    }
+    const kilobytes = (caracteres * 2) / 1024;
+    inspectorTotal.textContent = `${clavesDelCurso().length} claves · unos ${kilobytes.toFixed(1)} KB de los ~5 MB disponibles`;
+};
+
+document.querySelector("#inspector-actualizar").addEventListener("click", pintarInspector);
+
+document.querySelector("#inspector-borrar").addEventListener("click", () =&gt; {
+    for (const clave of clavesDelCurso()) {
+        localStorage.removeItem(clave);
+    }
+    pintarInspector();
+    inspectorTotal.textContent = "Listo. Recarga la página para empezar de cero.";
+});
+
+pintarInspector();</pre>
+                </figure>
+            </div>
+            <p>No usamos <code>localStorage.clear()</code> porque borraría también lo que guardaron otras páginas del mismo sitio. Cada carácter ocupa unos 2 bytes, por eso el cálculo multiplica por 2. Los ejemplos de arriba siguen con sus datos en memoria: si tocas alguno antes de recargar, volverá a guardar.</p>
+            <details class="codigo-completo">
+                <summary>Ver ejemplo completo</summary>
+                <p>Copia este código en un archivo nuevo <code>.html</code> y ábrelo en el navegador: se verá igual que el resultado de arriba.</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Inspector: ver y borrar todo lo guardado&lt;/title&gt;
+    &lt;style&gt;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 24px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2430;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        :where(input, select, textarea, button) {
+            font: inherit;
+        }
+
+        :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            color: inherit;
+        }
+
+        :where(input, select, textarea):focus-visible {
+            border-color: #ca8a04;
+            outline: 3px solid #fde047;
+            outline-offset: 1px;
+        }
+
+        :where(button) {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f2430;
+            color: #f7df1e;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        :where(button):focus-visible {
+            outline: 3px solid #ca8a04;
+            outline-offset: 2px;
+        }
+
+        :where(button:disabled) {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        :where(button[type="reset"], .boton-secundario) {
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+            accent-color: #ca8a04;
+        }
+
+        .botones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .ayuda {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .tabla-claves {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .tabla-claves th,
+        .tabla-claves td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            word-break: break-all;
+        }
+
+        .tabla-claves button {
+            padding: 4px 10px;
+            background: #e2e8f0;
+            color: #1f2430;
+        }
+
+        .peligro {
+            background: #dc2626;
+            color: #ffffff;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;table class="tabla-claves"&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;&lt;th&gt;Clave&lt;/th&gt;&lt;th&gt;Valor&lt;/th&gt;&lt;th&gt;Tamaño&lt;/th&gt;&lt;th&gt;Acción&lt;/th&gt;&lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody id="inspector-filas"&gt;&lt;/tbody&gt;
+    &lt;/table&gt;
+    &lt;p id="inspector-total" class="ayuda"&gt;&lt;/p&gt;
+    &lt;div class="botones"&gt;
+        &lt;button type="button" id="inspector-actualizar" class="boton-secundario"&gt;Actualizar&lt;/button&gt;
+        &lt;button type="button" id="inspector-borrar" class="peligro"&gt;Borrar todo lo guardado del curso&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;script&gt;
+        const inspectorFilas = document.querySelector("#inspector-filas");
+        const inspectorTotal = document.querySelector("#inspector-total");
+
+        const clavesDelCurso = () =&gt; Object.keys(localStorage).filter((clave) =&gt; clave.startsWith("curso-")).sort();
+
+        const pintarInspector = () =&gt; {
+            inspectorFilas.innerHTML = "";
+            let caracteres = 0;
+            for (const clave of clavesDelCurso()) {
+                const valor = localStorage.getItem(clave);
+                caracteres += clave.length + valor.length;
+
+                const fila = inspectorFilas.insertRow();
+                fila.insertCell().textContent = clave;
+                fila.insertCell().textContent = valor.length &gt; 40 ? `${valor.slice(0, 40)}…` : valor;
+                fila.insertCell().textContent = `${valor.length} car.`;
+
+                const borrar = document.createElement("button");
+                borrar.type = "button";
+                borrar.textContent = "Borrar";
+                borrar.setAttribute("aria-label", `Borrar ${clave}`);
+                borrar.addEventListener("click", () =&gt; {
+                    localStorage.removeItem(clave);
+                    pintarInspector();
+                });
+                fila.insertCell().append(borrar);
+            }
+            const kilobytes = (caracteres * 2) / 1024;
+            inspectorTotal.textContent = `${clavesDelCurso().length} claves · unos ${kilobytes.toFixed(1)} KB de los ~5 MB disponibles`;
+        };
+
+        document.querySelector("#inspector-actualizar").addEventListener("click", pintarInspector);
+
+        document.querySelector("#inspector-borrar").addEventListener("click", () =&gt; {
+            for (const clave of clavesDelCurso()) {
+                localStorage.removeItem(clave);
+            }
+            pintarInspector();
+            inspectorTotal.textContent = "Listo. Recarga la página para empezar de cero.";
+        });
+
+        pintarInspector();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </details>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="24-js-formularios.html">Anterior: formularios con JavaScript</a> |
+            <a href="index.html">Índice</a> |
+            <a href="26-js-fetch-apis.html">Siguiente: fetch y APIs</a>
+        </nav>
+    </footer>
+</body>
+</html>

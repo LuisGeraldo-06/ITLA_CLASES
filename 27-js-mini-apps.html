@@ -1,0 +1,3534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>27. JavaScript: mini aplicaciones</title>
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/copiar.js" defer></script>
+    <script src="js/consola.js" defer></script>
+    <link rel="stylesheet" href="css/27-js-mini-apps.css">
+    <script src="js/27-js-mini-apps.js" defer></script>
+</head>
+<body class="leccion-js">
+    <header class="leccion-cabecera">
+        <p><a href="index.html">Volver al índice</a></p>
+        <h1>27. JavaScript: mini aplicaciones</h1>
+        <p>Última lección: ya no hay temas nuevos, hay <strong>aplicaciones completas</strong>. Cada ejemplo junta lo que aprendiste en el curso: HTML para la estructura, CSS para que se vea bien y JavaScript para el comportamiento (DOM, eventos, arrays y objetos, <code>localStorage</code> y temporizadores). Todas funcionan copiando sus tres bloques de código en una página nueva. Úsalas como punto de partida para tus propios proyectos.</p>
+        <ul class="indice-local">
+            <li><a href="#teoria">Teoría</a></li>
+            <li><a href="#ej-reloj">Reloj</a></li>
+            <li><a href="#ej-carrusel">Carrusel</a></li>
+            <li><a href="#ej-quiz">Quiz</a></li>
+            <li><a href="#ej-memoria">Memoria</a></li>
+            <li><a href="#ej-cronometro">Cronómetro</a></li>
+            <li><a href="#ej-pomodoro">Pomodoro</a></li>
+            <li><a href="#ej-tareas">Lista de tareas</a></li>
+            <li><a href="#ej-calculadora">Calculadora</a></li>
+            <li><a href="#ej-ppt">Piedra, papel o tijera</a></li>
+            <li><a href="#ej-claves">Contraseñas</a></li>
+            <li><a href="#ej-unidades">Conversor de unidades</a></li>
+            <li><a href="#ej-palabras">Contador de palabras</a></li>
+            <li><a href="#ej-dibujo">Dibujo en canvas</a></li>
+            <li><a href="#ej-carrito">Carrito de compras</a></li>
+            <li><a href="#ej-gastos">Gastos por categoría</a></li>
+            <li><a href="#ej-adivina">Adivina el número</a></li>
+            <li><a href="#ej-recetas">Buscador de recetas</a></li>
+            <li><a href="#ej-kanban">Tablero Kanban</a></li>
+            <li><a href="#final">¡Felicidades!</a></li>
+        </ul>
+    </header>
+
+    <main class="leccion-contenido">
+        <section id="teoria" class="ejemplo teoria">
+            <h2>Cómo se arma una mini aplicación</h2>
+            <p>Casi todas siguen la misma receta de cuatro pasos. Si la entiendes, puedes construir cualquiera de estas apps (y muchas más):</p>
+            <table>
+                <thead>
+                    <tr><th>Paso</th><th>Qué es</th><th>En código</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1. Referencias</td><td>guardar en constantes los elementos que vamos a tocar</td><td><code>const lista = document.querySelector("#tareas-lista");</code></td></tr>
+                    <tr><td>2. Estado</td><td>los datos de la app viven en variables (arrays, objetos, números), <strong>no</strong> en el HTML</td><td><code>let tareas = [];</code></td></tr>
+                    <tr><td>3. Pintar</td><td>una función que borra y vuelve a dibujar la interfaz a partir del estado</td><td><code>function pintar() { … }</code></td></tr>
+                    <tr><td>4. Eventos</td><td>cada acción cambia el estado, guarda y vuelve a pintar</td><td><code>boton.addEventListener("click", …)</code></td></tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                    <tr><th>Mini app</th><th>Lo que practica</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Reloj, cronómetro, pomodoro</td><td><code>setInterval</code>, <code>Date</code>, <code>padStart</code></td></tr>
+                    <tr><td>Carrusel</td><td>índices circulares con <code>%</code>, autoplay, clases activas</td></tr>
+                    <tr><td>Quiz, memoria, piedra-papel-tijera, adivina el número</td><td>lógica de juego, estados, puntajes en <code>localStorage</code></td></tr>
+                    <tr><td>Tareas, carrito, gastos, kanban</td><td>arrays de objetos, <code>filter</code>/<code>find</code>/<code>reduce</code>, persistencia</td></tr>
+                    <tr><td>Calculadora, contraseñas, unidades, contador de palabras</td><td>formularios, eventos <code>input</code>, cálculos y formatos</td></tr>
+                    <tr><td>Dibujo en canvas</td><td>eventos de puntero y la API de <code>&lt;canvas&gt;</code></td></tr>
+                    <tr><td>Recetas</td><td>filtros combinados y búsqueda sin acentos</td></tr>
+                </tbody>
+            </table>
+            <div class="codigo">
+                <figure>
+                    <figcaption>El esqueleto que repiten casi todas</figcaption>
+<pre>const lista = document.querySelector("#mi-lista");
+
+let datos = JSON.parse(localStorage.getItem("mi-app")) || [];
+
+function guardar() {
+    localStorage.setItem("mi-app", JSON.stringify(datos));
+}
+
+function pintar() {
+    lista.innerHTML = "";
+    for (const dato of datos) {
+        const li = document.createElement("li");
+        li.textContent = dato.texto;
+        lista.append(li);
+    }
+}
+
+boton.addEventListener("click", () =&gt; {
+    datos.push({ id: Date.now(), texto: "Nuevo" });
+    guardar();
+    pintar();
+});
+
+pintar();</pre>
+                </figure>
+                <figure>
+                    <figcaption>Delegación de eventos: un solo listener para muchos botones</figcaption>
+<pre>contenedor.addEventListener("click", (evento) =&gt; {
+    const boton = evento.target.closest("button");
+    if (!boton) {
+        return;
+    }
+    console.log("Pulsaste", boton.dataset.id);
+});</pre>
+                </figure>
+            </div>
+            <p>Cada app usa un prefijo propio en sus <code>id</code>, clases y claves de <code>localStorage</code> (<code>reloj-</code>, <code>quiz-</code>, <code>kanban-</code>…) para que puedan convivir en la misma página sin pisarse.</p>
+        </section>
+
+        <section id="ej-reloj" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 1</span>
+            <h2>Reloj digital con fecha y saludo</h2>
+            <p><code>setInterval</code> llama a <code>actualizarReloj</code> cada segundo. <code>padStart</code> agrega el cero de «09», <code>toLocaleDateString</code> escribe la fecha en español y la preferencia de 12/24 horas se recuerda en <code>localStorage</code>.</p>
+            <div class="resultado">
+                <div class="reloj">
+                    <p id="reloj-saludo" class="reloj-saludo"></p>
+                    <p id="reloj-hora" class="reloj-hora">00:00:00</p>
+                    <p id="reloj-fecha" class="reloj-fecha"></p>
+                    <label class="reloj-opcion"><input type="checkbox" id="reloj-12h"> Formato 12 horas</label>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="reloj"&gt;
+    &lt;p id="reloj-saludo" class="reloj-saludo"&gt;&lt;/p&gt;
+    &lt;p id="reloj-hora" class="reloj-hora"&gt;00:00:00&lt;/p&gt;
+    &lt;p id="reloj-fecha" class="reloj-fecha"&gt;&lt;/p&gt;
+    &lt;label class="reloj-opcion"&gt;&lt;input type="checkbox" id="reloj-12h"&gt; Formato 12 horas&lt;/label&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.reloj {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 24px;
+    border-radius: 20px;
+    background: #0f172a;
+    color: #f8fafc;
+    text-align: center;
+}
+
+.reloj-hora {
+    margin: 0;
+    color: #f7df1e;
+    font-family: "Courier New", monospace;
+    font-size: clamp(2.2rem, 9vw, 3.6rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.reloj-fecha {
+    margin: 4px 0 16px;
+    color: #cbd5e1;
+    text-transform: capitalize;
+}
+
+.reloj-saludo {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.reloj-opcion {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const relojHora = document.querySelector("#reloj-hora");
+const relojFecha = document.querySelector("#reloj-fecha");
+const relojSaludo = document.querySelector("#reloj-saludo");
+const reloj12h = document.querySelector("#reloj-12h");
+
+function dosDigitos(numero) {
+    return String(numero).padStart(2, "0");
+}
+
+function actualizarReloj() {
+    const ahora = new Date();
+    const horas24 = ahora.getHours();
+    let horas = horas24;
+    let sufijo = "";
+    if (reloj12h.checked) {
+        sufijo = horas24 &lt; 12 ? " a. m." : " p. m.";
+        horas = horas24 % 12 || 12;
+    }
+    relojHora.textContent = `${dosDigitos(horas)}:${dosDigitos(ahora.getMinutes())}:${dosDigitos(ahora.getSeconds())}${sufijo}`;
+    relojFecha.textContent = ahora.toLocaleDateString("es", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+    if (horas24 &lt; 12) {
+        relojSaludo.textContent = "☀️ Buenos días";
+    } else if (horas24 &lt; 19) {
+        relojSaludo.textContent = "🌇 Buenas tardes";
+    } else {
+        relojSaludo.textContent = "🌙 Buenas noches";
+    }
+}
+
+reloj12h.checked = localStorage.getItem("reloj-12h") === "si";
+reloj12h.addEventListener("change", () =&gt; {
+    localStorage.setItem("reloj-12h", reloj12h.checked ? "si" : "no");
+    actualizarReloj();
+});
+
+actualizarReloj();
+setInterval(actualizarReloj, 1000);</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-carrusel" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 2</span>
+            <h2>Carrusel con autoplay, flechas y puntos</h2>
+            <p>Las fotos van en fila dentro de una «pista» que se desplaza con <code>transform</code>. Los puntos se crean desde JavaScript (uno por foto). El autoplay avanza cada 3,5 s, se pausa al pasar el mouse y se reinicia cuando la persona navega a mano. El operador <code>%</code> hace que después de la última vuelva a la primera.</p>
+            <div class="resultado">
+                <div class="carrusel" id="carrusel">
+                    <div class="carrusel-pista" id="carrusel-pista">
+                        <figure class="carrusel-diapo">
+                            <img src="https://picsum.photos/id/1015/800/400" alt="Río entre montañas">
+                            <figcaption>Río entre montañas</figcaption>
+                        </figure>
+                        <figure class="carrusel-diapo">
+                            <img src="https://picsum.photos/id/1016/800/400" alt="Cañón al atardecer">
+                            <figcaption>Cañón al atardecer</figcaption>
+                        </figure>
+                        <figure class="carrusel-diapo">
+                            <img src="https://picsum.photos/id/1018/800/400" alt="Montañas verdes">
+                            <figcaption>Montañas verdes</figcaption>
+                        </figure>
+                        <figure class="carrusel-diapo">
+                            <img src="https://picsum.photos/id/1036/800/400" alt="Bosque nevado">
+                            <figcaption>Bosque nevado</figcaption>
+                        </figure>
+                        <figure class="carrusel-diapo">
+                            <img src="https://picsum.photos/id/1043/800/400" alt="Lago tranquilo">
+                            <figcaption>Lago tranquilo</figcaption>
+                        </figure>
+                    </div>
+                    <button type="button" class="carrusel-flecha carrusel-anterior" id="carrusel-anterior" aria-label="Foto anterior">‹</button>
+                    <button type="button" class="carrusel-flecha carrusel-siguiente" id="carrusel-siguiente" aria-label="Foto siguiente">›</button>
+                    <div class="carrusel-puntos" id="carrusel-puntos"></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="carrusel" id="carrusel"&gt;
+    &lt;div class="carrusel-pista" id="carrusel-pista"&gt;
+        &lt;figure class="carrusel-diapo"&gt;
+            &lt;img src="https://picsum.photos/id/1015/800/400" alt="Río entre montañas"&gt;
+            &lt;figcaption&gt;Río entre montañas&lt;/figcaption&gt;
+        &lt;/figure&gt;
+        &lt;figure class="carrusel-diapo"&gt;
+            &lt;img src="https://picsum.photos/id/1016/800/400" alt="Cañón al atardecer"&gt;
+            &lt;figcaption&gt;Cañón al atardecer&lt;/figcaption&gt;
+        &lt;/figure&gt;
+        &lt;figure class="carrusel-diapo"&gt;
+            &lt;img src="https://picsum.photos/id/1018/800/400" alt="Montañas verdes"&gt;
+            &lt;figcaption&gt;Montañas verdes&lt;/figcaption&gt;
+        &lt;/figure&gt;
+        &lt;figure class="carrusel-diapo"&gt;
+            &lt;img src="https://picsum.photos/id/1036/800/400" alt="Bosque nevado"&gt;
+            &lt;figcaption&gt;Bosque nevado&lt;/figcaption&gt;
+        &lt;/figure&gt;
+        &lt;figure class="carrusel-diapo"&gt;
+            &lt;img src="https://picsum.photos/id/1043/800/400" alt="Lago tranquilo"&gt;
+            &lt;figcaption&gt;Lago tranquilo&lt;/figcaption&gt;
+        &lt;/figure&gt;
+    &lt;/div&gt;
+    &lt;button type="button" class="carrusel-flecha carrusel-anterior" id="carrusel-anterior" aria-label="Foto anterior"&gt;‹&lt;/button&gt;
+    &lt;button type="button" class="carrusel-flecha carrusel-siguiente" id="carrusel-siguiente" aria-label="Foto siguiente"&gt;›&lt;/button&gt;
+    &lt;div class="carrusel-puntos" id="carrusel-puntos"&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.carrusel {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 14px;
+}
+
+.carrusel-pista {
+    display: flex;
+    transition: transform 0.6s ease;
+}
+
+.carrusel-diapo {
+    position: relative;
+    flex: 0 0 100%;
+    margin: 0;
+}
+
+.carrusel-diapo img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 2 / 1;
+    object-fit: cover;
+}
+
+.carrusel-diapo figcaption {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 40px 16px 40px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    color: #fff;
+    font-weight: 700;
+}
+
+.carrusel-flecha {
+    position: absolute;
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    color: #0f172a;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.carrusel-anterior {
+    left: 12px;
+}
+
+.carrusel-siguiente {
+    right: 12px;
+}
+
+.carrusel-puntos {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    display: flex;
+    gap: 8px;
+    transform: translateX(-50%);
+}
+
+.carrusel-punto {
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+}
+
+.carrusel-punto.activo {
+    background: #f7df1e;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const carrusel = document.querySelector("#carrusel");
+const carruselPista = document.querySelector("#carrusel-pista");
+const carruselAnterior = document.querySelector("#carrusel-anterior");
+const carruselSiguiente = document.querySelector("#carrusel-siguiente");
+const carruselPuntos = document.querySelector("#carrusel-puntos");
+
+const diapos = carruselPista.querySelectorAll(".carrusel-diapo");
+let actual = 0;
+let autoplay = null;
+
+diapos.forEach((diapo, indice) =&gt; {
+    const punto = document.createElement("button");
+    punto.type = "button";
+    punto.className = "carrusel-punto";
+    punto.setAttribute("aria-label", `Ir a la foto ${indice + 1}`);
+    punto.addEventListener("click", () =&gt; {
+        irA(indice);
+        reiniciarAutoplay();
+    });
+    carruselPuntos.append(punto);
+});
+const puntos = carruselPuntos.querySelectorAll(".carrusel-punto");
+
+function irA(indice) {
+    actual = (indice + diapos.length) % diapos.length;
+    carruselPista.style.transform = `translateX(-${actual * 100}%)`;
+    puntos.forEach((punto, i) =&gt; {
+        punto.classList.toggle("activo", i === actual);
+    });
+}
+
+function reiniciarAutoplay() {
+    clearInterval(autoplay);
+    autoplay = setInterval(() =&gt; irA(actual + 1), 3500);
+}
+
+carruselAnterior.addEventListener("click", () =&gt; {
+    irA(actual - 1);
+    reiniciarAutoplay();
+});
+
+carruselSiguiente.addEventListener("click", () =&gt; {
+    irA(actual + 1);
+    reiniciarAutoplay();
+});
+
+carrusel.addEventListener("mouseenter", () =&gt; clearInterval(autoplay));
+carrusel.addEventListener("mouseleave", reiniciarAutoplay);
+
+irA(0);
+reiniciarAutoplay();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-quiz" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 3</span>
+            <h2>Quiz de preguntas con puntaje</h2>
+            <p>Las preguntas son un array de objetos: texto, opciones y el índice de la correcta. Al responder se bloquean los botones, se colorea la correcta (y la tuya si fallaste) y se suma el puntaje. Al final se guarda el récord en <code>localStorage</code>.</p>
+            <div class="resultado">
+                <div class="quiz">
+                    <div class="quiz-cabecera">
+                        <span id="quiz-progreso">Pregunta 1 de 6</span>
+                        <span>Puntaje: <strong id="quiz-puntaje">0</strong></span>
+                    </div>
+                    <div class="quiz-barra"><div id="quiz-barra-relleno" class="quiz-barra-relleno"></div></div>
+                    <h3 id="quiz-pregunta" class="quiz-pregunta"></h3>
+                    <div id="quiz-opciones" class="quiz-opciones"></div>
+                    <p id="quiz-mensaje" class="quiz-mensaje" aria-live="polite"></p>
+                    <button type="button" id="quiz-siguiente" class="quiz-siguiente" hidden>Siguiente</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="quiz"&gt;
+    &lt;div class="quiz-cabecera"&gt;
+        &lt;span id="quiz-progreso"&gt;Pregunta 1 de 6&lt;/span&gt;
+        &lt;span&gt;Puntaje: &lt;strong id="quiz-puntaje"&gt;0&lt;/strong&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="quiz-barra"&gt;&lt;div id="quiz-barra-relleno" class="quiz-barra-relleno"&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;h3 id="quiz-pregunta" class="quiz-pregunta"&gt;&lt;/h3&gt;
+    &lt;div id="quiz-opciones" class="quiz-opciones"&gt;&lt;/div&gt;
+    &lt;p id="quiz-mensaje" class="quiz-mensaje" aria-live="polite"&gt;&lt;/p&gt;
+    &lt;button type="button" id="quiz-siguiente" class="quiz-siguiente" hidden&gt;Siguiente&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.quiz {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1);
+}
+
+.quiz-cabecera {
+    display: flex;
+    justify-content: space-between;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.quiz-barra {
+    height: 8px;
+    margin: 8px 0 16px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.quiz-barra-relleno {
+    width: 0;
+    height: 100%;
+    background: #f7df1e;
+    transition: width 0.3s;
+}
+
+.quiz-pregunta {
+    margin: 0 0 12px;
+}
+
+.quiz-opciones {
+    display: grid;
+    gap: 8px;
+}
+
+.quiz-opcion {
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #1f2430;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.quiz-opcion:hover:not(:disabled) {
+    border-color: #f7df1e;
+}
+
+.quiz-opcion.correcta {
+    border-color: #16a34a;
+    background: #dcfce7;
+}
+
+.quiz-opcion.incorrecta {
+    border-color: #dc2626;
+    background: #fee2e2;
+}
+
+.quiz-mensaje {
+    min-height: 1.6em;
+    font-weight: 700;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const quizProgreso = document.querySelector("#quiz-progreso");
+const quizPuntaje = document.querySelector("#quiz-puntaje");
+const quizBarraRelleno = document.querySelector("#quiz-barra-relleno");
+const quizPregunta = document.querySelector("#quiz-pregunta");
+const quizOpciones = document.querySelector("#quiz-opciones");
+const quizMensaje = document.querySelector("#quiz-mensaje");
+const quizSiguiente = document.querySelector("#quiz-siguiente");
+
+const preguntas = [
+    { texto: "¿Qué etiqueta HTML crea un enlace?", opciones: ["&lt;link&gt;", "&lt;a&gt;", "&lt;href&gt;", "&lt;url&gt;"], correcta: 1 },
+    { texto: "¿Qué propiedad CSS cambia el color del texto?", opciones: ["font-color", "text-color", "color", "foreground"], correcta: 2 },
+    { texto: "¿Qué valor de display activa Flexbox?", opciones: ["block", "grid", "inline", "flex"], correcta: 3 },
+    { texto: "¿Qué palabra declara una variable que no se reasigna?", opciones: ["const", "let", "var", "static"], correcta: 0 },
+    { texto: "¿Qué devuelve [1, 2, 3].map((n) =&gt; n * 2)?", opciones: ["6", "[1, 2, 3]", "[2, 4, 6]", "12"], correcta: 2 },
+    { texto: "¿Qué método convierte un objeto en texto JSON?", opciones: ["JSON.parse", "JSON.stringify", "toString", "JSON.text"], correcta: 1 }
+];
+let indice = 0;
+let puntaje = 0;
+
+function mostrarPregunta() {
+    const pregunta = preguntas[indice];
+    quizProgreso.textContent = `Pregunta ${indice + 1} de ${preguntas.length}`;
+    quizBarraRelleno.style.width = `${(indice / preguntas.length) * 100}%`;
+    quizPregunta.textContent = pregunta.texto;
+    quizMensaje.textContent = "";
+    quizSiguiente.hidden = true;
+    quizOpciones.innerHTML = "";
+    pregunta.opciones.forEach((opcion, i) =&gt; {
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.className = "quiz-opcion";
+        boton.textContent = opcion;
+        boton.addEventListener("click", () =&gt; responder(i));
+        quizOpciones.append(boton);
+    });
+}
+
+function responder(elegida) {
+    const pregunta = preguntas[indice];
+    const botones = quizOpciones.querySelectorAll(".quiz-opcion");
+    botones.forEach((boton) =&gt; {
+        boton.disabled = true;
+    });
+    botones[pregunta.correcta].classList.add("correcta");
+    if (elegida === pregunta.correcta) {
+        puntaje++;
+        quizPuntaje.textContent = puntaje;
+        quizMensaje.textContent = "✅ ¡Correcto!";
+    } else {
+        botones[elegida].classList.add("incorrecta");
+        quizMensaje.textContent = `❌ La respuesta era: ${pregunta.opciones[pregunta.correcta]}`;
+    }
+    quizSiguiente.textContent = indice === preguntas.length - 1 ? "Ver resultado" : "Siguiente";
+    quizSiguiente.hidden = false;
+}
+
+function mostrarResultado() {
+    const record = Math.max(puntaje, Number(localStorage.getItem("quiz-record")));
+    localStorage.setItem("quiz-record", record);
+    quizProgreso.textContent = "¡Terminado!";
+    quizBarraRelleno.style.width = "100%";
+    quizPregunta.textContent = `Obtuviste ${puntaje} de ${preguntas.length} 🎉`;
+    quizOpciones.innerHTML = "";
+    quizMensaje.textContent = `Tu mejor puntaje: ${record} de ${preguntas.length}`;
+    quizSiguiente.textContent = "Jugar otra vez";
+}
+
+quizSiguiente.addEventListener("click", () =&gt; {
+    if (indice === preguntas.length) {
+        indice = 0;
+        puntaje = 0;
+        quizPuntaje.textContent = 0;
+        mostrarPregunta();
+        return;
+    }
+    indice++;
+    if (indice === preguntas.length) {
+        mostrarResultado();
+    } else {
+        mostrarPregunta();
+    }
+});
+
+mostrarPregunta();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-memoria" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 4</span>
+            <h2>Juego de memoria (parejas de cartas)</h2>
+            <p>Cada símbolo se duplica y el mazo se baraja con el algoritmo de Fisher-Yates. Al voltear dos cartas se comparan: si coinciden quedan descubiertas; si no, se tapan después de 0,8 s (mientras tanto el tablero se bloquea). El volteo es puro CSS 3D. Se guarda tu mejor marca en movimientos.</p>
+            <div class="resultado">
+                <div class="memoria">
+                    <div class="memoria-barra">
+                        <span>Movimientos: <strong id="memoria-movimientos">0</strong></span>
+                        <span>Tiempo: <strong id="memoria-tiempo">0</strong> s</span>
+                        <span>Récord: <strong id="memoria-record">—</strong></span>
+                        <button type="button" id="memoria-reiniciar">Reiniciar</button>
+                    </div>
+                    <div id="memoria-tablero" class="memoria-tablero"></div>
+                    <p id="memoria-mensaje" class="memoria-mensaje" aria-live="polite"></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="memoria"&gt;
+    &lt;div class="memoria-barra"&gt;
+        &lt;span&gt;Movimientos: &lt;strong id="memoria-movimientos"&gt;0&lt;/strong&gt;&lt;/span&gt;
+        &lt;span&gt;Tiempo: &lt;strong id="memoria-tiempo"&gt;0&lt;/strong&gt; s&lt;/span&gt;
+        &lt;span&gt;Récord: &lt;strong id="memoria-record"&gt;—&lt;/strong&gt;&lt;/span&gt;
+        &lt;button type="button" id="memoria-reiniciar"&gt;Reiniciar&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div id="memoria-tablero" class="memoria-tablero"&gt;&lt;/div&gt;
+    &lt;p id="memoria-mensaje" class="memoria-mensaje" aria-live="polite"&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.memoria-barra {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+}
+
+.memoria-tablero {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 380px;
+    margin: 16px auto;
+}
+
+.memoria-carta {
+    position: relative;
+    aspect-ratio: 1;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    perspective: 600px;
+}
+
+.memoria-cara {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    font-size: 2rem;
+    backface-visibility: hidden;
+    transition: transform 0.4s;
+}
+
+.memoria-frente {
+    background: #1f2430;
+    color: #f7df1e;
+}
+
+.memoria-dorso {
+    border: 2px solid #cbd5e1;
+    background: #fff;
+    transform: rotateY(180deg);
+}
+
+.memoria-carta.volteada .memoria-frente {
+    transform: rotateY(180deg);
+}
+
+.memoria-carta.volteada .memoria-dorso {
+    transform: rotateY(0);
+}
+
+.memoria-carta.encontrada .memoria-dorso {
+    border-color: #22c55e;
+    background: #dcfce7;
+}
+
+.memoria-mensaje {
+    min-height: 1.6em;
+    font-weight: 700;
+    text-align: center;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const memoriaMovimientos = document.querySelector("#memoria-movimientos");
+const memoriaTiempo = document.querySelector("#memoria-tiempo");
+const memoriaRecord = document.querySelector("#memoria-record");
+const memoriaReiniciar = document.querySelector("#memoria-reiniciar");
+const memoriaTablero = document.querySelector("#memoria-tablero");
+const memoriaMensaje = document.querySelector("#memoria-mensaje");
+
+const simbolos = ["🍎", "🍌", "🍇", "🍓", "🍒", "🥝", "🍍", "🥥"];
+let primera = null;
+let bloqueado = false;
+let movimientos = 0;
+let parejas = 0;
+let segundos = 0;
+let cronometro = null;
+
+function barajar(lista) {
+    const copia = [...lista];
+    for (let i = copia.length - 1; i &gt; 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copia[i], copia[j]] = [copia[j], copia[i]];
+    }
+    return copia;
+}
+
+function pintarRecord() {
+    memoriaRecord.textContent = localStorage.getItem("memoria-record") || "—";
+}
+
+function iniciarJuego() {
+    clearInterval(cronometro);
+    cronometro = null;
+    primera = null;
+    bloqueado = false;
+    movimientos = 0;
+    parejas = 0;
+    segundos = 0;
+    memoriaMovimientos.textContent = 0;
+    memoriaTiempo.textContent = 0;
+    memoriaMensaje.textContent = "";
+    memoriaTablero.innerHTML = "";
+    for (const simbolo of barajar([...simbolos, ...simbolos])) {
+        const carta = document.createElement("button");
+        carta.type = "button";
+        carta.className = "memoria-carta";
+        carta.dataset.simbolo = simbolo;
+        carta.setAttribute("aria-label", "Carta tapada");
+        carta.innerHTML = `
+            &lt;span class="memoria-cara memoria-frente"&gt;?&lt;/span&gt;
+            &lt;span class="memoria-cara memoria-dorso"&gt;${simbolo}&lt;/span&gt;
+        `;
+        carta.addEventListener("click", () =&gt; voltear(carta));
+        memoriaTablero.append(carta);
+    }
+}
+
+function tapar(carta) {
+    carta.classList.remove("volteada");
+    carta.setAttribute("aria-label", "Carta tapada");
+}
+
+function terminar() {
+    clearInterval(cronometro);
+    const record = Number(localStorage.getItem("memoria-record"));
+    if (!record || movimientos &lt; record) {
+        localStorage.setItem("memoria-record", movimientos);
+        memoriaMensaje.textContent = `🏆 ¡Nuevo récord! ${movimientos} movimientos en ${segundos} s`;
+    } else {
+        memoriaMensaje.textContent = `🎉 ¡Completado en ${movimientos} movimientos y ${segundos} s!`;
+    }
+    pintarRecord();
+}
+
+function voltear(carta) {
+    if (bloqueado || carta === primera || carta.classList.contains("encontrada")) {
+        return;
+    }
+    if (!cronometro) {
+        cronometro = setInterval(() =&gt; {
+            segundos++;
+            memoriaTiempo.textContent = segundos;
+        }, 1000);
+    }
+    carta.classList.add("volteada");
+    carta.setAttribute("aria-label", carta.dataset.simbolo);
+    if (!primera) {
+        primera = carta;
+        return;
+    }
+    movimientos++;
+    memoriaMovimientos.textContent = movimientos;
+    if (primera.dataset.simbolo === carta.dataset.simbolo) {
+        primera.classList.add("encontrada");
+        carta.classList.add("encontrada");
+        primera = null;
+        parejas++;
+        if (parejas === simbolos.length) {
+            terminar();
+        }
+        return;
+    }
+    bloqueado = true;
+    setTimeout(() =&gt; {
+        tapar(primera);
+        tapar(carta);
+        primera = null;
+        bloqueado = false;
+    }, 800);
+}
+
+memoriaReiniciar.addEventListener("click", iniciarJuego);
+pintarRecord();
+iniciarJuego();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-cronometro" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 5</span>
+            <h2>Cronómetro con vueltas</h2>
+            <p>En vez de sumar 10 ms en cada tic (los intervalos no son exactos), se guarda la hora de inicio con <code>Date.now()</code> y se calcula la diferencia: así nunca se atrasa. Cada vuelta muestra su tiempo parcial y el total.</p>
+            <div class="resultado">
+                <div class="crono">
+                    <p id="crono-pantalla" class="crono-pantalla">00:00.00</p>
+                    <div class="crono-botones">
+                        <button type="button" id="crono-iniciar">Iniciar</button>
+                        <button type="button" id="crono-vuelta" disabled>Vuelta</button>
+                        <button type="button" id="crono-reiniciar">Reiniciar</button>
+                    </div>
+                    <ul id="crono-vueltas" class="crono-vueltas"></ul>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="crono"&gt;
+    &lt;p id="crono-pantalla" class="crono-pantalla"&gt;00:00.00&lt;/p&gt;
+    &lt;div class="crono-botones"&gt;
+        &lt;button type="button" id="crono-iniciar"&gt;Iniciar&lt;/button&gt;
+        &lt;button type="button" id="crono-vuelta" disabled&gt;Vuelta&lt;/button&gt;
+        &lt;button type="button" id="crono-reiniciar"&gt;Reiniciar&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;ul id="crono-vueltas" class="crono-vueltas"&gt;&lt;/ul&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.crono {
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.crono-pantalla {
+    margin: 0 0 12px;
+    font-family: "Courier New", monospace;
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.crono-botones {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.crono-vueltas {
+    max-height: 200px;
+    margin: 16px 0 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.crono-vueltas li {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    font-family: "Courier New", monospace;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const cronoPantalla = document.querySelector("#crono-pantalla");
+const cronoIniciar = document.querySelector("#crono-iniciar");
+const cronoVuelta = document.querySelector("#crono-vuelta");
+const cronoReiniciar = document.querySelector("#crono-reiniciar");
+const cronoVueltas = document.querySelector("#crono-vueltas");
+
+let inicio = 0;
+let acumulado = 0;
+let intervalo = null;
+let ultimaVuelta = 0;
+
+function formatoTiempo(ms) {
+    const minutos = Math.floor(ms / 60000);
+    const segundos = Math.floor((ms % 60000) / 1000);
+    const centesimas = Math.floor((ms % 1000) / 10);
+    return `${String(minutos).padStart(2, "0")}:${String(segundos).padStart(2, "0")}.${String(centesimas).padStart(2, "0")}`;
+}
+
+function tiempoTotal() {
+    return intervalo ? acumulado + Date.now() - inicio : acumulado;
+}
+
+function pintar() {
+    cronoPantalla.textContent = formatoTiempo(tiempoTotal());
+}
+
+cronoIniciar.addEventListener("click", () =&gt; {
+    if (intervalo) {
+        acumulado = tiempoTotal();
+        clearInterval(intervalo);
+        intervalo = null;
+        cronoIniciar.textContent = "Continuar";
+        cronoVuelta.disabled = true;
+    } else {
+        inicio = Date.now();
+        intervalo = setInterval(pintar, 30);
+        cronoIniciar.textContent = "Pausar";
+        cronoVuelta.disabled = false;
+    }
+});
+
+cronoVuelta.addEventListener("click", () =&gt; {
+    const total = tiempoTotal();
+    const fila = document.createElement("li");
+    fila.innerHTML = `
+        &lt;span&gt;Vuelta ${cronoVueltas.children.length + 1}&lt;/span&gt;
+        &lt;span&gt;+${formatoTiempo(total - ultimaVuelta)}&lt;/span&gt;
+        &lt;span&gt;${formatoTiempo(total)}&lt;/span&gt;
+    `;
+    ultimaVuelta = total;
+    cronoVueltas.prepend(fila);
+});
+
+cronoReiniciar.addEventListener("click", () =&gt; {
+    clearInterval(intervalo);
+    intervalo = null;
+    acumulado = 0;
+    ultimaVuelta = 0;
+    cronoVueltas.innerHTML = "";
+    cronoIniciar.textContent = "Iniciar";
+    cronoVuelta.disabled = true;
+    pintar();
+});</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-pomodoro" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 6</span>
+            <h2>Temporizador Pomodoro</h2>
+            <p>La técnica Pomodoro alterna 25 minutos de enfoque con descansos cortos. Cada botón de modo guarda sus minutos en <code>data-minutos</code>. Al terminar un enfoque se suma al contador del día, que se guarda en <code>localStorage</code> junto con la fecha. Usa «Demo 6 s» para verlo terminar en clase.</p>
+            <div class="resultado">
+                <div class="pomodoro" id="pomodoro">
+                    <div class="pomodoro-modos" id="pomodoro-modos">
+                        <button type="button" class="pomodoro-modo activo" data-minutos="25" data-tipo="enfoque">Enfoque</button>
+                        <button type="button" class="pomodoro-modo" data-minutos="5" data-tipo="descanso">Descanso corto</button>
+                        <button type="button" class="pomodoro-modo" data-minutos="15" data-tipo="descanso">Descanso largo</button>
+                        <button type="button" class="pomodoro-modo" data-minutos="0.1" data-tipo="enfoque">Demo 6 s</button>
+                    </div>
+                    <p id="pomodoro-tiempo" class="pomodoro-tiempo">25:00</p>
+                    <div class="pomodoro-barra"><div id="pomodoro-progreso" class="pomodoro-progreso"></div></div>
+                    <div class="pomodoro-botones">
+                        <button type="button" id="pomodoro-iniciar">Iniciar</button>
+                        <button type="button" id="pomodoro-reiniciar">Reiniciar</button>
+                    </div>
+                    <p id="pomodoro-mensaje" class="pomodoro-mensaje" aria-live="polite"></p>
+                    <p>Pomodoros completados hoy: <strong id="pomodoro-hechos">0</strong></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="pomodoro" id="pomodoro"&gt;
+    &lt;div class="pomodoro-modos" id="pomodoro-modos"&gt;
+        &lt;button type="button" class="pomodoro-modo activo" data-minutos="25" data-tipo="enfoque"&gt;Enfoque&lt;/button&gt;
+        &lt;button type="button" class="pomodoro-modo" data-minutos="5" data-tipo="descanso"&gt;Descanso corto&lt;/button&gt;
+        &lt;button type="button" class="pomodoro-modo" data-minutos="15" data-tipo="descanso"&gt;Descanso largo&lt;/button&gt;
+        &lt;button type="button" class="pomodoro-modo" data-minutos="0.1" data-tipo="enfoque"&gt;Demo 6 s&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p id="pomodoro-tiempo" class="pomodoro-tiempo"&gt;25:00&lt;/p&gt;
+    &lt;div class="pomodoro-barra"&gt;&lt;div id="pomodoro-progreso" class="pomodoro-progreso"&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class="pomodoro-botones"&gt;
+        &lt;button type="button" id="pomodoro-iniciar"&gt;Iniciar&lt;/button&gt;
+        &lt;button type="button" id="pomodoro-reiniciar"&gt;Reiniciar&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p id="pomodoro-mensaje" class="pomodoro-mensaje" aria-live="polite"&gt;&lt;/p&gt;
+    &lt;p&gt;Pomodoros completados hoy: &lt;strong id="pomodoro-hechos"&gt;0&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.pomodoro {
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 24px;
+    border-radius: 20px;
+    background: #dc2626;
+    color: #fff;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.pomodoro-fin {
+    animation: sacudir 0.5s 3;
+}
+
+@keyframes sacudir {
+    25% {
+        transform: rotate(-2deg);
+    }
+    75% {
+        transform: rotate(2deg);
+    }
+}
+
+.pomodoro-modos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+}
+
+.pomodoro-modo {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.pomodoro-modo.activo {
+    background: #fff;
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.pomodoro-tiempo {
+    margin: 16px 0 8px;
+    font-family: "Courier New", monospace;
+    font-size: 4rem;
+    font-weight: 700;
+}
+
+.pomodoro-barra {
+    height: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.pomodoro-progreso {
+    width: 0;
+    height: 100%;
+    background: #fff;
+}
+
+.pomodoro-botones {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.pomodoro-mensaje {
+    min-height: 1.6em;
+    font-weight: 700;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const pomodoro = document.querySelector("#pomodoro");
+const pomodoroModos = document.querySelector("#pomodoro-modos");
+const pomodoroTiempo = document.querySelector("#pomodoro-tiempo");
+const pomodoroProgreso = document.querySelector("#pomodoro-progreso");
+const pomodoroIniciar = document.querySelector("#pomodoro-iniciar");
+const pomodoroReiniciar = document.querySelector("#pomodoro-reiniciar");
+const pomodoroMensaje = document.querySelector("#pomodoro-mensaje");
+const pomodoroHechos = document.querySelector("#pomodoro-hechos");
+
+let modoActual = pomodoroModos.querySelector(".activo");
+let duracion = 25 * 60;
+let restante = duracion;
+let intervalo = null;
+
+function pintar() {
+    const minutos = String(Math.floor(restante / 60)).padStart(2, "0");
+    const segundos = String(restante % 60).padStart(2, "0");
+    pomodoroTiempo.textContent = `${minutos}:${segundos}`;
+    pomodoroProgreso.style.width = `${(1 - restante / duracion) * 100}%`;
+}
+
+function detener() {
+    clearInterval(intervalo);
+    intervalo = null;
+    pomodoroIniciar.textContent = "Iniciar";
+}
+
+function hoy() {
+    return new Date().toDateString();
+}
+
+function leerHechos() {
+    const guardado = JSON.parse(localStorage.getItem("pomodoro-hechos")) || {};
+    return guardado.fecha === hoy() ? guardado.cantidad : 0;
+}
+
+function terminar() {
+    detener();
+    if (modoActual.dataset.tipo === "enfoque") {
+        const cantidad = leerHechos() + 1;
+        localStorage.setItem("pomodoro-hechos", JSON.stringify({ fecha: hoy(), cantidad }));
+        pomodoroHechos.textContent = cantidad;
+        pomodoroMensaje.textContent = "⏰ ¡Tiempo! Toma un descanso.";
+    } else {
+        pomodoroMensaje.textContent = "💪 Fin del descanso. ¡A enfocarse!";
+    }
+    pomodoro.classList.add("pomodoro-fin");
+    setTimeout(() =&gt; pomodoro.classList.remove("pomodoro-fin"), 1500);
+    restante = duracion;
+    pintar();
+}
+
+function elegirModo(boton) {
+    detener();
+    modoActual.classList.remove("activo");
+    boton.classList.add("activo");
+    modoActual = boton;
+    duracion = Math.round(Number(boton.dataset.minutos) * 60);
+    restante = duracion;
+    pomodoroMensaje.textContent = "";
+    pintar();
+}
+
+pomodoroModos.addEventListener("click", (evento) =&gt; {
+    const boton = evento.target.closest(".pomodoro-modo");
+    if (boton) {
+        elegirModo(boton);
+    }
+});
+
+pomodoroIniciar.addEventListener("click", () =&gt; {
+    if (intervalo) {
+        detener();
+        return;
+    }
+    pomodoroMensaje.textContent = "";
+    pomodoroIniciar.textContent = "Pausar";
+    intervalo = setInterval(() =&gt; {
+        restante--;
+        pintar();
+        if (restante &lt;= 0) {
+            terminar();
+        }
+    }, 1000);
+});
+
+pomodoroReiniciar.addEventListener("click", () =&gt; {
+    detener();
+    restante = duracion;
+    pintar();
+});
+
+pomodoroHechos.textContent = leerHechos();
+pintar();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-tareas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 7</span>
+            <h2>Lista de tareas con filtros y persistencia</h2>
+            <p>La lista completa: agregar, marcar, borrar, filtrar (todas / pendientes / hechas), contador de pendientes y «borrar hechas». Todo se guarda en <code>localStorage</code>, así que sobrevive a recargar la página. El texto se pone con <code>textContent</code> para que nadie pueda inyectar HTML.</p>
+            <div class="resultado">
+                <div class="tareas">
+                    <form id="tareas-form" class="tareas-form">
+                        <label for="tareas-nueva" class="tareas-oculto">Nueva tarea</label>
+                        <input type="text" id="tareas-nueva" placeholder="¿Qué hay que hacer?" required maxlength="80">
+                        <button type="submit">Agregar</button>
+                    </form>
+                    <div id="tareas-filtros" class="tareas-filtros">
+                        <button type="button" data-filtro="todas" class="activo">Todas</button>
+                        <button type="button" data-filtro="pendientes">Pendientes</button>
+                        <button type="button" data-filtro="hechas">Hechas</button>
+                    </div>
+                    <ul id="tareas-lista" class="tareas-lista"></ul>
+                    <div class="tareas-pie">
+                        <span id="tareas-contador"></span>
+                        <button type="button" id="tareas-limpiar">Borrar hechas</button>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="tareas"&gt;
+    &lt;form id="tareas-form" class="tareas-form"&gt;
+        &lt;label for="tareas-nueva" class="tareas-oculto"&gt;Nueva tarea&lt;/label&gt;
+        &lt;input type="text" id="tareas-nueva" placeholder="¿Qué hay que hacer?" required maxlength="80"&gt;
+        &lt;button type="submit"&gt;Agregar&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;div id="tareas-filtros" class="tareas-filtros"&gt;
+        &lt;button type="button" data-filtro="todas" class="activo"&gt;Todas&lt;/button&gt;
+        &lt;button type="button" data-filtro="pendientes"&gt;Pendientes&lt;/button&gt;
+        &lt;button type="button" data-filtro="hechas"&gt;Hechas&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;ul id="tareas-lista" class="tareas-lista"&gt;&lt;/ul&gt;
+    &lt;div class="tareas-pie"&gt;
+        &lt;span id="tareas-contador"&gt;&lt;/span&gt;
+        &lt;button type="button" id="tareas-limpiar"&gt;Borrar hechas&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.tareas {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1);
+}
+
+.tareas-oculto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+}
+
+.tareas-form {
+    display: flex;
+    gap: 8px;
+}
+
+.tareas-form input {
+    flex: 1;
+}
+
+.tareas-filtros {
+    display: flex;
+    gap: 6px;
+    margin: 12px 0;
+}
+
+.tareas-filtros button {
+    padding: 4px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    background: #fff;
+    color: #1f2430;
+    font: inherit;
+    cursor: pointer;
+}
+
+.tareas-filtros button.activo {
+    border-color: #1f2430;
+    background: #1f2430;
+    color: #f7df1e;
+}
+
+.tareas-lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tarea {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 4px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.tarea span {
+    flex: 1;
+}
+
+.tarea.hecha span {
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+.tarea-borrar {
+    border: none;
+    background: none;
+    color: #94a3b8;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.tarea-borrar:hover {
+    color: #dc2626;
+}
+
+.tareas-vacia {
+    padding: 16px;
+    color: #64748b;
+    text-align: center;
+}
+
+.tareas-pie {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    color: #64748b;
+    font-size: 0.9rem;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const tareasForm = document.querySelector("#tareas-form");
+const tareasNueva = document.querySelector("#tareas-nueva");
+const tareasFiltros = document.querySelector("#tareas-filtros");
+const tareasLista = document.querySelector("#tareas-lista");
+const tareasContador = document.querySelector("#tareas-contador");
+const tareasLimpiar = document.querySelector("#tareas-limpiar");
+
+let tareas = JSON.parse(localStorage.getItem("tareas-app")) || [
+    { id: 1, texto: "Repasar fetch y APIs", hecha: true },
+    { id: 2, texto: "Terminar el proyecto final", hecha: false },
+    { id: 3, texto: "Publicar el portafolio", hecha: false }
+];
+let filtro = "todas";
+
+function guardar() {
+    localStorage.setItem("tareas-app", JSON.stringify(tareas));
+}
+
+function crearFila(tarea) {
+    const fila = document.createElement("li");
+    fila.className = tarea.hecha ? "tarea hecha" : "tarea";
+
+    const casilla = document.createElement("input");
+    casilla.type = "checkbox";
+    casilla.checked = tarea.hecha;
+    casilla.setAttribute("aria-label", "Marcar como hecha");
+    casilla.addEventListener("change", () =&gt; {
+        tarea.hecha = casilla.checked;
+        guardar();
+        pintar();
+    });
+
+    const texto = document.createElement("span");
+    texto.textContent = tarea.texto;
+
+    const borrar = document.createElement("button");
+    borrar.type = "button";
+    borrar.className = "tarea-borrar";
+    borrar.textContent = "✕";
+    borrar.setAttribute("aria-label", "Borrar tarea");
+    borrar.addEventListener("click", () =&gt; {
+        tareas = tareas.filter((t) =&gt; t.id !== tarea.id);
+        guardar();
+        pintar();
+    });
+
+    fila.append(casilla, texto, borrar);
+    return fila;
+}
+
+function pintar() {
+    const visibles = tareas.filter((tarea) =&gt; {
+        if (filtro === "pendientes") {
+            return !tarea.hecha;
+        }
+        if (filtro === "hechas") {
+            return tarea.hecha;
+        }
+        return true;
+    });
+    tareasLista.innerHTML = "";
+    for (const tarea of visibles) {
+        tareasLista.append(crearFila(tarea));
+    }
+    if (visibles.length === 0) {
+        tareasLista.innerHTML = `&lt;li class="tareas-vacia"&gt;No hay tareas aquí 🎉&lt;/li&gt;`;
+    }
+    const pendientes = tareas.filter((tarea) =&gt; !tarea.hecha).length;
+    tareasContador.textContent = `${pendientes} pendiente${pendientes === 1 ? "" : "s"}`;
+}
+
+tareasForm.addEventListener("submit", (evento) =&gt; {
+    evento.preventDefault();
+    const texto = tareasNueva.value.trim();
+    if (!texto) {
+        return;
+    }
+    tareas.push({ id: Date.now(), texto, hecha: false });
+    guardar();
+    tareasForm.reset();
+    pintar();
+});
+
+tareasFiltros.addEventListener("click", (evento) =&gt; {
+    const boton = evento.target.closest("button");
+    if (!boton) {
+        return;
+    }
+    filtro = boton.dataset.filtro;
+    tareasFiltros.querySelectorAll("button").forEach((b) =&gt; {
+        b.classList.toggle("activo", b === boton);
+    });
+    pintar();
+});
+
+tareasLimpiar.addEventListener("click", () =&gt; {
+    tareas = tareas.filter((tarea) =&gt; !tarea.hecha);
+    guardar();
+    pintar();
+});
+
+pintar();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-calculadora" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 8</span>
+            <h2>Calculadora funcional</h2>
+            <p>Un solo listener en el teclado de la calculadora (delegación) lee los <code>data-*</code> de la tecla pulsada. El estado son cuatro variables: el número en pantalla, el número anterior, el operador y si estamos esperando un número nuevo. Dividir entre cero muestra «Error».</p>
+            <div class="resultado">
+                <div class="calc">
+                    <output id="calc-pantalla" class="calc-pantalla">0</output>
+                    <div id="calc-teclas" class="calc-teclas">
+                        <button type="button" data-accion="limpiar" class="calc-gris">C</button>
+                        <button type="button" data-accion="borrar" class="calc-gris">⌫</button>
+                        <button type="button" data-accion="porcentaje" class="calc-gris">%</button>
+                        <button type="button" data-operador="/" class="calc-op">÷</button>
+                        <button type="button" data-valor="7">7</button>
+                        <button type="button" data-valor="8">8</button>
+                        <button type="button" data-valor="9">9</button>
+                        <button type="button" data-operador="*" class="calc-op">×</button>
+                        <button type="button" data-valor="4">4</button>
+                        <button type="button" data-valor="5">5</button>
+                        <button type="button" data-valor="6">6</button>
+                        <button type="button" data-operador="-" class="calc-op">−</button>
+                        <button type="button" data-valor="1">1</button>
+                        <button type="button" data-valor="2">2</button>
+                        <button type="button" data-valor="3">3</button>
+                        <button type="button" data-operador="+" class="calc-op">+</button>
+                        <button type="button" data-valor="0" class="calc-ancho">0</button>
+                        <button type="button" data-valor=".">,</button>
+                        <button type="button" data-accion="igual" class="calc-op">=</button>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="calc"&gt;
+    &lt;output id="calc-pantalla" class="calc-pantalla"&gt;0&lt;/output&gt;
+    &lt;div id="calc-teclas" class="calc-teclas"&gt;
+        &lt;button type="button" data-accion="limpiar" class="calc-gris"&gt;C&lt;/button&gt;
+        &lt;button type="button" data-accion="borrar" class="calc-gris"&gt;⌫&lt;/button&gt;
+        &lt;button type="button" data-accion="porcentaje" class="calc-gris"&gt;%&lt;/button&gt;
+        &lt;button type="button" data-operador="/" class="calc-op"&gt;÷&lt;/button&gt;
+        &lt;button type="button" data-valor="7"&gt;7&lt;/button&gt;
+        &lt;button type="button" data-valor="8"&gt;8&lt;/button&gt;
+        &lt;button type="button" data-valor="9"&gt;9&lt;/button&gt;
+        &lt;button type="button" data-operador="*" class="calc-op"&gt;×&lt;/button&gt;
+        &lt;button type="button" data-valor="4"&gt;4&lt;/button&gt;
+        &lt;button type="button" data-valor="5"&gt;5&lt;/button&gt;
+        &lt;button type="button" data-valor="6"&gt;6&lt;/button&gt;
+        &lt;button type="button" data-operador="-" class="calc-op"&gt;−&lt;/button&gt;
+        &lt;button type="button" data-valor="1"&gt;1&lt;/button&gt;
+        &lt;button type="button" data-valor="2"&gt;2&lt;/button&gt;
+        &lt;button type="button" data-valor="3"&gt;3&lt;/button&gt;
+        &lt;button type="button" data-operador="+" class="calc-op"&gt;+&lt;/button&gt;
+        &lt;button type="button" data-valor="0" class="calc-ancho"&gt;0&lt;/button&gt;
+        &lt;button type="button" data-valor="."&gt;,&lt;/button&gt;
+        &lt;button type="button" data-accion="igual" class="calc-op"&gt;=&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.calc {
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 16px;
+    border-radius: 24px;
+    background: #1f2430;
+}
+
+.calc-pantalla {
+    display: block;
+    margin-bottom: 12px;
+    padding: 8px;
+    overflow: hidden;
+    color: #fff;
+    font-size: 2.6rem;
+    text-align: right;
+    text-overflow: ellipsis;
+}
+
+.calc-teclas {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.calc-teclas button {
+    aspect-ratio: 1;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #334155;
+    color: #fff;
+    font: inherit;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.calc-teclas button:active {
+    filter: brightness(1.3);
+}
+
+.calc-teclas .calc-gris {
+    background: #94a3b8;
+    color: #0f172a;
+}
+
+.calc-teclas .calc-op {
+    background: #f7df1e;
+    color: #0f172a;
+}
+
+.calc-teclas .calc-ancho {
+    grid-column: span 2;
+    aspect-ratio: auto;
+    border-radius: 999px;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const calcPantalla = document.querySelector("#calc-pantalla");
+const calcTeclas = document.querySelector("#calc-teclas");
+
+let actual = "0";
+let anterior = null;
+let operador = null;
+let esperandoNumero = false;
+
+function calcular(a, b, op) {
+    switch (op) {
+        case "+":
+            return a + b;
+        case "-":
+            return a - b;
+        case "*":
+            return a * b;
+        case "/":
+            return b === 0 ? NaN : a / b;
+    }
+}
+
+function escribir(digito) {
+    if (esperandoNumero || actual === "0" || actual === "Error") {
+        actual = digito === "." ? "0." : digito;
+        esperandoNumero = false;
+    } else if (digito === "." &amp;&amp; actual.includes(".")) {
+        return;
+    } else if (actual.length &lt; 14) {
+        actual += digito;
+    }
+}
+
+function resolver() {
+    if (operador === null || esperandoNumero) {
+        return;
+    }
+    const resultado = calcular(anterior, Number(actual), operador);
+    actual = Number.isFinite(resultado) ? String(Number(resultado.toPrecision(12))) : "Error";
+    operador = null;
+    esperandoNumero = true;
+}
+
+function elegirOperador(op) {
+    if (actual === "Error") {
+        return;
+    }
+    resolver();
+    anterior = Number(actual);
+    operador = op;
+    esperandoNumero = true;
+}
+
+function limpiar() {
+    actual = "0";
+    anterior = null;
+    operador = null;
+    esperandoNumero = false;
+}
+
+calcTeclas.addEventListener("click", (evento) =&gt; {
+    const tecla = evento.target.closest("button");
+    if (!tecla) {
+        return;
+    }
+    const { valor, accion } = tecla.dataset;
+    if (valor) {
+        escribir(valor);
+    } else if (tecla.dataset.operador) {
+        elegirOperador(tecla.dataset.operador);
+    } else if (accion === "igual") {
+        resolver();
+    } else if (accion === "limpiar") {
+        limpiar();
+    } else if (accion === "borrar") {
+        actual = actual.length &gt; 1 &amp;&amp; !esperandoNumero ? actual.slice(0, -1) : "0";
+    } else if (accion === "porcentaje" &amp;&amp; actual !== "Error") {
+        actual = String(Number(actual) / 100);
+    }
+    calcPantalla.textContent = actual.replace(".", ",");
+});</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-ppt" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 9</span>
+            <h2>Piedra, papel o tijera</h2>
+            <p>Un objeto dice qué le gana a qué (<code>piedra → tijera</code>), así no hacen falta nueve <code>if</code>. La computadora elige al azar con <code>Math.random()</code> y el marcador se guarda en <code>localStorage</code>.</p>
+            <div class="resultado">
+                <div class="ppt">
+                    <div class="ppt-marcador">
+                        <div>Tú<strong id="ppt-tu">0</strong></div>
+                        <div>Empates<strong id="ppt-empates">0</strong></div>
+                        <div>Compu<strong id="ppt-compu">0</strong></div>
+                    </div>
+                    <div id="ppt-opciones" class="ppt-opciones">
+                        <button type="button" data-jugada="piedra" aria-label="Piedra">✊</button>
+                        <button type="button" data-jugada="papel" aria-label="Papel">✋</button>
+                        <button type="button" data-jugada="tijera" aria-label="Tijera">✌️</button>
+                    </div>
+                    <p id="ppt-resultado" class="ppt-resultado" aria-live="polite">¡Elige tu jugada!</p>
+                    <button type="button" id="ppt-reiniciar">Reiniciar marcador</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="ppt"&gt;
+    &lt;div class="ppt-marcador"&gt;
+        &lt;div&gt;Tú&lt;strong id="ppt-tu"&gt;0&lt;/strong&gt;&lt;/div&gt;
+        &lt;div&gt;Empates&lt;strong id="ppt-empates"&gt;0&lt;/strong&gt;&lt;/div&gt;
+        &lt;div&gt;Compu&lt;strong id="ppt-compu"&gt;0&lt;/strong&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div id="ppt-opciones" class="ppt-opciones"&gt;
+        &lt;button type="button" data-jugada="piedra" aria-label="Piedra"&gt;✊&lt;/button&gt;
+        &lt;button type="button" data-jugada="papel" aria-label="Papel"&gt;✋&lt;/button&gt;
+        &lt;button type="button" data-jugada="tijera" aria-label="Tijera"&gt;✌️&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p id="ppt-resultado" class="ppt-resultado" aria-live="polite"&gt;¡Elige tu jugada!&lt;/p&gt;
+    &lt;button type="button" id="ppt-reiniciar"&gt;Reiniciar marcador&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.ppt {
+    max-width: 420px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.ppt-marcador {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.ppt-marcador div {
+    padding: 8px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.ppt-marcador strong {
+    display: block;
+    color: #1f2430;
+    font-size: 1.8rem;
+}
+
+.ppt-opciones {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 20px 0 8px;
+}
+
+.ppt-opciones button {
+    width: 80px;
+    height: 80px;
+    border: 3px solid #e2e8f0;
+    border-radius: 50%;
+    background: #fff;
+    font-size: 2.4rem;
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+
+.ppt-opciones button:hover {
+    border-color: #f7df1e;
+    transform: scale(1.1);
+}
+
+.ppt-resultado {
+    min-height: 1.6em;
+    font-size: 1.3rem;
+    font-weight: 700;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const pptTu = document.querySelector("#ppt-tu");
+const pptEmpates = document.querySelector("#ppt-empates");
+const pptCompu = document.querySelector("#ppt-compu");
+const pptOpciones = document.querySelector("#ppt-opciones");
+const pptResultado = document.querySelector("#ppt-resultado");
+const pptReiniciar = document.querySelector("#ppt-reiniciar");
+
+const emojis = { piedra: "✊", papel: "✋", tijera: "✌️" };
+const leGanaA = { piedra: "tijera", papel: "piedra", tijera: "papel" };
+let marcador = JSON.parse(localStorage.getItem("ppt-marcador")) || { tu: 0, compu: 0, empates: 0 };
+
+function pintarMarcador() {
+    pptTu.textContent = marcador.tu;
+    pptEmpates.textContent = marcador.empates;
+    pptCompu.textContent = marcador.compu;
+    localStorage.setItem("ppt-marcador", JSON.stringify(marcador));
+}
+
+pptOpciones.addEventListener("click", (evento) =&gt; {
+    const boton = evento.target.closest("button");
+    if (!boton) {
+        return;
+    }
+    const tu = boton.dataset.jugada;
+    const jugadas = Object.keys(emojis);
+    const compu = jugadas[Math.floor(Math.random() * jugadas.length)];
+    let mensaje;
+    if (tu === compu) {
+        marcador.empates++;
+        mensaje = "🤝 Empate";
+    } else if (leGanaA[tu] === compu) {
+        marcador.tu++;
+        mensaje = `🎉 ¡Ganaste! ${tu} vence a ${compu}`;
+    } else {
+        marcador.compu++;
+        mensaje = `💻 Gana la compu: ${compu} vence a ${tu}`;
+    }
+    pptResultado.textContent = `${emojis[tu]} vs ${emojis[compu]} — ${mensaje}`;
+    pintarMarcador();
+});
+
+pptReiniciar.addEventListener("click", () =&gt; {
+    marcador = { tu: 0, compu: 0, empates: 0 };
+    pptResultado.textContent = "¡Elige tu jugada!";
+    pintarMarcador();
+});
+
+pintarMarcador();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-claves" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 10</span>
+            <h2>Generador de contraseñas con opciones y copiar</h2>
+            <p>Se juntan los grupos de caracteres marcados y se eligen al azar con <code>crypto.getRandomValues</code> (más seguro que <code>Math.random</code> para contraseñas). La barra mide la fuerza en bits de entropía: largo × log₂(cantidad de caracteres posibles). El botón copia con la API del portapapeles.</p>
+            <div class="resultado">
+                <div class="clave">
+                    <div class="clave-salida">
+                        <output id="clave-resultado" class="clave-resultado"></output>
+                        <button type="button" id="clave-copiar">Copiar</button>
+                    </div>
+                    <div class="clave-fuerza"><div id="clave-barra" class="clave-barra"></div></div>
+                    <p id="clave-nivel" class="clave-nivel"></p>
+                    <label for="clave-largo">Longitud: <strong id="clave-largo-valor">16</strong></label>
+                    <input type="range" id="clave-largo" min="6" max="40" value="16">
+                    <div class="clave-opciones">
+                        <label><input type="checkbox" id="clave-mayus" checked> Mayúsculas (A-Z)</label>
+                        <label><input type="checkbox" id="clave-minus" checked> Minúsculas (a-z)</label>
+                        <label><input type="checkbox" id="clave-numeros" checked> Números (0-9)</label>
+                        <label><input type="checkbox" id="clave-simbolos"> Símbolos (!@#$…)</label>
+                    </div>
+                    <button type="button" id="clave-generar">Generar otra</button>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="clave"&gt;
+    &lt;div class="clave-salida"&gt;
+        &lt;output id="clave-resultado" class="clave-resultado"&gt;&lt;/output&gt;
+        &lt;button type="button" id="clave-copiar"&gt;Copiar&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="clave-fuerza"&gt;&lt;div id="clave-barra" class="clave-barra"&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;p id="clave-nivel" class="clave-nivel"&gt;&lt;/p&gt;
+    &lt;label for="clave-largo"&gt;Longitud: &lt;strong id="clave-largo-valor"&gt;16&lt;/strong&gt;&lt;/label&gt;
+    &lt;input type="range" id="clave-largo" min="6" max="40" value="16"&gt;
+    &lt;div class="clave-opciones"&gt;
+        &lt;label&gt;&lt;input type="checkbox" id="clave-mayus" checked&gt; Mayúsculas (A-Z)&lt;/label&gt;
+        &lt;label&gt;&lt;input type="checkbox" id="clave-minus" checked&gt; Minúsculas (a-z)&lt;/label&gt;
+        &lt;label&gt;&lt;input type="checkbox" id="clave-numeros" checked&gt; Números (0-9)&lt;/label&gt;
+        &lt;label&gt;&lt;input type="checkbox" id="clave-simbolos"&gt; Símbolos (!@#$…)&lt;/label&gt;
+    &lt;/div&gt;
+    &lt;button type="button" id="clave-generar"&gt;Generar otra&lt;/button&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.clave {
+    display: grid;
+    gap: 10px;
+    max-width: 460px;
+    margin: 0 auto;
+}
+
+.clave-salida {
+    display: flex;
+    gap: 8px;
+}
+
+.clave-resultado {
+    flex: 1;
+    min-width: 0;
+    padding: 12px;
+    overflow-wrap: anywhere;
+    border-radius: 10px;
+    background: #0f172a;
+    color: #a6e3a1;
+    font-family: "Courier New", monospace;
+    font-size: 1.1rem;
+}
+
+.clave-fuerza {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.clave-barra {
+    width: 0;
+    height: 100%;
+    transition: width 0.3s, background 0.3s;
+}
+
+.clave-nivel {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.clave-opciones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 6px;
+}
+
+#clave-largo {
+    width: 100%;
+    accent-color: #1f2430;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const claveResultado = document.querySelector("#clave-resultado");
+const claveCopiar = document.querySelector("#clave-copiar");
+const claveBarra = document.querySelector("#clave-barra");
+const claveNivel = document.querySelector("#clave-nivel");
+const claveLargo = document.querySelector("#clave-largo");
+const claveLargoValor = document.querySelector("#clave-largo-valor");
+const claveGenerar = document.querySelector("#clave-generar");
+
+const grupos = [
+    { casilla: document.querySelector("#clave-mayus"), caracteres: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" },
+    { casilla: document.querySelector("#clave-minus"), caracteres: "abcdefghijklmnopqrstuvwxyz" },
+    { casilla: document.querySelector("#clave-numeros"), caracteres: "0123456789" },
+    { casilla: document.querySelector("#clave-simbolos"), caracteres: "!@#$%&amp;*?-_=+" }
+];
+
+function azar(maximo) {
+    return crypto.getRandomValues(new Uint32Array(1))[0] % maximo;
+}
+
+function generar() {
+    const largo = Number(claveLargo.value);
+    claveLargoValor.textContent = largo;
+    const disponibles = grupos
+        .filter((grupo) =&gt; grupo.casilla.checked)
+        .map((grupo) =&gt; grupo.caracteres)
+        .join("");
+    if (!disponibles) {
+        claveResultado.textContent = "Marca al menos una opción";
+        claveBarra.style.width = "0";
+        claveNivel.textContent = "";
+        return;
+    }
+    let clave = "";
+    for (let i = 0; i &lt; largo; i++) {
+        clave += disponibles[azar(disponibles.length)];
+    }
+    claveResultado.textContent = clave;
+
+    const bits = Math.round(largo * Math.log2(disponibles.length));
+    let nivel = "Débil";
+    let color = "#ef4444";
+    if (bits &gt;= 100) {
+        nivel = "Muy fuerte";
+        color = "#16a34a";
+    } else if (bits &gt;= 70) {
+        nivel = "Fuerte";
+        color = "#84cc16";
+    } else if (bits &gt;= 45) {
+        nivel = "Media";
+        color = "#f59e0b";
+    }
+    claveBarra.style.width = `${Math.min(bits, 120) / 1.2}%`;
+    claveBarra.style.background = color;
+    claveNivel.textContent = `${nivel} · ${bits} bits de entropía`;
+}
+
+claveCopiar.addEventListener("click", async () =&gt; {
+    try {
+        await navigator.clipboard.writeText(claveResultado.textContent);
+        claveCopiar.textContent = "¡Copiada!";
+    } catch {
+        claveCopiar.textContent = "No se pudo";
+    }
+    setTimeout(() =&gt; {
+        claveCopiar.textContent = "Copiar";
+    }, 1500);
+});
+
+claveLargo.addEventListener("input", generar);
+claveGenerar.addEventListener("click", generar);
+for (const grupo of grupos) {
+    grupo.casilla.addEventListener("change", generar);
+}
+
+generar();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-unidades" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 11</span>
+            <h2>Conversor de unidades</h2>
+            <p>Cada magnitud guarda cuánto vale cada unidad en la unidad base (metros, kilos, litros). Convertir es multiplicar por el factor de origen y dividir por el de destino. La temperatura no es proporcional, así que pasa primero a °C con funciones propias.</p>
+            <div class="resultado">
+                <div class="unidades">
+                    <label for="unidades-tipo">Magnitud</label>
+                    <select id="unidades-tipo"></select>
+                    <div class="unidades-fila">
+                        <input type="number" id="unidades-valor" value="1" step="any" aria-label="Valor a convertir">
+                        <select id="unidades-de" aria-label="Unidad de origen"></select>
+                        <span>→</span>
+                        <select id="unidades-a" aria-label="Unidad de destino"></select>
+                    </div>
+                    <p id="unidades-resultado" class="unidades-resultado" aria-live="polite"></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="unidades"&gt;
+    &lt;label for="unidades-tipo"&gt;Magnitud&lt;/label&gt;
+    &lt;select id="unidades-tipo"&gt;&lt;/select&gt;
+    &lt;div class="unidades-fila"&gt;
+        &lt;input type="number" id="unidades-valor" value="1" step="any" aria-label="Valor a convertir"&gt;
+        &lt;select id="unidades-de" aria-label="Unidad de origen"&gt;&lt;/select&gt;
+        &lt;span&gt;→&lt;/span&gt;
+        &lt;select id="unidades-a" aria-label="Unidad de destino"&gt;&lt;/select&gt;
+    &lt;/div&gt;
+    &lt;p id="unidades-resultado" class="unidades-resultado" aria-live="polite"&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.unidades {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 16px;
+    background: #f1f5f9;
+}
+
+.unidades-fila {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.unidades-fila input {
+    width: 120px;
+}
+
+.unidades-resultado {
+    font-size: 1.4rem;
+    font-weight: 800;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const unidadesTipo = document.querySelector("#unidades-tipo");
+const unidadesValor = document.querySelector("#unidades-valor");
+const unidadesDe = document.querySelector("#unidades-de");
+const unidadesA = document.querySelector("#unidades-a");
+const unidadesResultado = document.querySelector("#unidades-resultado");
+
+const magnitudes = {
+    longitud: { nombre: "Longitud", unidades: { m: 1, km: 1000, cm: 0.01, mm: 0.001, mi: 1609.344, ft: 0.3048, in: 0.0254 } },
+    peso: { nombre: "Peso", unidades: { kg: 1, g: 0.001, lb: 0.45359237, oz: 0.0283495 } },
+    volumen: { nombre: "Volumen", unidades: { L: 1, mL: 0.001, gal: 3.785411784, taza: 0.24 } },
+    temperatura: { nombre: "Temperatura", unidades: { "°C": 1, "°F": 1, K: 1 } }
+};
+const aCelsius = { "°C": (v) =&gt; v, "°F": (v) =&gt; ((v - 32) * 5) / 9, K: (v) =&gt; v - 273.15 };
+const desdeCelsius = { "°C": (c) =&gt; c, "°F": (c) =&gt; (c * 9) / 5 + 32, K: (c) =&gt; c + 273.15 };
+
+for (const [clave, magnitud] of Object.entries(magnitudes)) {
+    unidadesTipo.add(new Option(magnitud.nombre, clave));
+}
+
+function convertir() {
+    const valor = Number(unidadesValor.value);
+    const tipo = unidadesTipo.value;
+    const de = unidadesDe.value;
+    const a = unidadesA.value;
+    let resultado;
+    if (tipo === "temperatura") {
+        resultado = desdeCelsius[a](aCelsius[de](valor));
+    } else {
+        const factores = magnitudes[tipo].unidades;
+        resultado = (valor * factores[de]) / factores[a];
+    }
+    const formato = { maximumFractionDigits: 4 };
+    unidadesResultado.textContent = `${valor.toLocaleString("es", formato)} ${de} = ${resultado.toLocaleString("es", formato)} ${a}`;
+}
+
+function llenarUnidades() {
+    const unidades = Object.keys(magnitudes[unidadesTipo.value].unidades);
+    unidadesDe.innerHTML = "";
+    unidadesA.innerHTML = "";
+    for (const unidad of unidades) {
+        unidadesDe.add(new Option(unidad, unidad));
+        unidadesA.add(new Option(unidad, unidad));
+    }
+    unidadesA.selectedIndex = 1;
+    convertir();
+}
+
+unidadesTipo.addEventListener("change", llenarUnidades);
+unidadesValor.addEventListener("input", convertir);
+unidadesDe.addEventListener("change", convertir);
+unidadesA.addEventListener("change", convertir);
+
+llenarUnidades();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-palabras" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 12</span>
+            <h2>Contador de palabras y tiempo de lectura</h2>
+            <p>Con cada tecla se analiza el texto: palabras (con una expresión regular que entiende acentos y la ñ), caracteres, oraciones, minutos de lectura (≈ 200 palabras por minuto) y las palabras más repetidas. El borrador se guarda solo en <code>localStorage</code>.</p>
+            <div class="resultado">
+                <div class="palabras">
+                    <label for="palabras-texto">Escribe o pega tu texto</label>
+                    <textarea id="palabras-texto" rows="6" placeholder="Había una vez una programadora que…"></textarea>
+                    <div class="palabras-stats">
+                        <div><strong id="palabras-total">0</strong>palabras</div>
+                        <div><strong id="palabras-caracteres">0</strong>caracteres</div>
+                        <div><strong id="palabras-sin-espacios">0</strong>sin espacios</div>
+                        <div><strong id="palabras-oraciones">0</strong>oraciones</div>
+                        <div><strong id="palabras-lectura">0 s</strong>de lectura</div>
+                    </div>
+                    <p id="palabras-frecuentes" class="palabras-frecuentes"></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="palabras"&gt;
+    &lt;label for="palabras-texto"&gt;Escribe o pega tu texto&lt;/label&gt;
+    &lt;textarea id="palabras-texto" rows="6" placeholder="Había una vez una programadora que…"&gt;&lt;/textarea&gt;
+    &lt;div class="palabras-stats"&gt;
+        &lt;div&gt;&lt;strong id="palabras-total"&gt;0&lt;/strong&gt;palabras&lt;/div&gt;
+        &lt;div&gt;&lt;strong id="palabras-caracteres"&gt;0&lt;/strong&gt;caracteres&lt;/div&gt;
+        &lt;div&gt;&lt;strong id="palabras-sin-espacios"&gt;0&lt;/strong&gt;sin espacios&lt;/div&gt;
+        &lt;div&gt;&lt;strong id="palabras-oraciones"&gt;0&lt;/strong&gt;oraciones&lt;/div&gt;
+        &lt;div&gt;&lt;strong id="palabras-lectura"&gt;0 s&lt;/strong&gt;de lectura&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p id="palabras-frecuentes" class="palabras-frecuentes"&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.palabras textarea {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    resize: vertical;
+}
+
+.palabras-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.palabras-stats div {
+    padding: 10px;
+    border-radius: 12px;
+    background: #fffbea;
+    color: #64748b;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.palabras-stats strong {
+    display: block;
+    color: #1f2430;
+    font-size: 1.6rem;
+}
+
+.palabras-frecuentes {
+    color: #64748b;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const palabrasTexto = document.querySelector("#palabras-texto");
+const palabrasTotal = document.querySelector("#palabras-total");
+const palabrasCaracteres = document.querySelector("#palabras-caracteres");
+const palabrasSinEspacios = document.querySelector("#palabras-sin-espacios");
+const palabrasOraciones = document.querySelector("#palabras-oraciones");
+const palabrasLectura = document.querySelector("#palabras-lectura");
+const palabrasFrecuentes = document.querySelector("#palabras-frecuentes");
+
+function analizar() {
+    const texto = palabrasTexto.value;
+    const palabras = texto.toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+    const oraciones = texto.split(/[.!?]+/).filter((parte) =&gt; parte.trim() !== "");
+    const minutos = palabras.length / 200;
+
+    palabrasTotal.textContent = palabras.length;
+    palabrasCaracteres.textContent = texto.length;
+    palabrasSinEspacios.textContent = texto.replace(/\s/g, "").length;
+    palabrasOraciones.textContent = oraciones.length;
+    palabrasLectura.textContent = minutos &lt; 1 ? `${Math.ceil(minutos * 60)} s` : `${Math.ceil(minutos)} min`;
+
+    const conteo = {};
+    for (const palabra of palabras) {
+        if (palabra.length &gt; 3) {
+            conteo[palabra] = (conteo[palabra] || 0) + 1;
+        }
+    }
+    const top = Object.entries(conteo)
+        .filter(([, veces]) =&gt; veces &gt; 1)
+        .sort((a, b) =&gt; b[1] - a[1])
+        .slice(0, 5);
+    palabrasFrecuentes.textContent = top.length
+        ? `Más repetidas: ${top.map(([palabra, veces]) =&gt; `${palabra} (${veces})`).join(", ")}`
+        : "";
+
+    localStorage.setItem("palabras-borrador", texto);
+}
+
+palabrasTexto.value = localStorage.getItem("palabras-borrador") || "";
+palabrasTexto.addEventListener("input", analizar);
+analizar();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-dibujo" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 13</span>
+            <h2>Dibujo en canvas</h2>
+            <p>Los eventos <code>pointer</code> sirven igual para mouse, dedo y lápiz. Al presionar se empieza un trazo, al mover se agregan líneas y al soltar se termina. Como el canvas puede verse más chico que su tamaño real, las coordenadas se escalan. «Descargar» convierte el dibujo en PNG.</p>
+            <div class="resultado">
+                <div class="lienzo">
+                    <div class="lienzo-barra">
+                        <label for="lienzo-color">Color</label>
+                        <input type="color" id="lienzo-color" value="#1e293b">
+                        <label for="lienzo-grosor">Grosor</label>
+                        <input type="range" id="lienzo-grosor" min="1" max="30" value="5">
+                        <button type="button" id="lienzo-borrador" aria-pressed="false">Borrador</button>
+                        <button type="button" id="lienzo-limpiar">Limpiar</button>
+                        <button type="button" id="lienzo-descargar">Descargar PNG</button>
+                    </div>
+                    <canvas id="lienzo-canvas" class="lienzo-canvas" width="800" height="400"></canvas>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="lienzo"&gt;
+    &lt;div class="lienzo-barra"&gt;
+        &lt;label for="lienzo-color"&gt;Color&lt;/label&gt;
+        &lt;input type="color" id="lienzo-color" value="#1e293b"&gt;
+        &lt;label for="lienzo-grosor"&gt;Grosor&lt;/label&gt;
+        &lt;input type="range" id="lienzo-grosor" min="1" max="30" value="5"&gt;
+        &lt;button type="button" id="lienzo-borrador" aria-pressed="false"&gt;Borrador&lt;/button&gt;
+        &lt;button type="button" id="lienzo-limpiar"&gt;Limpiar&lt;/button&gt;
+        &lt;button type="button" id="lienzo-descargar"&gt;Descargar PNG&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;canvas id="lienzo-canvas" class="lienzo-canvas" width="800" height="400"&gt;&lt;/canvas&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.lienzo-barra {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.lienzo-barra [aria-pressed="true"] {
+    outline: 3px solid #f7df1e;
+}
+
+.lienzo-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    cursor: crosshair;
+    touch-action: none;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const lienzoColor = document.querySelector("#lienzo-color");
+const lienzoGrosor = document.querySelector("#lienzo-grosor");
+const lienzoBorrador = document.querySelector("#lienzo-borrador");
+const lienzoLimpiar = document.querySelector("#lienzo-limpiar");
+const lienzoDescargar = document.querySelector("#lienzo-descargar");
+const lienzoCanvas = document.querySelector("#lienzo-canvas");
+
+const contexto = lienzoCanvas.getContext("2d");
+let dibujando = false;
+let borrador = false;
+
+function fondoBlanco() {
+    contexto.fillStyle = "#ffffff";
+    contexto.fillRect(0, 0, lienzoCanvas.width, lienzoCanvas.height);
+}
+
+function posicion(evento) {
+    const caja = lienzoCanvas.getBoundingClientRect();
+    return {
+        x: ((evento.clientX - caja.left) * lienzoCanvas.width) / caja.width,
+        y: ((evento.clientY - caja.top) * lienzoCanvas.height) / caja.height
+    };
+}
+
+lienzoCanvas.addEventListener("pointerdown", (evento) =&gt; {
+    dibujando = true;
+    lienzoCanvas.setPointerCapture(evento.pointerId);
+    const { x, y } = posicion(evento);
+    contexto.strokeStyle = borrador ? "#ffffff" : lienzoColor.value;
+    contexto.lineWidth = Number(lienzoGrosor.value);
+    contexto.lineCap = "round";
+    contexto.lineJoin = "round";
+    contexto.beginPath();
+    contexto.moveTo(x, y);
+    contexto.lineTo(x, y);
+    contexto.stroke();
+});
+
+lienzoCanvas.addEventListener("pointermove", (evento) =&gt; {
+    if (!dibujando) {
+        return;
+    }
+    const { x, y } = posicion(evento);
+    contexto.lineTo(x, y);
+    contexto.stroke();
+});
+
+lienzoCanvas.addEventListener("pointerup", () =&gt; {
+    dibujando = false;
+});
+
+lienzoCanvas.addEventListener("pointercancel", () =&gt; {
+    dibujando = false;
+});
+
+lienzoBorrador.addEventListener("click", () =&gt; {
+    borrador = !borrador;
+    lienzoBorrador.setAttribute("aria-pressed", borrador);
+});
+
+lienzoLimpiar.addEventListener("click", fondoBlanco);
+
+lienzoDescargar.addEventListener("click", () =&gt; {
+    const enlace = document.createElement("a");
+    enlace.href = lienzoCanvas.toDataURL("image/png");
+    enlace.download = "mi-dibujo.png";
+    enlace.click();
+});
+
+fondoBlanco();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-carrito" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 14</span>
+            <h2>Carrito de compras completo</h2>
+            <p>Catálogo, carrito con cantidades (+ / − / eliminar), cupones de descuento (<code>JS10</code> o <code>CURSO20</code>), impuesto del 7 %, total y pago. El carrito guarda solo <code>{ id, cantidad }</code> y busca el resto en el catálogo con <code>find</code>; se conserva en <code>localStorage</code> al recargar.</p>
+            <div class="resultado">
+                <div class="carrito-app">
+                    <div id="carrito-catalogo" class="carrito-catalogo"></div>
+                    <aside class="carrito-panel">
+                        <h3>🛒 Tu carrito (<span id="carrito-unidades">0</span>)</h3>
+                        <ul id="carrito-lista" class="carrito-lista"></ul>
+                        <form id="carrito-cupon" class="carrito-cupon">
+                            <label for="carrito-codigo">Cupón</label>
+                            <input type="text" id="carrito-codigo" placeholder="JS10">
+                            <button type="submit">Aplicar</button>
+                        </form>
+                        <dl class="carrito-totales">
+                            <dt>Subtotal</dt>
+                            <dd id="carrito-subtotal">$0.00</dd>
+                            <dt>Descuento</dt>
+                            <dd id="carrito-descuento">−$0.00</dd>
+                            <dt>Impuesto (7 %)</dt>
+                            <dd id="carrito-impuesto">$0.00</dd>
+                            <dt class="carrito-total">Total</dt>
+                            <dd id="carrito-total" class="carrito-total">$0.00</dd>
+                        </dl>
+                        <button type="button" id="carrito-pagar" class="carrito-pagar">Pagar</button>
+                        <p id="carrito-mensaje" class="carrito-mensaje" aria-live="polite"></p>
+                    </aside>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="carrito-app"&gt;
+    &lt;div id="carrito-catalogo" class="carrito-catalogo"&gt;&lt;/div&gt;
+    &lt;aside class="carrito-panel"&gt;
+        &lt;h3&gt;🛒 Tu carrito (&lt;span id="carrito-unidades"&gt;0&lt;/span&gt;)&lt;/h3&gt;
+        &lt;ul id="carrito-lista" class="carrito-lista"&gt;&lt;/ul&gt;
+        &lt;form id="carrito-cupon" class="carrito-cupon"&gt;
+            &lt;label for="carrito-codigo"&gt;Cupón&lt;/label&gt;
+            &lt;input type="text" id="carrito-codigo" placeholder="JS10"&gt;
+            &lt;button type="submit"&gt;Aplicar&lt;/button&gt;
+        &lt;/form&gt;
+        &lt;dl class="carrito-totales"&gt;
+            &lt;dt&gt;Subtotal&lt;/dt&gt;
+            &lt;dd id="carrito-subtotal"&gt;$0.00&lt;/dd&gt;
+            &lt;dt&gt;Descuento&lt;/dt&gt;
+            &lt;dd id="carrito-descuento"&gt;−$0.00&lt;/dd&gt;
+            &lt;dt&gt;Impuesto (7 %)&lt;/dt&gt;
+            &lt;dd id="carrito-impuesto"&gt;$0.00&lt;/dd&gt;
+            &lt;dt class="carrito-total"&gt;Total&lt;/dt&gt;
+            &lt;dd id="carrito-total" class="carrito-total"&gt;$0.00&lt;/dd&gt;
+        &lt;/dl&gt;
+        &lt;button type="button" id="carrito-pagar" class="carrito-pagar"&gt;Pagar&lt;/button&gt;
+        &lt;p id="carrito-mensaje" class="carrito-mensaje" aria-live="polite"&gt;&lt;/p&gt;
+    &lt;/aside&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.carrito-app {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.carrito-catalogo {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.carrito-producto {
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    text-align: center;
+}
+
+.carrito-producto img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+}
+
+.carrito-producto h4 {
+    margin: 8px 8px 0;
+    font-size: 0.95rem;
+}
+
+.carrito-producto p {
+    margin: 2px 0 8px;
+    font-weight: 700;
+}
+
+.carrito-producto button {
+    margin-bottom: 12px;
+}
+
+.carrito-panel {
+    padding: 16px;
+    border-radius: 16px;
+    background: #f8fafc;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+}
+
+.carrito-panel h3 {
+    margin-top: 0;
+}
+
+.carrito-lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.carrito-lista li {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+}
+
+.carrito-controles {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.carrito-controles button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.carrito-cupon {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin: 12px 0;
+}
+
+.carrito-cupon input {
+    width: 100px;
+}
+
+.carrito-totales {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px;
+    margin: 0 0 12px;
+}
+
+.carrito-totales dd {
+    margin: 0;
+    text-align: right;
+}
+
+.carrito-total {
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.carrito-pagar {
+    width: 100%;
+}
+
+.carrito-lista .carrito-vacio {
+    display: block;
+    color: #64748b;
+    text-align: center;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const carritoCatalogo = document.querySelector("#carrito-catalogo");
+const carritoUnidades = document.querySelector("#carrito-unidades");
+const carritoLista = document.querySelector("#carrito-lista");
+const carritoCupon = document.querySelector("#carrito-cupon");
+const carritoCodigo = document.querySelector("#carrito-codigo");
+const carritoSubtotal = document.querySelector("#carrito-subtotal");
+const carritoDescuento = document.querySelector("#carrito-descuento");
+const carritoImpuesto = document.querySelector("#carrito-impuesto");
+const carritoTotal = document.querySelector("#carrito-total");
+const carritoPagar = document.querySelector("#carrito-pagar");
+const carritoMensaje = document.querySelector("#carrito-mensaje");
+
+const productos = [
+    { id: 1, nombre: "Taza Café Lunar", precio: 12.5, imagen: "https://picsum.photos/id/30/300/200" },
+    { id: 2, nombre: "Cuaderno Brisa", precio: 8.9, imagen: "https://picsum.photos/id/24/300/200" },
+    { id: 3, nombre: "Cámara Retro Nébula", precio: 89.99, imagen: "https://picsum.photos/id/250/300/200" },
+    { id: 4, nombre: "Mochila Sendero", precio: 45, imagen: "https://picsum.photos/id/103/300/200" },
+    { id: 5, nombre: "Lámpara Faro", precio: 27.75, imagen: "https://picsum.photos/id/225/300/200" },
+    { id: 6, nombre: "Planta Verdi", precio: 15, imagen: "https://picsum.photos/id/152/300/200" }
+];
+const cupones = { JS10: 0.1, CURSO20: 0.2 };
+const dinero = new Intl.NumberFormat("es-US", { style: "currency", currency: "USD" });
+let carrito = JSON.parse(localStorage.getItem("carrito-app")) || [];
+let descuento = 0;
+
+carritoCatalogo.innerHTML = productos.map((producto) =&gt; `
+    &lt;article class="carrito-producto"&gt;
+        &lt;img src="${producto.imagen}" alt="${producto.nombre}" loading="lazy"&gt;
+        &lt;h4&gt;${producto.nombre}&lt;/h4&gt;
+        &lt;p&gt;${dinero.format(producto.precio)}&lt;/p&gt;
+        &lt;button type="button" data-agregar="${producto.id}"&gt;Agregar&lt;/button&gt;
+    &lt;/article&gt;
+`).join("");
+
+function pintarCarrito() {
+    let subtotal = 0;
+    let unidades = 0;
+    carritoLista.innerHTML = "";
+    for (const item of carrito) {
+        const producto = productos.find((p) =&gt; p.id === item.id);
+        subtotal += producto.precio * item.cantidad;
+        unidades += item.cantidad;
+        carritoLista.innerHTML += `
+            &lt;li&gt;
+                &lt;span&gt;${producto.nombre}&lt;/span&gt;
+                &lt;span class="carrito-controles"&gt;
+                    &lt;button type="button" data-cambio="-1" data-id="${item.id}" aria-label="Quitar uno"&gt;−&lt;/button&gt;
+                    &lt;strong&gt;${item.cantidad}&lt;/strong&gt;
+                    &lt;button type="button" data-cambio="1" data-id="${item.id}" aria-label="Agregar uno"&gt;+&lt;/button&gt;
+                    &lt;button type="button" data-cambio="eliminar" data-id="${item.id}" aria-label="Eliminar"&gt;🗑&lt;/button&gt;
+                &lt;/span&gt;
+                &lt;span&gt;${dinero.format(producto.precio * item.cantidad)}&lt;/span&gt;
+            &lt;/li&gt;
+        `;
+    }
+    if (carrito.length === 0) {
+        carritoLista.innerHTML = `&lt;li class="carrito-vacio"&gt;Tu carrito está vacío.&lt;/li&gt;`;
+    }
+    const montoDescuento = subtotal * descuento;
+    const impuesto = (subtotal - montoDescuento) * 0.07;
+    carritoUnidades.textContent = unidades;
+    carritoSubtotal.textContent = dinero.format(subtotal);
+    carritoDescuento.textContent = `−${dinero.format(montoDescuento)}`;
+    carritoImpuesto.textContent = dinero.format(impuesto);
+    carritoTotal.textContent = dinero.format(subtotal - montoDescuento + impuesto);
+    carritoPagar.disabled = carrito.length === 0;
+    localStorage.setItem("carrito-app", JSON.stringify(carrito));
+}
+
+function cambiarCantidad(id, cambio) {
+    const item = carrito.find((i) =&gt; i.id === id);
+    if (item) {
+        item.cantidad += cambio;
+    } else {
+        carrito.push({ id, cantidad: 1 });
+    }
+    carrito = carrito.filter((i) =&gt; i.cantidad &gt; 0);
+    pintarCarrito();
+}
+
+carritoCatalogo.addEventListener("click", (evento) =&gt; {
+    const boton = evento.target.closest("[data-agregar]");
+    if (boton) {
+        cambiarCantidad(Number(boton.dataset.agregar), 1);
+        carritoMensaje.textContent = "";
+    }
+});
+
+carritoLista.addEventListener("click", (evento) =&gt; {
+    const boton = evento.target.closest("[data-cambio]");
+    if (!boton) {
+        return;
+    }
+    const id = Number(boton.dataset.id);
+    if (boton.dataset.cambio === "eliminar") {
+        carrito = carrito.filter((i) =&gt; i.id !== id);
+        pintarCarrito();
+    } else {
+        cambiarCantidad(id, Number(boton.dataset.cambio));
+    }
+});
+
+carritoCupon.addEventListener("submit", (evento) =&gt; {
+    evento.preventDefault();
+    const codigo = carritoCodigo.value.trim().toUpperCase();
+    if (cupones[codigo]) {
+        descuento = cupones[codigo];
+        carritoMensaje.textContent = `🏷️ Cupón ${codigo}: ${descuento * 100} % de descuento`;
+    } else {
+        descuento = 0;
+        carritoMensaje.textContent = "Ese cupón no existe.";
+    }
+    pintarCarrito();
+});
+
+carritoPagar.addEventListener("click", () =&gt; {
+    carritoMensaje.textContent = `✅ ¡Gracias por tu compra! Pagaste ${carritoTotal.textContent}.`;
+    carrito = [];
+    descuento = 0;
+    carritoCodigo.value = "";
+    pintarCarrito();
+});
+
+pintarCarrito();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-gastos" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 15</span>
+            <h2>Gestor de gastos con totales por categoría</h2>
+            <p>Cada gasto es un objeto con descripción, monto, categoría y fecha. <code>reduce</code> calcula el total; un objeto acumula cuánto va en cada categoría y se dibuja como barras proporcionales. Todo persiste en <code>localStorage</code>.</p>
+            <div class="resultado">
+                <div class="gastos">
+                    <form id="gastos-form" class="gastos-form">
+                        <div>
+                            <label for="gastos-descripcion">Descripción</label>
+                            <input type="text" id="gastos-descripcion" required maxlength="40" placeholder="Almuerzo">
+                        </div>
+                        <div>
+                            <label for="gastos-monto">Monto ($)</label>
+                            <input type="number" id="gastos-monto" required min="0.01" step="0.01" placeholder="8.50">
+                        </div>
+                        <div>
+                            <label for="gastos-categoria">Categoría</label>
+                            <select id="gastos-categoria">
+                                <option>Comida</option>
+                                <option>Transporte</option>
+                                <option>Casa</option>
+                                <option>Ocio</option>
+                                <option>Salud</option>
+                            </select>
+                        </div>
+                        <button type="submit">Agregar</button>
+                    </form>
+                    <p class="gastos-total">Total gastado: <strong id="gastos-total">$0.00</strong></p>
+                    <div id="gastos-categorias" class="gastos-categorias"></div>
+                    <ul id="gastos-lista" class="gastos-lista"></ul>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="gastos"&gt;
+    &lt;form id="gastos-form" class="gastos-form"&gt;
+        &lt;div&gt;
+            &lt;label for="gastos-descripcion"&gt;Descripción&lt;/label&gt;
+            &lt;input type="text" id="gastos-descripcion" required maxlength="40" placeholder="Almuerzo"&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+            &lt;label for="gastos-monto"&gt;Monto ($)&lt;/label&gt;
+            &lt;input type="number" id="gastos-monto" required min="0.01" step="0.01" placeholder="8.50"&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+            &lt;label for="gastos-categoria"&gt;Categoría&lt;/label&gt;
+            &lt;select id="gastos-categoria"&gt;
+                &lt;option&gt;Comida&lt;/option&gt;
+                &lt;option&gt;Transporte&lt;/option&gt;
+                &lt;option&gt;Casa&lt;/option&gt;
+                &lt;option&gt;Ocio&lt;/option&gt;
+                &lt;option&gt;Salud&lt;/option&gt;
+            &lt;/select&gt;
+        &lt;/div&gt;
+        &lt;button type="submit"&gt;Agregar&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;p class="gastos-total"&gt;Total gastado: &lt;strong id="gastos-total"&gt;$0.00&lt;/strong&gt;&lt;/p&gt;
+    &lt;div id="gastos-categorias" class="gastos-categorias"&gt;&lt;/div&gt;
+    &lt;ul id="gastos-lista" class="gastos-lista"&gt;&lt;/ul&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.gastos {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.gastos-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    align-items: end;
+}
+
+.gastos-form label {
+    display: block;
+    font-size: 0.85rem;
+}
+
+.gastos-form input,
+.gastos-form select {
+    width: 100%;
+}
+
+.gastos-total {
+    font-size: 1.2rem;
+}
+
+.gastos-cat {
+    display: grid;
+    grid-template-columns: 100px 1fr 90px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+.gastos-cat strong {
+    text-align: right;
+}
+
+.gastos-barra {
+    height: 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.gastos-barra div {
+    height: 100%;
+    border-radius: 999px;
+}
+
+.gastos-lista {
+    padding: 0;
+    list-style: none;
+}
+
+.gastos-lista li {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.gastos-lista li span:nth-child(2) {
+    flex: 1;
+}
+
+.gastos-punto {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.gastos-borrar {
+    border: none;
+    background: none;
+    color: #94a3b8;
+    cursor: pointer;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const gastosForm = document.querySelector("#gastos-form");
+const gastosDescripcion = document.querySelector("#gastos-descripcion");
+const gastosMonto = document.querySelector("#gastos-monto");
+const gastosCategoria = document.querySelector("#gastos-categoria");
+const gastosTotal = document.querySelector("#gastos-total");
+const gastosCategorias = document.querySelector("#gastos-categorias");
+const gastosLista = document.querySelector("#gastos-lista");
+
+const colores = { Comida: "#f59e0b", Transporte: "#3b82f6", Casa: "#8b5cf6", Ocio: "#ec4899", Salud: "#10b981" };
+const dinero = new Intl.NumberFormat("es-US", { style: "currency", currency: "USD" });
+let gastos = JSON.parse(localStorage.getItem("gastos-app")) || [
+    { id: 1, descripcion: "Supermercado", monto: 54.3, categoria: "Comida", fecha: "02/11/2026" },
+    { id: 2, descripcion: "Pasaje de bus", monto: 2.5, categoria: "Transporte", fecha: "03/11/2026" },
+    { id: 3, descripcion: "Cine", monto: 9, categoria: "Ocio", fecha: "05/11/2026" }
+];
+
+function pintar() {
+    const total = gastos.reduce((suma, gasto) =&gt; suma + gasto.monto, 0);
+    gastosTotal.textContent = dinero.format(total);
+
+    const porCategoria = {};
+    for (const gasto of gastos) {
+        porCategoria[gasto.categoria] = (porCategoria[gasto.categoria] || 0) + gasto.monto;
+    }
+    gastosCategorias.innerHTML = Object.entries(porCategoria)
+        .sort((a, b) =&gt; b[1] - a[1])
+        .map(([categoria, monto]) =&gt; `
+            &lt;div class="gastos-cat"&gt;
+                &lt;span&gt;${categoria}&lt;/span&gt;
+                &lt;div class="gastos-barra"&gt;
+                    &lt;div style="width: ${(monto / total) * 100}%; background: ${colores[categoria]}"&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;strong&gt;${dinero.format(monto)}&lt;/strong&gt;
+            &lt;/div&gt;
+        `)
+        .join("");
+
+    gastosLista.innerHTML = "";
+    for (const gasto of [...gastos].reverse()) {
+        const fila = document.createElement("li");
+        fila.innerHTML = `
+            &lt;span class="gastos-punto" style="background: ${colores[gasto.categoria]}"&gt;&lt;/span&gt;
+            &lt;span&gt;&lt;/span&gt;
+            &lt;strong&gt;${dinero.format(gasto.monto)}&lt;/strong&gt;
+            &lt;button type="button" class="gastos-borrar" aria-label="Borrar gasto"&gt;✕&lt;/button&gt;
+        `;
+        fila.children[1].textContent = `${gasto.descripcion} · ${gasto.categoria} · ${gasto.fecha}`;
+        fila.querySelector(".gastos-borrar").addEventListener("click", () =&gt; {
+            gastos = gastos.filter((g) =&gt; g.id !== gasto.id);
+            pintar();
+        });
+        gastosLista.append(fila);
+    }
+    if (gastos.length === 0) {
+        gastosLista.innerHTML = `&lt;li&gt;Aún no registras gastos.&lt;/li&gt;`;
+    }
+    localStorage.setItem("gastos-app", JSON.stringify(gastos));
+}
+
+gastosForm.addEventListener("submit", (evento) =&gt; {
+    evento.preventDefault();
+    gastos.push({
+        id: Date.now(),
+        descripcion: gastosDescripcion.value.trim(),
+        monto: Number(gastosMonto.value),
+        categoria: gastosCategoria.value,
+        fecha: new Date().toLocaleDateString("es")
+    });
+    gastosForm.reset();
+    gastosDescripcion.focus();
+    pintar();
+});
+
+pintar();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-adivina" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 16</span>
+            <h2>Adivina el número</h2>
+            <p>La computadora piensa un número del 1 al 100 y tienes 7 intentos. Cada respuesta dice si es mayor o menor y qué tan cerca estás (frío, tibio, caliente). Los intentos quedan como fichas de colores y el mejor resultado se guarda.</p>
+            <div class="resultado">
+                <div class="adivina">
+                    <p>Pensé un número del <strong>1 al 100</strong>. Te quedan <strong id="adivina-intentos">7</strong> intentos.</p>
+                    <form id="adivina-form" class="adivina-form">
+                        <label for="adivina-numero">Tu número</label>
+                        <input type="number" id="adivina-numero" min="1" max="100" required placeholder="50">
+                        <button type="submit" id="adivina-probar">Probar</button>
+                    </form>
+                    <p id="adivina-pista" class="adivina-pista" aria-live="polite"></p>
+                    <ul id="adivina-historial" class="adivina-historial"></ul>
+                    <button type="button" id="adivina-nuevo" hidden>Jugar otra vez</button>
+                    <p class="adivina-record">Récord: <span id="adivina-record">—</span></p>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="adivina"&gt;
+    &lt;p&gt;Pensé un número del &lt;strong&gt;1 al 100&lt;/strong&gt;. Te quedan &lt;strong id="adivina-intentos"&gt;7&lt;/strong&gt; intentos.&lt;/p&gt;
+    &lt;form id="adivina-form" class="adivina-form"&gt;
+        &lt;label for="adivina-numero"&gt;Tu número&lt;/label&gt;
+        &lt;input type="number" id="adivina-numero" min="1" max="100" required placeholder="50"&gt;
+        &lt;button type="submit" id="adivina-probar"&gt;Probar&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;p id="adivina-pista" class="adivina-pista" aria-live="polite"&gt;&lt;/p&gt;
+    &lt;ul id="adivina-historial" class="adivina-historial"&gt;&lt;/ul&gt;
+    &lt;button type="button" id="adivina-nuevo" hidden&gt;Jugar otra vez&lt;/button&gt;
+    &lt;p class="adivina-record"&gt;Récord: &lt;span id="adivina-record"&gt;—&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.adivina {
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 16px;
+    background: #f5f3ff;
+    text-align: center;
+}
+
+.adivina-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.adivina-form input {
+    width: 90px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.adivina-pista {
+    min-height: 1.6em;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.adivina-historial {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    padding: 0;
+    list-style: none;
+}
+
+.adivina-historial li {
+    padding: 4px 10px;
+    border-radius: 999px;
+    color: #fff;
+    font-weight: 700;
+}
+
+.adivina-historial .bajo {
+    background: #3b82f6;
+}
+
+.adivina-historial .alto {
+    background: #ef4444;
+}
+
+.adivina-historial .exacto {
+    background: #16a34a;
+}
+
+.adivina-record {
+    color: #64748b;
+    font-size: 0.9rem;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const adivinaIntentos = document.querySelector("#adivina-intentos");
+const adivinaForm = document.querySelector("#adivina-form");
+const adivinaNumero = document.querySelector("#adivina-numero");
+const adivinaProbar = document.querySelector("#adivina-probar");
+const adivinaPista = document.querySelector("#adivina-pista");
+const adivinaHistorial = document.querySelector("#adivina-historial");
+const adivinaNuevo = document.querySelector("#adivina-nuevo");
+const adivinaRecord = document.querySelector("#adivina-record");
+
+const maxIntentos = 7;
+let secreto = 0;
+let restantes = 0;
+
+function pintarRecord() {
+    const record = localStorage.getItem("adivina-record");
+    adivinaRecord.textContent = record ? `${record} intento(s)` : "—";
+}
+
+function nuevoJuego() {
+    secreto = Math.floor(Math.random() * 100) + 1;
+    restantes = maxIntentos;
+    adivinaIntentos.textContent = restantes;
+    adivinaPista.textContent = "";
+    adivinaHistorial.innerHTML = "";
+    adivinaNumero.value = "";
+    adivinaNumero.disabled = false;
+    adivinaProbar.disabled = false;
+    adivinaNuevo.hidden = true;
+}
+
+function terminar(mensaje) {
+    adivinaPista.textContent = mensaje;
+    adivinaNumero.disabled = true;
+    adivinaProbar.disabled = true;
+    adivinaNuevo.hidden = false;
+}
+
+adivinaForm.addEventListener("submit", (evento) =&gt; {
+    evento.preventDefault();
+    const intento = Number(adivinaNumero.value);
+    restantes--;
+    adivinaIntentos.textContent = restantes;
+
+    const ficha = document.createElement("li");
+    ficha.textContent = intento;
+    adivinaHistorial.append(ficha);
+    adivinaNumero.value = "";
+
+    if (intento === secreto) {
+        ficha.className = "exacto";
+        const usados = maxIntentos - restantes;
+        const record = Number(localStorage.getItem("adivina-record"));
+        if (!record || usados &lt; record) {
+            localStorage.setItem("adivina-record", usados);
+            pintarRecord();
+        }
+        terminar(`🎉 ¡Sí! Era el ${secreto}. Lo lograste en ${usados} intento(s).`);
+        return;
+    }
+
+    ficha.className = intento &lt; secreto ? "bajo" : "alto";
+    if (restantes === 0) {
+        terminar(`😢 Se acabaron los intentos. Era el ${secreto}.`);
+        return;
+    }
+    const distancia = Math.abs(intento - secreto);
+    let temperatura = "🧊 Frío";
+    if (distancia &lt;= 5) {
+        temperatura = "🔥 ¡Muy caliente!";
+    } else if (distancia &lt;= 15) {
+        temperatura = "🌡️ Tibio";
+    }
+    adivinaPista.textContent = `${intento &lt; secreto ? "⬆️ Es mayor" : "⬇️ Es menor"} que ${intento}. ${temperatura}`;
+});
+
+adivinaNuevo.addEventListener("click", nuevoJuego);
+pintarRecord();
+nuevoJuego();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-recetas" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 17</span>
+            <h2>Buscador de recetas filtrable</h2>
+            <p>Cinco filtros que se combinan: texto (en el nombre o los ingredientes, sin importar acentos), categoría, tiempo máximo, solo vegetarianas y solo favoritas. Todos disparan el mismo evento <code>input</code> y la misma función <code>filtrar</code>. Las favoritas (❤️) se guardan en <code>localStorage</code>.</p>
+            <div class="resultado">
+                <div class="recetas">
+                    <div class="recetas-filtros">
+                        <input type="search" id="recetas-buscar" placeholder="Busca por nombre o ingrediente" aria-label="Buscar receta">
+                        <select id="recetas-categoria" aria-label="Categoría">
+                            <option value="">Todas las categorías</option>
+                            <option>Desayuno</option>
+                            <option>Almuerzo</option>
+                            <option>Cena</option>
+                            <option>Postre</option>
+                        </select>
+                        <label for="recetas-tiempo">Máx. <span id="recetas-tiempo-valor">60</span> min</label>
+                        <input type="range" id="recetas-tiempo" min="10" max="60" step="5" value="60">
+                        <label><input type="checkbox" id="recetas-veggie"> Solo vegetarianas</label>
+                        <label><input type="checkbox" id="recetas-favoritas"> Solo favoritas</label>
+                    </div>
+                    <p id="recetas-conteo" class="recetas-conteo"></p>
+                    <div id="recetas-lista" class="recetas-lista"></div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="recetas"&gt;
+    &lt;div class="recetas-filtros"&gt;
+        &lt;input type="search" id="recetas-buscar" placeholder="Busca por nombre o ingrediente" aria-label="Buscar receta"&gt;
+        &lt;select id="recetas-categoria" aria-label="Categoría"&gt;
+            &lt;option value=""&gt;Todas las categorías&lt;/option&gt;
+            &lt;option&gt;Desayuno&lt;/option&gt;
+            &lt;option&gt;Almuerzo&lt;/option&gt;
+            &lt;option&gt;Cena&lt;/option&gt;
+            &lt;option&gt;Postre&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;label for="recetas-tiempo"&gt;Máx. &lt;span id="recetas-tiempo-valor"&gt;60&lt;/span&gt; min&lt;/label&gt;
+        &lt;input type="range" id="recetas-tiempo" min="10" max="60" step="5" value="60"&gt;
+        &lt;label&gt;&lt;input type="checkbox" id="recetas-veggie"&gt; Solo vegetarianas&lt;/label&gt;
+        &lt;label&gt;&lt;input type="checkbox" id="recetas-favoritas"&gt; Solo favoritas&lt;/label&gt;
+    &lt;/div&gt;
+    &lt;p id="recetas-conteo" class="recetas-conteo"&gt;&lt;/p&gt;
+    &lt;div id="recetas-lista" class="recetas-lista"&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.recetas-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    align-items: center;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f1f5f9;
+}
+
+.recetas-filtros label {
+    font-size: 0.9rem;
+}
+
+.recetas-conteo {
+    color: #64748b;
+}
+
+.recetas-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+}
+
+.receta {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+.receta img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 5 / 3;
+    object-fit: cover;
+}
+
+.receta h4,
+.receta p {
+    margin: 6px 12px;
+}
+
+.receta-ingredientes {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.receta-favorita {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    cursor: pointer;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const recetasBuscar = document.querySelector("#recetas-buscar");
+const recetasCategoria = document.querySelector("#recetas-categoria");
+const recetasTiempo = document.querySelector("#recetas-tiempo");
+const recetasTiempoValor = document.querySelector("#recetas-tiempo-valor");
+const recetasVeggie = document.querySelector("#recetas-veggie");
+const recetasFavoritas = document.querySelector("#recetas-favoritas");
+const recetasConteo = document.querySelector("#recetas-conteo");
+const recetasLista = document.querySelector("#recetas-lista");
+
+const recetas = [
+    { id: 1, nombre: "Panqueques de avena", categoria: "Desayuno", minutos: 15, vegetariana: true, ingredientes: ["avena", "huevo", "leche", "banano"], imagen: "https://picsum.photos/id/1080/400/240" },
+    { id: 2, nombre: "Sancocho de gallina", categoria: "Almuerzo", minutos: 60, vegetariana: false, ingredientes: ["gallina", "ñame", "culantro", "maíz"], imagen: "https://picsum.photos/id/292/400/240" },
+    { id: 3, nombre: "Tacos de frijol", categoria: "Cena", minutos: 20, vegetariana: true, ingredientes: ["tortilla", "frijol", "aguacate", "queso"], imagen: "https://picsum.photos/id/312/400/240" },
+    { id: 4, nombre: "Arepas con queso", categoria: "Desayuno", minutos: 25, vegetariana: true, ingredientes: ["harina de maíz", "queso", "mantequilla"], imagen: "https://picsum.photos/id/429/400/240" },
+    { id: 5, nombre: "Ceviche de corvina", categoria: "Almuerzo", minutos: 30, vegetariana: false, ingredientes: ["corvina", "limón", "cebolla", "ají"], imagen: "https://picsum.photos/id/431/400/240" },
+    { id: 6, nombre: "Tortilla de papas", categoria: "Cena", minutos: 35, vegetariana: true, ingredientes: ["papa", "huevo", "cebolla"], imagen: "https://picsum.photos/id/488/400/240" },
+    { id: 7, nombre: "Arroz con leche", categoria: "Postre", minutos: 40, vegetariana: true, ingredientes: ["arroz", "leche", "canela", "azúcar"], imagen: "https://picsum.photos/id/493/400/240" },
+    { id: 8, nombre: "Pollo al curry", categoria: "Cena", minutos: 45, vegetariana: false, ingredientes: ["pollo", "curry", "coco", "arroz"], imagen: "https://picsum.photos/id/674/400/240" },
+    { id: 9, nombre: "Brownies de cacao", categoria: "Postre", minutos: 50, vegetariana: true, ingredientes: ["cacao", "harina", "huevo", "azúcar"], imagen: "https://picsum.photos/id/835/400/240" },
+    { id: 10, nombre: "Ensalada tropical", categoria: "Almuerzo", minutos: 15, vegetariana: true, ingredientes: ["lechuga", "mango", "aguacate", "limón"], imagen: "https://picsum.photos/id/102/400/240" }
+];
+let favoritas = JSON.parse(localStorage.getItem("recetas-favoritas")) || [];
+
+function normalizar(texto) {
+    return texto.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
+function filtrar() {
+    const texto = normalizar(recetasBuscar.value.trim());
+    const maximo = Number(recetasTiempo.value);
+    recetasTiempoValor.textContent = maximo;
+
+    const visibles = recetas.filter((receta) =&gt; {
+        const dondeBuscar = normalizar([receta.nombre, ...receta.ingredientes].join(" "));
+        return dondeBuscar.includes(texto)
+            &amp;&amp; (recetasCategoria.value === "" || receta.categoria === recetasCategoria.value)
+            &amp;&amp; receta.minutos &lt;= maximo
+            &amp;&amp; (!recetasVeggie.checked || receta.vegetariana)
+            &amp;&amp; (!recetasFavoritas.checked || favoritas.includes(receta.id));
+    });
+
+    recetasConteo.textContent = `${visibles.length} de ${recetas.length} recetas`;
+    recetasLista.innerHTML = visibles.map((receta) =&gt; {
+        const esFavorita = favoritas.includes(receta.id);
+        return `
+            &lt;article class="receta"&gt;
+                &lt;img src="${receta.imagen}" alt="${receta.nombre}" loading="lazy"&gt;
+                &lt;button type="button" class="receta-favorita" data-id="${receta.id}" aria-pressed="${esFavorita}" aria-label="Favorita"&gt;${esFavorita ? "❤️" : "🤍"}&lt;/button&gt;
+                &lt;h4&gt;${receta.nombre}&lt;/h4&gt;
+                &lt;p&gt;${receta.categoria} · ⏱ ${receta.minutos} min ${receta.vegetariana ? "· 🌱" : ""}&lt;/p&gt;
+                &lt;p class="receta-ingredientes"&gt;${receta.ingredientes.join(", ")}&lt;/p&gt;
+            &lt;/article&gt;
+        `;
+    }).join("") || `&lt;p&gt;Ninguna receta coincide. Prueba con otros filtros.&lt;/p&gt;`;
+}
+
+recetasLista.addEventListener("click", (evento) =&gt; {
+    const boton = evento.target.closest(".receta-favorita");
+    if (!boton) {
+        return;
+    }
+    const id = Number(boton.dataset.id);
+    if (favoritas.includes(id)) {
+        favoritas = favoritas.filter((f) =&gt; f !== id);
+    } else {
+        favoritas.push(id);
+    }
+    localStorage.setItem("recetas-favoritas", JSON.stringify(favoritas));
+    filtrar();
+});
+
+for (const control of [recetasBuscar, recetasCategoria, recetasTiempo, recetasVeggie, recetasFavoritas]) {
+    control.addEventListener("input", filtrar);
+}
+
+filtrar();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="ej-kanban" class="ejemplo">
+            <span class="etiqueta-ej">Ejemplo 18</span>
+            <h2>Tablero Kanban con arrastrar y soltar</h2>
+            <p>Tres columnas (Por hacer, En curso, Hecho). Las tarjetas se mueven <strong>arrastrándolas</strong> (API de drag &amp; drop de HTML5) o con las flechas, que también funcionan en celulares y con teclado. Cada tarjeta guarda en qué columna está y el tablero se conserva en <code>localStorage</code>.</p>
+            <div class="resultado">
+                <div class="kanban">
+                    <form id="kanban-form" class="kanban-form">
+                        <label for="kanban-texto">Nueva tarjeta</label>
+                        <input type="text" id="kanban-texto" placeholder="Ej.: Diseñar el logo" required maxlength="60">
+                        <button type="submit">Agregar</button>
+                    </form>
+                    <div id="kanban-tablero" class="kanban-tablero">
+                        <div class="kanban-columna" data-columna="pendiente">
+                            <h3>📋 Por hacer <span class="kanban-contador"></span></h3>
+                            <ul class="kanban-lista"></ul>
+                        </div>
+                        <div class="kanban-columna" data-columna="curso">
+                            <h3>🚧 En curso <span class="kanban-contador"></span></h3>
+                            <ul class="kanban-lista"></ul>
+                        </div>
+                        <div class="kanban-columna" data-columna="hecho">
+                            <h3>✅ Hecho <span class="kanban-contador"></span></h3>
+                            <ul class="kanban-lista"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="codigo">
+                <figure>
+                    <figcaption>HTML</figcaption>
+<pre>&lt;div class="kanban"&gt;
+    &lt;form id="kanban-form" class="kanban-form"&gt;
+        &lt;label for="kanban-texto"&gt;Nueva tarjeta&lt;/label&gt;
+        &lt;input type="text" id="kanban-texto" placeholder="Ej.: Diseñar el logo" required maxlength="60"&gt;
+        &lt;button type="submit"&gt;Agregar&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;div id="kanban-tablero" class="kanban-tablero"&gt;
+        &lt;div class="kanban-columna" data-columna="pendiente"&gt;
+            &lt;h3&gt;📋 Por hacer &lt;span class="kanban-contador"&gt;&lt;/span&gt;&lt;/h3&gt;
+            &lt;ul class="kanban-lista"&gt;&lt;/ul&gt;
+        &lt;/div&gt;
+        &lt;div class="kanban-columna" data-columna="curso"&gt;
+            &lt;h3&gt;🚧 En curso &lt;span class="kanban-contador"&gt;&lt;/span&gt;&lt;/h3&gt;
+            &lt;ul class="kanban-lista"&gt;&lt;/ul&gt;
+        &lt;/div&gt;
+        &lt;div class="kanban-columna" data-columna="hecho"&gt;
+            &lt;h3&gt;✅ Hecho &lt;span class="kanban-contador"&gt;&lt;/span&gt;&lt;/h3&gt;
+            &lt;ul class="kanban-lista"&gt;&lt;/ul&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </figure>
+                <figure>
+                    <figcaption>CSS</figcaption>
+<pre>.kanban-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.kanban-form input {
+    flex: 1;
+    min-width: 180px;
+}
+
+.kanban-tablero {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.kanban-columna {
+    min-height: 200px;
+    padding: 10px;
+    border: 2px dashed transparent;
+    border-radius: 12px;
+    background: #f1f5f9;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.kanban-columna.encima {
+    border-color: #f7df1e;
+    background: #fffbea;
+}
+
+.kanban-columna h3 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+}
+
+.kanban-contador {
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #1f2430;
+    color: #f7df1e;
+    font-size: 0.8rem;
+}
+
+.kanban-lista {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.kanban-tarjeta {
+    padding: 10px;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    cursor: grab;
+}
+
+.kanban-tarjeta.arrastrando {
+    opacity: 0.4;
+}
+
+.kanban-acciones {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+    margin-top: 6px;
+}
+
+.kanban-acciones button {
+    padding: 2px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff;
+    color: #1f2430;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.kanban-acciones button:disabled {
+    opacity: 0.3;
+    cursor: default;
+}</pre>
+                </figure>
+                <figure>
+                    <figcaption>JavaScript</figcaption>
+<pre>const kanbanForm = document.querySelector("#kanban-form");
+const kanbanTexto = document.querySelector("#kanban-texto");
+const kanbanTablero = document.querySelector("#kanban-tablero");
+const zonas = kanbanTablero.querySelectorAll(".kanban-columna");
+
+const columnas = ["pendiente", "curso", "hecho"];
+let tarjetas = JSON.parse(localStorage.getItem("kanban-app")) || [
+    { id: 1, texto: "Diseñar la portada", columna: "hecho" },
+    { id: 2, texto: "Conectar la API del clima", columna: "curso" },
+    { id: 3, texto: "Escribir los textos", columna: "pendiente" },
+    { id: 4, texto: "Publicar el proyecto", columna: "pendiente" }
+];
+
+function guardar() {
+    localStorage.setItem("kanban-app", JSON.stringify(tarjetas));
+}
+
+function crearTarjeta(tarjeta) {
+    const elemento = document.createElement("li");
+    elemento.className = "kanban-tarjeta";
+    elemento.draggable = true;
+    elemento.dataset.id = tarjeta.id;
+    elemento.innerHTML = `
+        &lt;span class="kanban-texto"&gt;&lt;/span&gt;
+        &lt;div class="kanban-acciones"&gt;
+            &lt;button type="button" class="kanban-izquierda" aria-label="Mover a la columna anterior"&gt;←&lt;/button&gt;
+            &lt;button type="button" class="kanban-borrar" aria-label="Borrar tarjeta"&gt;✕&lt;/button&gt;
+            &lt;button type="button" class="kanban-derecha" aria-label="Mover a la columna siguiente"&gt;→&lt;/button&gt;
+        &lt;/div&gt;
+    `;
+    elemento.querySelector(".kanban-texto").textContent = tarjeta.texto;
+    elemento.querySelector(".kanban-izquierda").disabled = tarjeta.columna === columnas[0];
+    elemento.querySelector(".kanban-derecha").disabled = tarjeta.columna === columnas[columnas.length - 1];
+    return elemento;
+}
+
+function pintar() {
+    for (const zona of zonas) {
+        const propias = tarjetas.filter((tarjeta) =&gt; tarjeta.columna === zona.dataset.columna);
+        const lista = zona.querySelector(".kanban-lista");
+        lista.innerHTML = "";
+        for (const tarjeta of propias) {
+            lista.append(crearTarjeta(tarjeta));
+        }
+        zona.querySelector(".kanban-contador").textContent = propias.length;
+    }
+}
+
+function moverA(id, columna) {
+    const tarjeta = tarjetas.find((t) =&gt; t.id === id);
+    if (tarjeta &amp;&amp; columnas.includes(columna)) {
+        tarjeta.columna = columna;
+        guardar();
+        pintar();
+    }
+}
+
+kanbanTablero.addEventListener("click", (evento) =&gt; {
+    const boton = evento.target.closest("button");
+    if (!boton) {
+        return;
+    }
+    const id = Number(boton.closest(".kanban-tarjeta").dataset.id);
+    const tarjeta = tarjetas.find((t) =&gt; t.id === id);
+    const posicion = columnas.indexOf(tarjeta.columna);
+    if (boton.classList.contains("kanban-borrar")) {
+        tarjetas = tarjetas.filter((t) =&gt; t.id !== id);
+        guardar();
+        pintar();
+    } else if (boton.classList.contains("kanban-izquierda")) {
+        moverA(id, columnas[posicion - 1]);
+    } else {
+        moverA(id, columnas[posicion + 1]);
+    }
+});
+
+kanbanTablero.addEventListener("dragstart", (evento) =&gt; {
+    const tarjeta = evento.target.closest(".kanban-tarjeta");
+    evento.dataTransfer.setData("text/plain", tarjeta.dataset.id);
+    tarjeta.classList.add("arrastrando");
+});
+
+kanbanTablero.addEventListener("dragend", (evento) =&gt; {
+    evento.target.classList.remove("arrastrando");
+});
+
+for (const zona of zonas) {
+    zona.addEventListener("dragover", (evento) =&gt; {
+        evento.preventDefault();
+        zona.classList.add("encima");
+    });
+    zona.addEventListener("dragleave", (evento) =&gt; {
+        if (!zona.contains(evento.relatedTarget)) {
+            zona.classList.remove("encima");
+        }
+    });
+    zona.addEventListener("drop", (evento) =&gt; {
+        evento.preventDefault();
+        zona.classList.remove("encima");
+        moverA(Number(evento.dataTransfer.getData("text/plain")), zona.dataset.columna);
+    });
+}
+
+kanbanForm.addEventListener("submit", (evento) =&gt; {
+    evento.preventDefault();
+    tarjetas.push({ id: Date.now(), texto: kanbanTexto.value.trim(), columna: "pendiente" });
+    guardar();
+    kanbanForm.reset();
+    pintar();
+});
+
+pintar();</pre>
+                </figure>
+            </div>
+        </section>
+
+        <section id="final" class="ejemplo teoria felicidades">
+            <h2>🎉 ¡Felicidades, terminaste el curso!</h2>
+            <p>Empezaste escribiendo tu primera etiqueta <code>&lt;h1&gt;</code> y hoy construyes relojes, juegos, carritos de compra y tableros que guardan datos y hablan con servidores reales. Eso es programar para la web.</p>
+            <p>¿Qué sigue? Elige una de estas mini aplicaciones y <strong>hazla tuya</strong>: cámbiale el diseño, agrégale una función (sonido al pomodoro, más preguntas al quiz que vengan de una API, un modo oscuro al kanban…) y publícala en tu portafolio. Cada proyecto que terminas vale más que diez tutoriales.</p>
+            <p><strong>¡Mucho éxito, y a seguir programando! 🚀</strong></p>
+        </section>
+    </main>
+
+    <footer class="leccion-pie">
+        <nav aria-label="Navegación de prácticas">
+            <a href="26-js-fetch-apis.html">Anterior: fetch y APIs</a> |
+            <a href="index.html">Índice</a>
+        </nav>
+    </footer>
+</body>
+</html>
