@@ -1,0 +1,451 @@
+.resultado [hidden] {
+    display: none !important;
+}
+
+.resultado :where(input, select, textarea, button) {
+    font: inherit;
+}
+
+.resultado :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: inherit;
+}
+
+.resultado :where(input, select, textarea):focus-visible {
+    border-color: #ca8a04;
+    outline: 3px solid #fde047;
+    outline-offset: 1px;
+}
+
+.resultado :where(button) {
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 8px;
+    background: #1f2430;
+    color: #f7df1e;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.resultado :where(button):focus-visible {
+    outline: 3px solid #ca8a04;
+    outline-offset: 2px;
+}
+
+.resultado :where(button:disabled) {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.resultado :where(button[type="reset"], .boton-secundario) {
+    background: #e2e8f0;
+    color: #1f2430;
+}
+
+.resultado :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+    accent-color: #ca8a04;
+}
+
+.formulario {
+    display: grid;
+    gap: 6px;
+    max-width: 480px;
+}
+
+.formulario label,
+.campo label {
+    font-weight: 600;
+}
+
+.formulario .opcion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 400;
+}
+
+.formulario fieldset {
+    display: grid;
+    gap: 4px;
+    margin: 8px 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.campo {
+    display: grid;
+    gap: 6px;
+    max-width: 480px;
+}
+
+.botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.ayuda {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.aviso {
+    margin: 8px 0 0;
+    color: #0f766e;
+    font-weight: 600;
+}
+
+.salida {
+    display: block;
+    min-height: 48px;
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #a6e3a1;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+}
+
+.con-boton {
+    display: flex;
+    gap: 6px;
+    max-width: 360px;
+}
+
+.con-boton button {
+    padding: 0 14px;
+    background: #e2e8f0;
+}
+
+
+.fila-agregar {
+    display: flex;
+    gap: 8px;
+    max-width: 480px;
+}
+
+.fila-agregar input[type="number"] {
+    width: 90px;
+}
+
+.lista-simple {
+    max-width: 480px;
+    padding-left: 0;
+    list-style: none;
+}
+
+.lista-simple li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 4px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.lista-simple li > :first-child {
+    flex: 1;
+}
+
+.lista-simple button {
+    padding: 4px 12px;
+    background: #e2e8f0;
+    color: #1f2430;
+}
+
+#ej-visitas .visitas strong {
+    color: #a16207;
+    font-size: 2rem;
+}
+
+#ej-session .comparar-almacen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    max-width: 480px;
+    margin-bottom: 12px;
+}
+
+#ej-session .comparar-almacen > div {
+    padding: 16px;
+    border-radius: 10px;
+    background: #fefce8;
+    text-align: center;
+}
+
+#ej-session .comparar-almacen p {
+    margin: 0;
+    font-family: "Courier New", monospace;
+}
+
+#ej-session .comparar-almacen strong {
+    font-size: 2.2rem;
+}
+
+#ej-preferencias .fila {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+#ej-preferencias .fila select {
+    width: auto;
+}
+
+#ej-preferencias .articulo {
+    max-width: 480px;
+    padding: 16px;
+    border-left: 4px solid #f7df1e;
+    background: #f8fafc;
+}
+
+#ej-preferencias .articulo h3 {
+    margin-top: 0;
+}
+
+#ej-cookies .sitio-falso {
+    position: relative;
+    min-height: 180px;
+    padding: 16px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+#ej-cookies .cookies-banner {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 10px;
+    background: #1f2430;
+    color: #f8fafc;
+}
+
+#ej-cookies .cookies-banner p {
+    flex: 1 1 220px;
+    margin: 0;
+}
+
+#ej-cookies .cookies-banner button {
+    background: #f7df1e;
+    color: #1f2430;
+}
+
+#ej-cookies .cookies-banner button + button {
+    background: transparent;
+    color: #f8fafc;
+    outline: 1px solid #64748b;
+}
+
+#ej-tareas .tarea label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#ej-tareas .tarea.hecha label {
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+#ej-carrito .tienda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+#ej-carrito .productos {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#ej-carrito .productos li {
+    display: grid;
+    grid-template-columns: 72px 1fr auto;
+    align-items: center;
+    gap: 10px;
+}
+
+#ej-carrito .productos img {
+    width: 72px;
+    height: 54px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+#ej-carrito .productos span {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#ej-carrito .productos strong {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+#ej-carrito .productos button {
+    grid-column: 3;
+    grid-row: 1 / 3;
+}
+
+#ej-carrito .carrito {
+    padding: 16px;
+    border-radius: 10px;
+    background: #fefce8;
+}
+
+#ej-carrito .carrito h3 {
+    margin-top: 0;
+}
+
+#ej-favoritos .recetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+}
+
+#ej-favoritos .receta {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+#ej-favoritos .receta img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+#ej-favoritos .receta h3 {
+    margin: 8px 12px 12px;
+    font-size: 1rem;
+}
+
+#ej-favoritos .corazon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #dc2626;
+    font-size: 1.3rem;
+}
+
+#ej-historial .catalogo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#ej-historial .catalogo button {
+    background: #f1f5f9;
+    color: #1f2430;
+    font-weight: 400;
+}
+
+#ej-record .juego,
+#ej-pomodoro .pomodoro {
+    max-width: 420px;
+    padding: 20px;
+    border-radius: 12px;
+    background: #1f2430;
+    color: #f8fafc;
+    text-align: center;
+}
+
+#ej-record .juego strong {
+    color: #f7df1e;
+}
+
+#ej-record .juego-boton {
+    width: 100%;
+    padding: 28px;
+    background: #f7df1e;
+    color: #1f2430;
+    font-size: 1.4rem;
+}
+
+#ej-record .aviso,
+#ej-pomodoro .aviso {
+    color: #a6e3a1;
+}
+
+#ej-pomodoro .pomo-reloj {
+    margin: 0;
+    color: #f7df1e;
+    font-family: "Courier New", monospace;
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+#ej-pomodoro .botones {
+    justify-content: center;
+}
+
+#ej-pomodoro button {
+    background: #f7df1e;
+    color: #1f2430;
+}
+
+#ej-borrar-todo .tabla-claves {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+#ej-borrar-todo .tabla-claves th,
+#ej-borrar-todo .tabla-claves td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    word-break: break-all;
+}
+
+#ej-borrar-todo .tabla-claves button {
+    padding: 4px 10px;
+    background: #e2e8f0;
+    color: #1f2430;
+}
+
+#ej-borrar-todo .peligro {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.tema-panel {
+    max-width: 420px;
+    padding: 20px;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #1f2430;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.tema-panel[data-tema="oscuro"] {
+    background: #0f172a;
+    color: #e2e8f0;
+}

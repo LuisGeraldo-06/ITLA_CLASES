@@ -1,0 +1,17 @@
+.teoria code,
+.ejemplo > p code {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: #fdf8d2;
+    color: #3d3500;
+}
+
+.resultado {
+    border-color: #f2e38a;
+    background: #fffdf0;
+}
+
+.consola {
+    max-height: 420px;
+    overflow: auto;
+}

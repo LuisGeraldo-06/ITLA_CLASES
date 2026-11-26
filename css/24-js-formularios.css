@@ -1,0 +1,345 @@
+.resultado [hidden] {
+    display: none !important;
+}
+
+.resultado :where(input, select, textarea, button) {
+    font: inherit;
+}
+
+.resultado :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), select, textarea) {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: inherit;
+}
+
+.resultado :where(input, select, textarea):focus-visible {
+    border-color: #ca8a04;
+    outline: 3px solid #fde047;
+    outline-offset: 1px;
+}
+
+.resultado :where(button) {
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 8px;
+    background: #1f2430;
+    color: #f7df1e;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.resultado :where(button):focus-visible {
+    outline: 3px solid #ca8a04;
+    outline-offset: 2px;
+}
+
+.resultado :where(button:disabled) {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.resultado :where(button[type="reset"], .boton-secundario) {
+    background: #e2e8f0;
+    color: #1f2430;
+}
+
+.resultado :where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+    accent-color: #ca8a04;
+}
+
+.formulario {
+    display: grid;
+    gap: 6px;
+    max-width: 480px;
+}
+
+.formulario label,
+.campo label {
+    font-weight: 600;
+}
+
+.formulario .opcion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 400;
+}
+
+.formulario fieldset {
+    display: grid;
+    gap: 4px;
+    margin: 8px 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.campo {
+    display: grid;
+    gap: 6px;
+    max-width: 480px;
+}
+
+.botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.ayuda {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.aviso {
+    margin: 8px 0 0;
+    color: #0f766e;
+    font-weight: 600;
+}
+
+.salida {
+    display: block;
+    min-height: 48px;
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #a6e3a1;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+}
+
+.con-boton {
+    display: flex;
+    gap: 6px;
+    max-width: 360px;
+}
+
+.con-boton button {
+    padding: 0 14px;
+    background: #e2e8f0;
+}
+
+#ej-arrastre .archivos-lista,
+#ej-buscador .directorio {
+    padding-left: 0;
+    list-style: none;
+}
+
+#ej-arrastre .archivos-lista li,
+#ej-buscador .directorio li {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+#ej-vista-previa .avatar-editor {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+}
+
+#ej-vista-previa img {
+    border: 4px solid #f7df1e;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+#ej-prestamo .resumen {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 16px;
+    max-width: 480px;
+    margin: 16px 0 0;
+    padding: 16px;
+    border-radius: 10px;
+    background: #fefce8;
+}
+
+#ej-prestamo dt {
+    color: #64748b;
+}
+
+#ej-prestamo dd {
+    margin: 0;
+    font-weight: 700;
+    text-align: right;
+}
+
+#ej-cotizador .cotizacion {
+    max-width: 480px;
+    margin-top: 12px;
+    padding: 16px;
+    border-radius: 10px;
+    background: #1f2430;
+    color: #f8fafc;
+}
+
+#ej-cotizador .cotizacion strong {
+    display: block;
+    color: #f7df1e;
+    font-size: 2rem;
+}
+
+#ej-tarjeta .tarjeta-vista {
+    display: grid;
+    gap: 10px;
+    max-width: 340px;
+    margin-bottom: 12px;
+    padding: 20px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #334155, #0f172a);
+    color: #f8fafc;
+    font-family: "Courier New", monospace;
+}
+
+#ej-tarjeta .tarjeta-vista[data-marca="visa"] {
+    background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+}
+
+#ej-tarjeta .tarjeta-vista[data-marca="mastercard"] {
+    background: linear-gradient(135deg, #ea580c, #7c2d12);
+}
+
+#ej-tarjeta .marca {
+    justify-self: end;
+    font-family: system-ui, sans-serif;
+    font-weight: 700;
+}
+
+#ej-tarjeta .vista-numero {
+    font-size: 1.3rem;
+    letter-spacing: 0.08em;
+}
+
+#ej-tarjeta .vista-pie {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+}
+
+#ej-tarjeta .fila {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+#ej-encuesta .escala {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+#ej-encuesta .progreso {
+    margin: 0;
+    color: #a16207;
+    font-weight: 700;
+}
+
+#ej-encuesta .resumen-tabla {
+    max-width: 480px;
+    margin-top: 16px;
+    border-collapse: collapse;
+}
+
+#ej-encuesta .resumen-tabla caption {
+    font-weight: 700;
+    text-align: left;
+}
+
+#ej-encuesta .resumen-tabla td {
+    padding: 6px 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+#ej-encuesta .resumen-tabla td:first-child {
+    font-weight: 600;
+}
+
+input[aria-invalid="true"] {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+.error {
+    min-height: 1.4em;
+    margin: 0;
+    color: #b91c1c;
+    font-size: 0.9rem;
+}
+
+.medidor {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.medidor-barra {
+    width: 0;
+    height: 100%;
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.reglas li.cumple {
+    color: #16a34a;
+    text-decoration: line-through;
+}
+
+.contador {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.9rem;
+    text-align: right;
+}
+
+.contador.cerca {
+    color: #d97706;
+}
+
+.contador.lleno {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.otp {
+    display: flex;
+    gap: 8px;
+}
+
+.otp .otp-digito {
+    width: 48px;
+    height: 56px;
+    padding: 0;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.zona-archivos {
+    display: grid;
+    justify-items: center;
+    padding: 24px 16px;
+    border: 2px dashed #94a3b8;
+    border-radius: 14px;
+    text-align: center;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.zona-archivos p {
+    margin: 0 0 8px;
+}
+
+.zona-archivos.arrastrando {
+    border-color: #ca8a04;
+    background: #fef9c3;
+}
+
+.zona-archivos.arrastrando * {
+    pointer-events: none;
+}

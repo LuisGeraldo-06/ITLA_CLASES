@@ -1,0 +1,12 @@
+.teoria td code,
+.ejemplo > p code {
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #fef9c3;
+    color: #323330;
+}
+
+.resultado .consola {
+    max-height: 460px;
+    overflow-y: auto;
+}

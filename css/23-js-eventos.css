@@ -1,0 +1,822 @@
+.leccion-contenido .resultado img {
+    max-width: 100%;
+    height: auto;
+}
+
+.leccion-contenido .resultado button {
+    font: inherit;
+}
+
+kbd {
+    padding: 1px 6px;
+    border: 1px solid #cbd5e1;
+    border-bottom-width: 3px;
+    border-radius: 4px;
+    background: #f8fafc;
+    color: #1f2430;
+    font-family: inherit;
+}
+
+.oculto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+#ej-hamburguesa .barra-sitio {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 380px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: #1f2430;
+}
+
+#ej-hamburguesa .logo-sitio {
+    color: #f7df1e;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+#ej-hamburguesa .boton-hamburguesa {
+    display: grid;
+    gap: 5px;
+    padding: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+#ej-hamburguesa .linea {
+    width: 26px;
+    height: 3px;
+    border-radius: 2px;
+    background: #ffffff;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+#ej-hamburguesa .boton-hamburguesa.activo .linea:nth-of-type(2) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+#ej-hamburguesa .boton-hamburguesa.activo .linea:nth-of-type(3) {
+    opacity: 0;
+}
+
+#ej-hamburguesa .boton-hamburguesa.activo .linea:nth-of-type(4) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+#ej-hamburguesa .menu-sitio {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    margin-top: 12px;
+}
+
+#ej-hamburguesa .menu-sitio.abierto {
+    display: flex;
+}
+
+#ej-hamburguesa .menu-sitio a {
+    padding: 10px 0;
+    border-top: 1px solid #374151;
+    color: #e5e7eb;
+    text-decoration: none;
+}
+
+#ej-contador .contador {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+#ej-contador .contador button {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: #f7df1e;
+    color: #1f2430;
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#ej-contador .contador button:disabled {
+    background: #e5e7eb;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+#ej-contador .contador output {
+    min-width: 40px;
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+#ej-contador .reiniciar {
+    padding: 6px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+#ej-evento .tarjeta-clic {
+    max-width: 280px;
+    padding: 10px;
+    border: 1px solid #dfe3ec;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+#ej-evento .tarjeta-clic:hover {
+    box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
+}
+
+#ej-evento .tarjeta-clic img {
+    display: block;
+    border-radius: 8px;
+}
+
+#ej-evento .tarjeta-clic h3 {
+    margin: 8px 0;
+}
+
+#ej-evento .tarjeta-clic-acciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#ej-evento .tarjeta-clic button {
+    padding: 4px 10px;
+    border: 1px solid #f43f5e;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #f43f5e;
+    cursor: pointer;
+}
+
+#ej-evento .tarjeta-clic button.marcado {
+    background: #f43f5e;
+    color: #ffffff;
+}
+
+#ej-evento .registro {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #1f2430;
+    color: #f7df1e;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+}
+
+#ej-me-gusta .post {
+    max-width: 400px;
+    overflow: hidden;
+    border: 1px solid #dfe3ec;
+    border-radius: 12px;
+}
+
+#ej-me-gusta .post-cabecera {
+    padding: 10px 12px;
+}
+
+#ej-me-gusta .post-foto {
+    position: relative;
+    user-select: none;
+}
+
+#ej-me-gusta .post-foto img {
+    display: block;
+}
+
+#ej-me-gusta .corazon-grande {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #ffffff;
+    font-size: 6rem;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#ej-me-gusta .corazon-grande.animar {
+    animation: latido 0.8s ease-out;
+}
+
+@keyframes latido {
+    0% { opacity: 0; transform: scale(0.4); }
+    30% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(1); }
+}
+
+#ej-me-gusta .post-acciones {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 12px;
+}
+
+#ej-me-gusta #boton-like {
+    border: none;
+    background: none;
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
+#ej-me-gusta #boton-like.activo {
+    color: #ef4444;
+}
+
+#ej-input .publicar {
+    display: grid;
+    gap: 6px;
+    max-width: 420px;
+}
+
+#ej-input .publicar label {
+    font-weight: 700;
+}
+
+#ej-input .publicar textarea,
+#ej-input .publicar select {
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: inherit;
+}
+
+#ej-input .contador-caracteres {
+    margin: 0;
+    color: #5b6275;
+    font-size: 0.85rem;
+    text-align: right;
+}
+
+#ej-input .contador-caracteres.casi-lleno {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+#ej-input .vista-previa {
+    padding: 10px 12px;
+    border-left: 4px solid #f7df1e;
+    background: #fffbea;
+    overflow-wrap: anywhere;
+}
+
+#ej-input .vista-previa p {
+    margin: 4px 0 0;
+}
+
+#ej-atajos .bandeja-correo {
+    max-width: 440px;
+}
+
+#ej-atajos .bandeja-correo input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: inherit;
+}
+
+#ej-atajos .bandeja-correo ul {
+    margin: 10px 0;
+    padding: 0;
+    list-style: none;
+}
+
+#ej-atajos .correo {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    border-left: 4px solid transparent;
+}
+
+#ej-atajos .correo.seleccionado {
+    border-left-color: #f7df1e;
+    background: #fffbea;
+    font-weight: 700;
+}
+
+#ej-atajos .ayuda-atajos {
+    color: #5b6275;
+    font-size: 0.85rem;
+}
+
+#ej-tooltip .grafico-ventas {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    height: 200px;
+    padding: 10px;
+    border-bottom: 2px solid #1f2430;
+}
+
+#ej-tooltip .barra-venta {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 4px;
+    border-radius: 6px 6px 0 0;
+    background: #fde047;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: crosshair;
+    transition: background 0.2s;
+}
+
+#ej-tooltip .barra-venta:hover {
+    background: #eab308;
+}
+
+#ej-tooltip .tooltip {
+    position: fixed;
+    z-index: 10;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: #1f2430;
+    color: #ffffff;
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+
+#ej-pestanas .pestanas-lista {
+    display: flex;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+#ej-pestanas .pestana {
+    margin-bottom: -2px;
+    padding: 10px 16px;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: none;
+    color: #5b6275;
+    cursor: pointer;
+}
+
+#ej-pestanas .pestana[aria-selected="true"] {
+    border-bottom-color: #f7df1e;
+    color: #1f2430;
+    font-weight: 700;
+}
+
+#ej-pestanas .panel-pestana {
+    padding: 4px 4px 0;
+}
+
+#ej-modal .modal-fondo {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgb(15 23 42 / 0.6);
+}
+
+#ej-modal .modal-fondo[hidden] {
+    display: none;
+}
+
+#ej-modal .modal {
+    max-width: 380px;
+    padding: 24px;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 20px 50px rgb(0 0 0 / 0.3);
+}
+
+#ej-modal .modal h3 {
+    margin-top: 0;
+}
+
+#ej-modal .modal button,
+#ej-modal .abrir-modal {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #f7df1e;
+    color: #1f2430;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#ej-acordeon .acordeon {
+    max-width: 480px;
+    border: 1px solid #dfe3ec;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+#ej-acordeon .acordeon h3 {
+    margin: 0;
+    border-top: 1px solid #dfe3ec;
+}
+
+#ej-acordeon .acordeon h3:first-child {
+    border-top: none;
+}
+
+#ej-acordeon .acordeon-pregunta {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    background: #ffffff;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+}
+
+#ej-acordeon .acordeon-pregunta::after {
+    content: "+";
+}
+
+#ej-acordeon .acordeon-pregunta[aria-expanded="true"] {
+    background: #fffbea;
+}
+
+#ej-acordeon .acordeon-pregunta[aria-expanded="true"]::after {
+    content: "−";
+}
+
+#ej-acordeon .acordeon-respuesta {
+    padding: 0 16px;
+    background: #fffbea;
+}
+
+#ej-acordeon .acordeon-respuesta p {
+    margin: 0;
+    padding-bottom: 14px;
+}
+
+#ej-dropdown .desplegable {
+    position: relative;
+    display: inline-block;
+}
+
+#ej-dropdown .desplegable > button {
+    padding: 8px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+#ej-dropdown .desplegable-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 5;
+    min-width: 180px;
+    margin: 0;
+    padding: 6px;
+    border: 1px solid #dfe3ec;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgb(0 0 0 / 0.12);
+    list-style: none;
+}
+
+#ej-dropdown .desplegable-menu a {
+    display: block;
+    padding: 8px 10px;
+    border-radius: 6px;
+    color: #1f2430;
+    text-decoration: none;
+}
+
+#ej-dropdown .desplegable-menu a:hover {
+    background: #fffbea;
+}
+
+#ej-carrito .tienda {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+#ej-carrito .tienda ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#ej-carrito .catalogo-carrito li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+#ej-carrito .agregar {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 6px;
+    background: #f7df1e;
+    color: #1f2430;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#ej-carrito .carrito {
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: #1f2430;
+    color: #e5e7eb;
+}
+
+#ej-carrito .carrito h3 {
+    margin-top: 0;
+    color: #f7df1e;
+}
+
+#ej-carrito .carrito li {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+#ej-carrito .quitar {
+    border: none;
+    background: none;
+    color: #fca5a5;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+#ej-tareas .tareas {
+    max-width: 440px;
+}
+
+#ej-tareas .form-tarea {
+    display: flex;
+    gap: 8px;
+}
+
+#ej-tareas .form-tarea input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: inherit;
+}
+
+#ej-tareas .form-tarea button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #1f2430;
+    color: #f7df1e;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#ej-tareas .lista-tareas {
+    padding: 0;
+    list-style: none;
+}
+
+#ej-tareas .tarea {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+#ej-tareas .tarea input {
+    accent-color: #16a34a;
+}
+
+#ej-tareas .tarea.hecha label {
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+#ej-tareas .tarea-borrar {
+    border: none;
+    background: none;
+    color: #dc2626;
+    cursor: pointer;
+}
+
+#ej-copiar .cupon {
+    display: grid;
+    gap: 8px;
+    max-width: 340px;
+    padding: 18px;
+    border: 2px dashed #eab308;
+    border-radius: 14px;
+    background: #fffbea;
+}
+
+#ej-copiar .cupon p {
+    margin: 0;
+    color: #5b6275;
+}
+
+#ej-copiar .cupon-fila {
+    display: flex;
+    gap: 8px;
+}
+
+#ej-copiar .cupon code {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+#ej-copiar #copiar-cupon {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #1f2430;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+#ej-copiar #copiar-cupon.copiado {
+    background: #16a34a;
+}
+
+#ej-copiar .cupon label {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+#ej-copiar .cupon input {
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: inherit;
+}
+
+#ej-slider .slider {
+    position: relative;
+    max-width: 480px;
+    border-radius: 12px;
+}
+
+#ej-slider .slider:focus-visible {
+    outline: 3px solid #f7df1e;
+    outline-offset: 4px;
+}
+
+#ej-slider .slider img {
+    display: block;
+    border-radius: 12px;
+}
+
+#ej-slider .slider-flecha {
+    position: absolute;
+    top: 105px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.85);
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+#ej-slider .slider-flecha.anterior {
+    left: 10px;
+}
+
+#ej-slider .slider-flecha.siguiente {
+    right: 10px;
+}
+
+#ej-slider .slider p {
+    margin: 8px 0 4px;
+    text-align: center;
+}
+
+#ej-slider .slider-puntos {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+#ej-slider .slider-puntos button {
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #cbd5e1;
+    cursor: pointer;
+}
+
+#ej-slider .slider-puntos button.activo {
+    background: #eab308;
+}
+
+#ej-scroll .lector {
+    max-width: 440px;
+    overflow: hidden;
+    border: 1px solid #dfe3ec;
+    border-radius: 12px;
+}
+
+#ej-scroll .lectura-progreso {
+    height: 6px;
+    background: #f1f5f9;
+}
+
+#ej-scroll .lectura-relleno {
+    width: 0;
+    height: 100%;
+    background: #eab308;
+}
+
+#ej-scroll .articulo-scroll {
+    height: 180px;
+    padding: 0 16px;
+    overflow-y: auto;
+}
+
+#ej-scroll .volver-arriba {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 15;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 999px;
+    background: #1f2430;
+    color: #f7df1e;
+    font-weight: 700;
+    box-shadow: 0 6px 16px rgb(0 0 0 / 0.25);
+    cursor: pointer;
+}
+
+#ej-resize .medidor {
+    padding: 20px;
+    border-radius: 12px;
+    background: #1f2430;
+    color: #e5e7eb;
+    text-align: center;
+}
+
+#ej-resize .medidor p {
+    margin: 4px 0;
+}
+
+#ej-resize .medidor-numeros {
+    color: #f7df1e;
+    font-family: "Courier New", monospace;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+#ej-una-vez .premios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+#ej-una-vez .premio {
+    padding: 16px;
+    border: 1px solid #dfe3ec;
+    border-radius: 12px;
+    text-align: center;
+}
+
+#ej-una-vez .premio button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 10px;
+    background: #f7df1e;
+    color: #1f2430;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#ej-una-vez .premio button.agotado {
+    background: #e5e7eb;
+    color: #94a3b8;
+    cursor: default;
+}
